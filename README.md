@@ -47,3 +47,7 @@ Handles communication with the selected LLM.
 
 ### evaluation.py
 Evaluates generated meal plans using quantitative and rule-based metrics.
+
+
+   ## Data
+   Nutrition data comes from USDA FoodData Central (Foundation + SR Legacy). Run `python fetch_data.py` to download it into `data/raw/`.
