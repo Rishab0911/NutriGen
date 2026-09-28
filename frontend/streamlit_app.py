@@ -1,6 +1,34 @@
 import streamlit as st
 
-st.title("NutriGen")
+
+def build_user_profile(
+    name,
+    age,
+    gender,
+    goal,
+    diet_type,
+    spice_level,
+    eats_mushrooms,
+    dietary_preferences,
+    allergies,
+    has_other_preferences,
+):
+    """Collect every form input into one dictionary."""
+    return {
+        "name": name,
+        "age": age,
+        "gender": gender,
+        "goal": goal,
+        "diet_type": diet_type,
+        "spice_level": spice_level,
+        "eats_mushrooms": eats_mushrooms,
+        "dietary_preferences": dietary_preferences,
+        "allergies": allergies,
+        "has_other_preferences": has_other_preferences,
+    }
+
+
+st.title(" NutriGen")
 st.write("Personalized Meal Planner")
 
 # Personal Information
@@ -41,6 +69,8 @@ spice_level = st.slider(
 )
 
 # Vegetarian-specific preference
+# None means "this question was not asked"
+eats_mushrooms = None
 if diet_type == "Vegetarian":
     eats_mushrooms = st.radio(
         "Do you eat mushrooms?",
@@ -65,6 +95,20 @@ has_other_preferences = st.checkbox(
 # Generate Meal Plan
 if st.button("Generate Meal Plan"):
     if name:
-        st.success(f"Welcome, {name}! Your meal plan is being generated.")
+        user_profile = build_user_profile(
+            name,
+            age,
+            gender,
+            goal,
+            diet_type,
+            spice_level,
+            eats_mushrooms,
+            dietary_preferences,
+            allergies,
+            has_other_preferences,
+        )
+        st.success(f"Welcome, {name}! Your profile has been saved.")
+        st.subheader("Your profile (for testing)")
+        st.json(user_profile)
     else:
         st.warning("Please enter your name first.")
