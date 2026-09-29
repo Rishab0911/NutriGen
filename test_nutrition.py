@@ -10,3 +10,4 @@ names = get_food_names()
 print()
 print("Kul food names:", len(names))
 print("First 5:", names[:5])
+
