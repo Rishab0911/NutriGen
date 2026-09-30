@@ -9,7 +9,7 @@ print(df[["calories", "protein", "fat", "carbs"]].isna().sum())
 print()
 
 all_missing = df[["calories", "protein", "fat", "carbs"]].isna().all(axis=1).sum()
-print("Rows jinme chaaron nutrients missing hain:", all_missing)
+print("rows that have all nutrients missing:", all_missing)
 print()
 print(df[["calories", "protein", "fat", "carbs"]].describe())
 
