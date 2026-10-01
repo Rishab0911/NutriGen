@@ -9,15 +9,30 @@ class UserProfile(BaseModel):
     age: int=Field(gt=0,lt=120)
     goal: str
     diet: str
+
+def calculate_calories(weight: float, goal: str):
+        base_calories = weight * 30
+
+        if goal == "weight loss":
+            return base_calories - 300
+
+        elif goal == "weight gain":
+            return base_calories + 300
+
+        else:
+            return base_calories
+
 @app.get("/")
 def home():
     return {"message": "NutriGen Backend is Running!"}
 
 @app.post("/generate-meal")
 def generate_meal(data: UserProfile):
+    daily_calories = calculate_calories(data.weight, data.goal)
     return {
         "status": "success",
         "message": "Dummy meal plan generated",
+        "daily_calories": daily_calories,
         "meal_plan": [
             {
                 "meal": "Breakfast",
@@ -35,6 +50,7 @@ def generate_meal(data: UserProfile):
                 "calories": 550
             }
         ]
+
     }
 
 @app.get("/health")
