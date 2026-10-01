@@ -4,7 +4,7 @@ from pydantic import BaseModel,Field
 app = FastAPI()
 app = FastAPI()
 
-class UserData(BaseModel):
+class UserProfile(BaseModel):
     weight: float=Field(gt=0)
     age: int=Field(gt=0,lt=120)
     goal: str
@@ -14,7 +14,7 @@ def home():
     return {"message": "NutriGen Backend is Running!"}
 
 @app.post("/generate-meal")
-def generate_meal(data: UserData):
+def generate_meal(data: UserProfile):
     return {
         "status": "success",
         "message": "Dummy meal plan generated",
