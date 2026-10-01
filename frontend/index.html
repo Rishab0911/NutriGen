@@ -3,177 +3,122 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NutriGen - Personalized Nutrition</title>
+
+  <title>NutriGen — Personalized Nutrition</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
 
-  <main class="app-container">
+  <!-- =====================================================
+       LANDING PAGE
+  ====================================================== -->
 
-    <!-- =====================================================
-         LANDING PAGE
-         ===================================================== -->
+  <div id="landing-page" class="landing-page">
 
-    <section class="landing-page" id="landing-page">
+    <header class="site-header">
 
-      <!-- HEADER -->
-      <header class="site-header">
+      <div class="brand">
+        <span class="brand-mark">N</span>
+        <span class="brand-name">NutriGen</span>
+      </div>
 
-        <div class="brand">
-          <span class="brand-name">NUTRIGEN</span>
-        </div>
+      <nav class="main-nav">
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How It Works</a>
 
-        <nav class="main-nav">
-          <a href="#features">Features</a>
-          <a href="#how-it-works">How It Works</a>
+        <button id="start-plan-button" class="nav-cta" type="button">
+          Build My Plan
+        </button>
+      </nav>
 
-          <button
-            type="button"
-            class="nav-cta"
-            id="start-plan-button"
-          >
-            Build My Plan
-          </button>
-        </nav>
+    </header>
 
-      </header>
 
+    <main>
 
       <!-- HERO -->
+
       <section class="hero-section">
 
         <div class="hero-content">
 
-          <span class="hero-eyebrow">
+          <p class="eyebrow">
             PERSONALIZED NUTRITION
-          </span>
+          </p>
 
           <h1>
-            Nutrition that fits
-            <span>your life.</span>
+            Nutrition that
+            <span>fits your life.</span>
           </h1>
 
           <p class="hero-description">
-            NutriGen creates a personalized nutrition experience based on
-            your goals, food preferences, dietary needs and the foods you
-            actually enjoy.
+            Build a personalized nutrition profile based on your goals,
+            food preferences, dietary needs, and lifestyle.
           </p>
 
-          <div class="hero-actions">
-
-            <button
-              type="button"
-              class="primary-cta"
-              id="hero-start-button"
-            >
-              Build My Plan
-              <span>→</span>
-            </button>
-
-            <a
-              href="#how-it-works"
-              class="secondary-cta"
-            >
-              See how it works
-            </a>
-
-          </div>
+          <button id="hero-start-button" class="primary-button" type="button">
+            Build My Plan
+            <span>→</span>
+          </button>
 
         </div>
 
 
-        <!-- HERO PREVIEW -->
-        <div class="hero-visual">
+        <div class="hero-preview">
 
-          <div class="plan-preview-card">
+          <div class="preview-card">
 
             <div class="preview-top">
+              <span>Today's plan</span>
+              <span class="preview-badge">Personalized</span>
+            </div>
+
+            <div class="meal-preview">
+
+              <div class="meal-icon">🥣</div>
 
               <div>
-                <span class="preview-label">
-                  YOUR DAY
-                </span>
-
-                <h3>
-                  Personalized Plan
-                </h3>
+                <strong>Breakfast</strong>
+                <p>Protein oats & berries</p>
               </div>
 
-              <span class="preview-status">
-                Tailored for you
-              </span>
+              <span>420 kcal</span>
 
             </div>
 
+            <div class="meal-preview">
 
-            <div class="preview-meal">
+              <div class="meal-icon">🥗</div>
 
-              <div class="meal-icon">
-                ☀️
+              <div>
+                <strong>Lunch</strong>
+                <p>Paneer grain bowl</p>
               </div>
 
-              <div class="meal-info">
-                <span>BREAKFAST</span>
-                <strong>Protein-rich breakfast</strong>
-                <small>Balanced & personalized</small>
-              </div>
-
-              <span class="meal-arrow">→</span>
+              <span>560 kcal</span>
 
             </div>
 
+            <div class="meal-preview">
 
-            <div class="preview-meal">
-
-              <div class="meal-icon">
-                🥗
-              </div>
-
-              <div class="meal-info">
-                <span>LUNCH</span>
-                <strong>Balanced lunch</strong>
-                <small>Built around your preferences</small>
-              </div>
-
-              <span class="meal-arrow">→</span>
-
-            </div>
-
-
-            <div class="preview-meal">
-
-              <div class="meal-icon">
-                🌙
-              </div>
-
-              <div class="meal-info">
-                <span>DINNER</span>
-                <strong>Nutritious dinner</strong>
-                <small>Matched to your goals</small>
-              </div>
-
-              <span class="meal-arrow">→</span>
-
-            </div>
-
-
-            <div class="preview-summary">
+              <div class="meal-icon">🍛</div>
 
               <div>
-                <span>Personalized</span>
-                <strong>For your goals</strong>
+                <strong>Dinner</strong>
+                <p>Vegetable tofu curry</p>
               </div>
 
-              <div>
-                <span>Preferences</span>
-                <strong>Included</strong>
-              </div>
-
-              <div>
-                <span>Restrictions</span>
-                <strong>Considered</strong>
-              </div>
+              <span>610 kcal</span>
 
             </div>
 
@@ -185,50 +130,44 @@
 
 
       <!-- VALUE STRIP -->
+
       <section class="value-strip">
 
-        <div class="value-item">
+        <div>
           <strong>Goal-based</strong>
-          <span>
-            Plans built around what you want to achieve
-          </span>
+          <span>Built around what you want to achieve</span>
         </div>
 
-        <div class="value-item">
+        <div>
           <strong>Preference-aware</strong>
-          <span>
-            Your food choices remain part of the plan
-          </span>
+          <span>Food choices that fit your lifestyle</span>
         </div>
 
-        <div class="value-item">
+        <div>
           <strong>Allergy-conscious</strong>
-          <span>
-            Important foods and restrictions are considered
-          </span>
+          <span>Restrictions are part of your profile</span>
         </div>
 
       </section>
 
 
       <!-- FEATURES -->
-      <section
-        class="features-section"
-        id="features"
-      >
 
-        <div class="section-intro">
+      <section id="features" class="content-section">
 
-          <span class="section-eyebrow">
+        <div class="section-heading">
+
+          <p class="eyebrow">
             WHY NUTRIGEN
-          </span>
+          </p>
 
           <h2>
-            More than a meal plan.
+            A plan built around you.
           </h2>
 
           <p>
-            Your nutrition should adapt to you—not the other way around.
+            Your nutrition profile brings together the information
+            needed to create a more personalized meal experience.
           </p>
 
         </div>
@@ -238,21 +177,13 @@
 
           <article class="feature-card">
 
-            <div class="feature-icon">
-              ◎
-            </div>
+            <div class="feature-number">01</div>
 
-            <span class="feature-number">
-              01
-            </span>
-
-            <h3>
-              Personalized Plans
-            </h3>
+            <h3>Personal Profile</h3>
 
             <p>
-              Your plan is shaped around your personal information,
-              goals and nutritional preferences.
+              Tell us about yourself, your age, height, gender,
+              and current body weight.
             </p>
 
           </article>
@@ -260,21 +191,13 @@
 
           <article class="feature-card">
 
-            <div class="feature-icon">
-              ↗
-            </div>
+            <div class="feature-number">02</div>
 
-            <span class="feature-number">
-              02
-            </span>
-
-            <h3>
-              Goal Focused
-            </h3>
+            <h3>Your Goals</h3>
 
             <p>
-              Whether you want to lose weight, gain weight or maintain
-              your current weight, your goal becomes part of the plan.
+              Select whether you want to lose, gain, or maintain
+              your weight and provide your target.
             </p>
 
           </article>
@@ -282,21 +205,13 @@
 
           <article class="feature-card">
 
-            <div class="feature-icon">
-              ◇
-            </div>
+            <div class="feature-number">03</div>
 
-            <span class="feature-number">
-              03
-            </span>
-
-            <h3>
-              Food That Fits You
-            </h3>
+            <h3>Food Preferences</h3>
 
             <p>
-              Tell us what you like, avoid or specifically want included.
-              Your preferences aren't an afterthought.
+              Choose your diet type, food preferences, and foods
+              you would like to include or avoid.
             </p>
 
           </article>
@@ -304,21 +219,13 @@
 
           <article class="feature-card">
 
-            <div class="feature-icon">
-              ✓
-            </div>
+            <div class="feature-number">04</div>
 
-            <span class="feature-number">
-              04
-            </span>
-
-            <h3>
-              Restrictions Considered
-            </h3>
+            <h3>Health & Restrictions</h3>
 
             <p>
-              Allergies and dietary restrictions can be included so
-              unsuitable foods can be accounted for.
+              Add allergies, dietary restrictions, and additional
+              information that matters to your nutrition plan.
             </p>
 
           </article>
@@ -329,1145 +236,985 @@
 
 
       <!-- HOW IT WORKS -->
-      <section
-        class="how-it-works-section"
-        id="how-it-works"
-      >
 
-        <div class="section-intro">
+      <section id="how-it-works" class="content-section how-section">
 
-          <span class="section-eyebrow">
+        <div class="section-heading">
+
+          <p class="eyebrow">
             HOW IT WORKS
-          </span>
+          </p>
 
           <h2>
-            Your plan starts with you.
+            Four simple steps.
           </h2>
-
-          <p>
-            A few simple steps give NutriGen the information it needs
-            to personalize your experience.
-          </p>
 
         </div>
 
 
         <div class="steps-grid">
 
-          <article class="process-step">
+          <div class="how-step">
+            <span>1</span>
+            <strong>About You</strong>
+            <p>Basic personal information.</p>
+          </div>
 
-            <span class="process-number">
-              01
-            </span>
+          <div class="how-step">
+            <span>2</span>
+            <strong>Your Goal</strong>
+            <p>Choose your nutrition goal.</p>
+          </div>
 
-            <h3>
-              Tell us about you
-            </h3>
+          <div class="how-step">
+            <span>3</span>
+            <strong>Food Preferences</strong>
+            <p>Tell us what you eat.</p>
+          </div>
 
-            <p>
-              Share a few basic details so we can understand who the
-              plan is being created for.
-            </p>
-
-          </article>
-
-
-          <article class="process-step">
-
-            <span class="process-number">
-              02
-            </span>
-
-            <h3>
-              Set your goal
-            </h3>
-
-            <p>
-              Choose what you want to achieve and provide your current
-              and target weight where relevant.
-            </p>
-
-          </article>
-
-
-          <article class="process-step">
-
-            <span class="process-number">
-              03
-            </span>
-
-            <h3>
-              Tell us what works
-            </h3>
-
-            <p>
-              Add your diet type, food preferences, specific foods,
-              allergies and dietary restrictions.
-            </p>
-
-          </article>
-
-
-          <article class="process-step">
-
-            <span class="process-number">
-              04
-            </span>
-
-            <h3>
-              Get your plan
-            </h3>
-
-            <p>
-              Your information becomes the foundation for a personalized
-              nutrition and meal-planning experience.
-            </p>
-
-          </article>
+          <div class="how-step">
+            <span>4</span>
+            <strong>Restrictions</strong>
+            <p>Tell us what to avoid.</p>
+          </div>
 
         </div>
 
 
-        <div class="how-it-works-cta">
+        <button
+          id="how-it-works-start-button"
+          class="primary-button"
+          type="button"
+        >
+          Start My Profile
+          <span>→</span>
+        </button>
+
+      </section>
+
+    </main>
+
+
+    <footer class="site-footer">
+      <span>© 2026 NutriGen</span>
+      <span>Personalized nutrition made simple.</span>
+    </footer>
+
+  </div>
+
+
+  <!-- =====================================================
+       PERSONALIZATION PAGE
+  ====================================================== -->
+
+  <div id="personalization-page" class="personalization-page hidden">
+
+    <header class="app-header">
+
+      <div class="brand">
+        <span class="brand-mark">N</span>
+        <span class="brand-name">NutriGen</span>
+      </div>
+
+      <button id="back-to-home" class="text-button" type="button">
+        ← Home
+      </button>
+
+    </header>
+
+
+    <div class="personalization-layout">
+
+
+      <!-- SIDEBAR -->
+
+      <aside class="form-sidebar">
+
+        <div class="sidebar-heading">
+
+          <p class="eyebrow">
+            YOUR PROFILE
+          </p>
+
+          <h2>Let's get to know you.</h2>
+
+          <p>
+            Complete each step to build your personalized profile.
+          </p>
+
+        </div>
+
+
+        <div class="sidebar-steps">
 
           <button
             type="button"
-            class="primary-cta"
-            id="how-it-works-start-button"
+            class="sidebar-step active"
+            data-step="1"
           >
-            Start Personalizing
-            <span>→</span>
+            <span class="sidebar-number">1</span>
+
+            <span class="sidebar-text">
+              <strong>About You</strong>
+              <small>Basic information</small>
+            </span>
+          </button>
+
+
+          <button
+            type="button"
+            class="sidebar-step"
+            data-step="2"
+          >
+            <span class="sidebar-number">2</span>
+
+            <span class="sidebar-text">
+              <strong>Your Goal</strong>
+              <small>Goals & weight</small>
+            </span>
+          </button>
+
+
+          <button
+            type="button"
+            class="sidebar-step"
+            data-step="3"
+          >
+            <span class="sidebar-number">3</span>
+
+            <span class="sidebar-text">
+              <strong>Food Preferences</strong>
+              <small>What you eat</small>
+            </span>
+          </button>
+
+
+          <button
+            type="button"
+            class="sidebar-step"
+            data-step="4"
+          >
+            <span class="sidebar-number">4</span>
+
+            <span class="sidebar-text">
+              <strong>Health & Restrictions</strong>
+              <small>Safety & details</small>
+            </span>
           </button>
 
         </div>
 
-      </section>
-
-    </section>
+      </aside>
 
 
+      <!-- FORM -->
 
-    <!-- =====================================================
-         PERSONALIZATION EXPERIENCE
-         ===================================================== -->
+      <main class="form-main">
 
-    <section
-      class="personalization-page hidden"
-      id="personalization-page"
-    >
+        <div class="progress-area">
 
-      <!-- APP HEADER -->
-      <header class="app-header">
+          <div class="progress-top">
 
-        <div class="brand">
-          <span class="brand-name">
-            NUTRIGEN
-          </span>
+            <span id="step-label">
+              Step 1 of 4
+            </span>
+
+            <span id="step-name">
+              About You
+            </span>
+
+          </div>
+
+          <div class="progress-bar">
+            <div id="progress-fill"></div>
+          </div>
+
         </div>
 
-        <h1>
-          Build your personalized nutrition plan.
-        </h1>
 
-        <p class="subtitle">
-          Tell us a little about yourself and we'll create meals
-          that fit your goals, preferences and lifestyle.
-        </p>
-
-      </header>
-
-
-
-      <!-- ===================================================
-           PERSONALIZATION LAYOUT
-           =================================================== -->
-
-      <div class="personalization-layout">
-
-
-        <!-- =================================================
-             SIDEBAR
-             ================================================= -->
-
-        <aside class="form-sidebar">
-
-          <div class="sidebar-header">
-
-            <span class="sidebar-label">
-              YOUR PLAN
-            </span>
-
-            <strong>
-              Personalization
-            </strong>
-
-          </div>
-
-
-          <div class="sidebar-steps">
-
-            <button
-              type="button"
-              class="sidebar-step active"
-              data-sidebar-step="1"
-            >
-
-              <span class="sidebar-step-number">
-                01
-              </span>
-
-              <span class="sidebar-step-content">
-
-                <strong>
-                  About You
-                </strong>
-
-                <small>
-                  Basic information
-                </small>
-
-              </span>
-
-            </button>
-
-
-            <button
-              type="button"
-              class="sidebar-step"
-              data-sidebar-step="2"
-            >
-
-              <span class="sidebar-step-number">
-                02
-              </span>
-
-              <span class="sidebar-step-content">
-
-                <strong>
-                  Your Goal
-                </strong>
-
-                <small>
-                  What you want to achieve
-                </small>
-
-              </span>
-
-            </button>
-
-
-            <button
-              type="button"
-              class="sidebar-step"
-              data-sidebar-step="3"
-            >
-
-              <span class="sidebar-step-number">
-                03
-              </span>
-
-              <span class="sidebar-step-content">
-
-                <strong>
-                  Food Preferences
-                </strong>
-
-                <small>
-                  What works for you
-                </small>
-
-              </span>
-
-            </button>
-
-
-            <button
-              type="button"
-              class="sidebar-step"
-              data-sidebar-step="4"
-            >
-
-              <span class="sidebar-step-number">
-                04
-              </span>
-
-              <span class="sidebar-step-content">
-
-                <strong>
-                  Health & Restrictions
-                </strong>
-
-                <small>
-                  Important considerations
-                </small>
-
-              </span>
-
-            </button>
-
-          </div>
-
-
-          <div class="sidebar-note">
-
-            <span>
-              ✦
-            </span>
-
-            <p>
-              Your answers help shape a nutrition experience
-              around your individual needs.
-            </p>
-
-          </div>
-
-        </aside>
-
-
-
-        <!-- =================================================
-             MAIN FORM AREA
-             ================================================= -->
-
-        <div class="form-main">
-
-
-          <!-- PROGRESS -->
-          <div class="progress-area">
-
-            <div class="progress-text">
-
-              <span id="step-label">
-                Step 1 of 4
-              </span>
-
-              <span id="step-name">
-                About You
-              </span>
-
-            </div>
-
-            <div class="progress-bar">
-
-              <div id="progress-fill"></div>
-
-            </div>
-
-          </div>
-
+        <form id="nutrition-form" novalidate>
 
 
           <!-- =================================================
-               FORM
-               ================================================= -->
+               SLIDE 1
+          ================================================== -->
 
-          <form id="nutrigen-form">
+          <section
+            class="form-slide active"
+            data-slide="1"
+          >
+
+            <div class="slide-heading">
+
+              <p class="eyebrow">
+                STEP 01
+              </p>
+
+              <h1>Tell us about yourself.</h1>
+
+              <p>
+                This helps us understand the basic information
+                behind your nutrition profile.
+              </p>
+
+            </div>
 
 
-            <!-- =================================================
-                 SLIDE 1
-                 ================================================= -->
+            <!-- NAME -->
 
-            <section
-              class="form-slide active"
-              id="slide-1"
-            >
+            <div class="form-group">
 
-              <div class="section-heading">
+              <label for="name">
+                Name
+              </label>
 
-                <span class="section-number">
-                  01
-                </span>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                placeholder="e.g. Tanush"
+                autocomplete="name"
+                required
+              />
 
-                <div>
+              <p class="field-error" id="name-error"></p>
 
-                  <h2>
-                    About You
-                  </h2>
+            </div>
 
-                  <p>
-                    Let's start with some basic information.
-                  </p>
 
-                </div>
+            <!-- AGE + HEIGHT -->
 
-              </div>
-
+            <div class="form-row">
 
               <div class="form-group">
 
-                <label for="name">
-                  What's your name?
+                <label for="age">
+                  Age
                 </label>
 
                 <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  placeholder="Enter your name"
-                  autocomplete="name"
+                  type="number"
+                  id="age"
+                  name="age"
+                  min="1"
+                  max="120"
+                  step="1"
+                  inputmode="numeric"
+                  placeholder="e.g. 20"
                   required
                 />
 
+                <p class="field-error" id="age-error"></p>
+
               </div>
 
 
-              <div class="form-row">
+              <div class="form-group">
 
-                <div class="form-group">
+                <label for="height">
+                  Height
+                </label>
 
-                  <label for="age">
-                    Age
-                  </label>
+                <div class="input-with-unit">
 
                   <input
                     type="number"
-                    id="age"
-                    name="age"
-                    min="1"
-                    max="120"
-                    placeholder="e.g. 20"
+                    id="height"
+                    name="height"
+                    min="50"
+                    max="250"
+                    step="0.1"
+                    inputmode="decimal"
+                    placeholder="e.g. 170"
                     required
                   />
 
-                </div>
-
-
-                <div class="form-group">
-
-                  <label>
-                    Gender
-                  </label>
-
-                  <div class="choice-group">
-
-                    <label class="choice-card">
-
-                      <input
-                        type="radio"
-                        name="gender"
-                        value="Male"
-                        checked
-                      />
-
-                      <span>
-                        Male
-                      </span>
-
-                    </label>
-
-
-                    <label class="choice-card">
-
-                      <input
-                        type="radio"
-                        name="gender"
-                        value="Female"
-                      />
-
-                      <span>
-                        Female
-                      </span>
-
-                    </label>
-
-
-                    <label class="choice-card">
-
-                      <input
-                        type="radio"
-                        name="gender"
-                        value="Other"
-                      />
-
-                      <span>
-                        Other
-                      </span>
-
-                    </label>
-
-                  </div>
+                  <span>cm</span>
 
                 </div>
 
-              </div>
-
-
-              <div class="navigation">
-
-                <button
-                  type="button"
-                  class="next-button"
-                  data-next="2"
-                >
-                  Continue
-                  <span>→</span>
-                </button>
+                <p class="field-error" id="height-error"></p>
 
               </div>
 
-            </section>
+            </div>
 
 
+            <!-- GENDER -->
 
-            <!-- =================================================
-                 SLIDE 2
-                 ================================================= -->
+            <div class="form-group">
 
-            <section
-              class="form-slide"
-              id="slide-2"
-            >
+              <label>
+                Gender
+              </label>
 
-              <div class="section-heading">
+              <div class="choice-group">
 
-                <span class="section-number">
-                  02
-                </span>
+                <label class="choice-card">
 
-                <div>
+                  <input
+                    type="radio"
+                    name="gender"
+                    value="Male"
+                    checked
+                  />
 
-                  <h2>
-                    Your Goal
-                  </h2>
+                  <span>Male</span>
 
-                  <p>
-                    Tell us what you want your nutrition plan to help
-                    you achieve.
-                  </p>
-
-                </div>
-
-              </div>
-
-
-              <div class="form-group">
-
-                <label>
-                  What is your main goal?
                 </label>
 
-                <div class="goal-options">
+
+                <label class="choice-card">
+
+                  <input
+                    type="radio"
+                    name="gender"
+                    value="Female"
+                  />
+
+                  <span>Female</span>
+
+                </label>
 
 
-                  <label class="goal-card">
+                <label class="choice-card">
 
-                    <input
-                      type="radio"
-                      name="goal"
-                      value="Weight Loss"
-                      checked
-                    />
+                  <input
+                    type="radio"
+                    name="gender"
+                    value="Other"
+                  />
 
-                    <div class="goal-content">
+                  <span>Other</span>
 
-                      <strong>
-                        Lose weight
-                      </strong>
-
-                      <span>
-                        Work toward a healthier lower weight.
-                      </span>
-
-                    </div>
-
-                  </label>
-
-
-                  <label class="goal-card">
-
-                    <input
-                      type="radio"
-                      name="goal"
-                      value="Weight Gain"
-                    />
-
-                    <div class="goal-content">
-
-                      <strong>
-                        Gain weight
-                      </strong>
-
-                      <span>
-                        Build toward a healthier higher weight.
-                      </span>
-
-                    </div>
-
-                  </label>
-
-
-                  <label class="goal-card">
-
-                    <input
-                      type="radio"
-                      name="goal"
-                      value="Maintain Weight"
-                    />
-
-                    <div class="goal-content">
-
-                      <strong>
-                        Maintain weight
-                      </strong>
-
-                      <span>
-                        Maintain your current weight with balanced meals.
-                      </span>
-
-                    </div>
-
-                  </label>
-
-                </div>
+                </label>
 
               </div>
 
-
-              <div class="form-row weight-row">
-
-                <div class="form-group">
-
-                  <label for="current-weight">
-                    Current weight
-                  </label>
-
-                  <div class="input-with-unit">
-
-                    <input
-                      type="number"
-                      id="current-weight"
-                      name="current_weight"
-                      min="20"
-                      max="300"
-                      step="0.1"
-                      inputmode="decimal"
-                      placeholder="e.g. 70"
-                      required
-                    />
-
-                    <span>
-                      kg
-                    </span>
-
-                  </div>
-
-                </div>
+            </div>
 
 
-                <div class="form-group">
+            <div class="navigation-buttons">
 
-                  <label for="target-weight">
-                    Target weight
-                  </label>
+              <button
+                type="button"
+                class="primary-button next-button"
+                data-next="2"
+              >
+                Continue
+                <span>→</span>
+              </button>
 
-                  <div class="input-with-unit">
+            </div>
 
-                    <input
-                      type="number"
-                      id="target-weight"
-                      name="target_weight"
-                      min="20"
-                      max="300"
-                      step="0.1"
-                      inputmode="decimal"
-                      placeholder="e.g. 65"
-                      required
-                    />
-
-                    <span>
-                      kg
-                    </span>
-
-                  </div>
-
-                </div>
-
-              </div>
+          </section>
 
 
-              <p class="helper-text">
-                Your target weight should match the goal you selected.
+          <!-- =================================================
+               SLIDE 2
+          ================================================== -->
+
+          <section
+            class="form-slide"
+            data-slide="2"
+          >
+
+            <div class="slide-heading">
+
+              <p class="eyebrow">
+                STEP 02
               </p>
 
+              <h1>What is your goal?</h1>
 
-              <div class="navigation">
+              <p>
+                Choose your main goal and provide your weight
+                information.
+              </p>
 
-                <button
-                  type="button"
-                  class="back-button"
-                  data-back="1"
-                >
-                  ← Back
-                </button>
+            </div>
 
-                <button
-                  type="button"
-                  class="next-button"
-                  data-next="3"
-                >
-                  Continue
-                  <span>→</span>
-                </button>
+
+            <!-- GOAL -->
+
+            <div class="form-group">
+
+              <label>
+                Primary goal
+              </label>
+
+              <div class="choice-group stacked-choice">
+
+                <label class="choice-card">
+
+                  <input
+                    type="radio"
+                    name="goal"
+                    value="Weight Loss"
+                    checked
+                  />
+
+                  <span>Weight Loss</span>
+
+                </label>
+
+
+                <label class="choice-card">
+
+                  <input
+                    type="radio"
+                    name="goal"
+                    value="Weight Gain"
+                  />
+
+                  <span>Weight Gain</span>
+
+                </label>
+
+
+                <label class="choice-card">
+
+                  <input
+                    type="radio"
+                    name="goal"
+                    value="Maintain Weight"
+                  />
+
+                  <span>Maintain Weight</span>
+
+                </label>
 
               </div>
 
-            </section>
+            </div>
 
 
+            <!-- WEIGHT -->
 
-            <!-- =================================================
-                 SLIDE 3
-                 ================================================= -->
+            <div class="form-row">
 
-            <section
-              class="form-slide"
-              id="slide-3"
-            >
+              <div class="form-group">
 
-              <div class="section-heading">
+                <label for="current-weight">
+                  Current weight
+                </label>
 
-                <span class="section-number">
-                  03
-                </span>
+                <div class="input-with-unit">
 
-                <div>
+                  <input
+                    type="number"
+                    id="current-weight"
+                    name="current_weight"
+                    min="20"
+                    max="300"
+                    step="0.1"
+                    inputmode="decimal"
+                    placeholder="e.g. 70"
+                    required
+                  />
 
-                  <h2>
-                    Food Preferences
-                  </h2>
-
-                  <p>
-                    Help us understand what works for you.
-                  </p>
+                  <span>kg</span>
 
                 </div>
+
+                <p class="field-error" id="current-weight-error"></p>
 
               </div>
 
 
               <div class="form-group">
 
-                <label>
-                  What type of diet do you follow?
+                <label for="target-weight">
+                  Target weight
                 </label>
 
-                <div class="choice-group large-choice">
+                <div class="input-with-unit">
 
+                  <input
+                    type="number"
+                    id="target-weight"
+                    name="target_weight"
+                    min="20"
+                    max="300"
+                    step="0.1"
+                    inputmode="decimal"
+                    placeholder="e.g. 65"
+                    required
+                  />
 
-                  <label class="choice-card">
-
-                    <input
-                      type="radio"
-                      name="diet_type"
-                      value="Vegetarian"
-                      checked
-                    />
-
-                    <span>
-                      Vegetarian
-                    </span>
-
-                  </label>
-
-
-                  <label class="choice-card">
-
-                    <input
-                      type="radio"
-                      name="diet_type"
-                      value="Non-Vegetarian"
-                    />
-
-                    <span>
-                      Non-Vegetarian
-                    </span>
-
-                  </label>
-
-
-                  <label class="choice-card">
-
-                    <input
-                      type="radio"
-                      name="diet_type"
-                      value="Vegan"
-                    />
-
-                    <span>
-                      Vegan
-                    </span>
-
-                  </label>
+                  <span>kg</span>
 
                 </div>
 
-              </div>
-
-
-              <div class="form-group">
-
-                <label>
-                  Are there foods you prefer or avoid?
-                </label>
-
-                <p class="field-description">
-                  Select anything that applies. You can also add something
-                  that isn't listed.
-                </p>
-
-
-                <div
-                  id="food-preferences"
-                  class="checkbox-group"
-                >
-
-                  <label class="check-card">
-
-                    <input
-                      type="checkbox"
-                      name="food_preferences"
-                      value="High Protein"
-                    />
-
-                    <span>
-                      High Protein
-                    </span>
-
-                  </label>
-
-
-                  <label class="check-card">
-
-                    <input
-                      type="checkbox"
-                      name="food_preferences"
-                      value="Low Carb"
-                    />
-
-                    <span>
-                      Low Carb
-                    </span>
-
-                  </label>
-
-
-                  <label class="check-card">
-
-                    <input
-                      type="checkbox"
-                      name="food_preferences"
-                      value="High Fiber"
-                    />
-
-                    <span>
-                      High Fiber
-                    </span>
-
-                  </label>
-
-
-                  <label class="check-card">
-
-                    <input
-                      type="checkbox"
-                      name="food_preferences"
-                      value="Low Fat"
-                    />
-
-                    <span>
-                      Low Fat
-                    </span>
-
-                  </label>
-
-
-                  <label class="check-card">
-
-                    <input
-                      type="checkbox"
-                      name="food_preferences"
-                      value="No Added Sugar"
-                    />
-
-                    <span>
-                      No Added Sugar
-                    </span>
-
-                  </label>
-
-
-                  <label class="check-card">
-
-                    <input
-                      type="checkbox"
-                      name="food_preferences"
-                      value="Dairy Free"
-                    />
-
-                    <span>
-                      Dairy Free
-                    </span>
-
-                  </label>
-
-                </div>
+                <p class="field-error" id="target-weight-error"></p>
 
               </div>
 
+            </div>
 
-              <div class="form-group">
 
-                <label
-                  for="other-food-preference"
-                  class="secondary-label"
-                >
-                  Something else?
-                </label>
+            <p class="helper-text">
+              Your target weight should match the goal you selected.
+            </p>
+
+
+            <!-- CALORIES -->
+
+            <div class="form-group calorie-group">
+
+              <label for="daily-calories">
+                Daily calorie target
+              </label>
+
+              <div class="input-with-unit">
 
                 <input
-                  type="text"
-                  id="other-food-preference"
-                  name="other_food_preference"
-                  placeholder="Tell us about another food preference..."
+                  type="number"
+                  id="daily-calories"
+                  name="daily_calories"
+                  min="1000"
+                  max="6000"
+                  step="50"
+                  inputmode="numeric"
+                  placeholder="e.g. 2200"
+                  required
                 />
+
+                <span>kcal</span>
+
+              </div>
+
+              <p class="field-description">
+                Enter the daily calorie target you want your plan to use.
+              </p>
+
+              <p class="field-error" id="calories-error"></p>
+
+            </div>
+
+
+            <div class="navigation-buttons">
+
+              <button
+                type="button"
+                class="secondary-button back-button"
+                data-back="1"
+              >
+                ← Back
+              </button>
+
+              <button
+                type="button"
+                class="primary-button next-button"
+                data-next="3"
+              >
+                Continue
+                <span>→</span>
+              </button>
+
+            </div>
+
+          </section>
+
+
+          <!-- =================================================
+               SLIDE 3
+          ================================================== -->
+
+          <section
+            class="form-slide"
+            data-slide="3"
+          >
+
+            <div class="slide-heading">
+
+              <p class="eyebrow">
+                STEP 03
+              </p>
+
+              <h1>What do you like to eat?</h1>
+
+              <p>
+                Choose your diet type and food preferences.
+              </p>
+
+            </div>
+
+
+            <!-- DIET TYPE -->
+
+            <div class="form-group">
+
+              <label>
+                Diet type
+              </label>
+
+              <div class="choice-group">
+
+                <label class="choice-card">
+
+                  <input
+                    type="radio"
+                    name="diet-type"
+                    value="Vegetarian"
+                    checked
+                  />
+
+                  <span>Vegetarian</span>
+
+                </label>
+
+
+                <label class="choice-card">
+
+                  <input
+                    type="radio"
+                    name="diet-type"
+                    value="Non-Vegetarian"
+                  />
+
+                  <span>Non-Vegetarian</span>
+
+                </label>
+
+
+                <label class="choice-card">
+
+                  <input
+                    type="radio"
+                    name="diet-type"
+                    value="Vegan"
+                  />
+
+                  <span>Vegan</span>
+
+                </label>
+
+              </div>
+
+              <p class="field-error" id="diet-type-error"></p>
+
+            </div>
+
+
+            <!-- FOOD PREFERENCES -->
+
+            <div class="form-group">
+
+              <label>
+                Food preferences
+              </label>
+
+              <div class="checkbox-grid">
+
+                <label class="check-card">
+                  <input
+                    type="checkbox"
+                    name="food-preferences"
+                    value="High Protein"
+                  />
+                  <span>High Protein</span>
+                </label>
+
+                <label class="check-card">
+                  <input
+                    type="checkbox"
+                    name="food-preferences"
+                    value="Low Carb"
+                  />
+                  <span>Low Carb</span>
+                </label>
+
+                <label class="check-card">
+                  <input
+                    type="checkbox"
+                    name="food-preferences"
+                    value="High Fiber"
+                  />
+                  <span>High Fiber</span>
+                </label>
+
+                <label class="check-card">
+                  <input
+                    type="checkbox"
+                    name="food-preferences"
+                    value="Low Fat"
+                  />
+                  <span>Low Fat</span>
+                </label>
+
+                <label class="check-card">
+                  <input
+                    type="checkbox"
+                    name="food-preferences"
+                    value="No Added Sugar"
+                  />
+                  <span>No Added Sugar</span>
+                </label>
+
+                <label class="check-card">
+                  <input
+                    type="checkbox"
+                    name="food-preferences"
+                    value="Dairy Free"
+                  />
+                  <span>Dairy Free</span>
+                </label>
+
+              </div>
+
+            </div>
+
+
+            <!-- OTHER PREFERENCE -->
+
+            <div class="form-group">
+
+              <label for="other-food-preference">
+                Other preference
+              </label>
+
+              <input
+                type="text"
+                id="other-food-preference"
+                name="other_food_preference"
+                placeholder="Anything else you prefer?"
+              />
+
+            </div>
+
+
+            <!-- INCLUDE / EXCLUDE -->
+
+            <div class="form-row">
+
+              <div class="form-group">
+
+                <label for="include-foods">
+                  Foods to include
+                </label>
+
+                <textarea
+                  id="include-foods"
+                  name="include_foods"
+                  rows="3"
+                  placeholder="e.g. paneer, mushrooms, tofu"
+                ></textarea>
 
               </div>
 
 
               <div class="form-group">
 
-                <label for="specific-foods">
-                  Are there specific foods you want included or excluded?
+                <label for="exclude-foods">
+                  Foods to avoid
                 </label>
 
-                <p class="field-description">
-                  For example, mushrooms, paneer, eggs, tofu, etc.
-                </p>
-
-                <input
-                  type="text"
-                  id="specific-foods"
-                  name="specific_foods"
-                  placeholder="e.g. I like mushrooms but avoid tofu"
-                />
+                <textarea
+                  id="exclude-foods"
+                  name="exclude_foods"
+                  rows="3"
+                  placeholder="e.g. very spicy foods"
+                ></textarea>
 
               </div>
 
+            </div>
 
-              <div class="navigation">
 
-                <button
-                  type="button"
-                  class="back-button"
-                  data-back="2"
-                >
-                  ← Back
-                </button>
+            <div class="navigation-buttons">
 
-                <button
-                  type="button"
-                  class="next-button"
-                  data-next="4"
-                >
-                  Continue
-                  <span>→</span>
-                </button>
+              <button
+                type="button"
+                class="secondary-button back-button"
+                data-back="2"
+              >
+                ← Back
+              </button>
+
+              <button
+                type="button"
+                class="primary-button next-button"
+                data-next="4"
+              >
+                Continue
+                <span>→</span>
+              </button>
+
+            </div>
+
+          </section>
+
+
+          <!-- =================================================
+               SLIDE 4
+          ================================================== -->
+
+          <section
+            class="form-slide"
+            data-slide="4"
+          >
+
+            <div class="slide-heading">
+
+              <p class="eyebrow">
+                STEP 04
+              </p>
+
+              <h1>Anything we should know?</h1>
+
+              <p>
+                Tell us whether you have allergies or dietary
+                restrictions so we can account for them.
+              </p>
+
+            </div>
+
+
+            <!-- YES / NO -->
+
+            <div class="form-group">
+
+              <label>
+                Do you have any food allergies or dietary restrictions?
+              </label>
+
+              <div class="choice-group restriction-choice">
+
+                <label class="choice-card">
+
+                  <input
+                    type="radio"
+                    name="has-restrictions"
+                    value="Yes"
+                  />
+
+                  <span>Yes</span>
+
+                </label>
+
+
+                <label class="choice-card">
+
+                  <input
+                    type="radio"
+                    name="has-restrictions"
+                    value="No"
+                  />
+
+                  <span>No</span>
+
+                </label>
 
               </div>
 
-            </section>
+              <p
+                class="field-error"
+                id="restriction-choice-error"
+              ></p>
+
+            </div>
 
 
+            <!-- RESTRICTION DETAILS -->
 
-            <!-- =================================================
-                 SLIDE 4
-                 ================================================= -->
-
-            <section
-              class="form-slide"
-              id="slide-4"
+            <div
+              id="restriction-details"
+              class="restriction-details hidden"
             >
 
-              <div class="section-heading">
+              <!-- ALLERGIES -->
 
-                <span class="section-number">
-                  04
-                </span>
+              <details class="expandable-section">
 
-                <div>
+                <summary>
+                  <span>Food allergies</span>
+                  <span>+</span>
+                </summary>
 
-                  <h2>
-                    Health & Restrictions
-                  </h2>
+                <div class="expandable-content">
 
-                  <p>
-                    These details help us avoid unsuitable meal suggestions.
-                  </p>
+                  <div class="checkbox-grid">
 
-                </div>
+                    <label class="check-card">
+                      <input
+                        type="checkbox"
+                        name="allergies"
+                        value="Milk"
+                      />
+                      <span>Milk</span>
+                    </label>
 
-              </div>
+                    <label class="check-card">
+                      <input
+                        type="checkbox"
+                        name="allergies"
+                        value="Eggs"
+                      />
+                      <span>Eggs</span>
+                    </label>
 
+                    <label class="check-card">
+                      <input
+                        type="checkbox"
+                        name="allergies"
+                        value="Peanuts"
+                      />
+                      <span>Peanuts</span>
+                    </label>
 
-              <!-- FOOD ALLERGIES -->
+                    <label class="check-card">
+                      <input
+                        type="checkbox"
+                        name="allergies"
+                        value="Tree Nuts"
+                      />
+                      <span>Tree Nuts</span>
+                    </label>
 
-              <div class="expandable-section">
+                    <label class="check-card">
+                      <input
+                        type="checkbox"
+                        name="allergies"
+                        value="Soy"
+                      />
+                      <span>Soy</span>
+                    </label>
 
-                <details>
+                    <label class="check-card">
+                      <input
+                        type="checkbox"
+                        name="allergies"
+                        value="Gluten"
+                      />
+                      <span>Gluten</span>
+                    </label>
 
-                  <summary>
+                    <label class="check-card">
+                      <input
+                        type="checkbox"
+                        name="allergies"
+                        value="Fish"
+                      />
+                      <span>Fish</span>
+                    </label>
 
-                    <span>
-                      Food allergies
-                    </span>
+                    <label class="check-card">
+                      <input
+                        type="checkbox"
+                        name="allergies"
+                        value="Shellfish"
+                      />
+                      <span>Shellfish</span>
+                    </label>
 
-                    <span class="summary-hint">
-                      Add if applicable
-                    </span>
-
-                  </summary>
-
-
-                  <div class="details-content">
-
-                    <p class="field-description">
-                      Select any foods you are allergic to.
-                    </p>
-
-
-                    <div
-                      id="allergies"
-                      class="checkbox-group"
-                    >
-
-                      <label class="check-card">
-
-                        <input
-                          type="checkbox"
-                          name="allergies"
-                          value="Milk"
-                        />
-
-                        <span>
-                          Milk
-                        </span>
-
-                      </label>
-
-
-                      <label class="check-card">
-
-                        <input
-                          type="checkbox"
-                          name="allergies"
-                          value="Eggs"
-                        />
-
-                        <span>
-                          Eggs
-                        </span>
-
-                      </label>
-
-
-                      <label class="check-card">
-
-                        <input
-                          type="checkbox"
-                          name="allergies"
-                          value="Peanuts"
-                        />
-
-                        <span>
-                          Peanuts
-                        </span>
-
-                      </label>
+                  </div>
 
 
-                      <label class="check-card">
+                  <div class="form-group">
 
-                        <input
-                          type="checkbox"
-                          name="allergies"
-                          value="Tree Nuts"
-                        />
-
-                        <span>
-                          Tree Nuts
-                        </span>
-
-                      </label>
-
-
-                      <label class="check-card">
-
-                        <input
-                          type="checkbox"
-                          name="allergies"
-                          value="Soy"
-                        />
-
-                        <span>
-                          Soy
-                        </span>
-
-                      </label>
-
-
-                      <label class="check-card">
-
-                        <input
-                          type="checkbox"
-                          name="allergies"
-                          value="Gluten"
-                        />
-
-                        <span>
-                          Gluten
-                        </span>
-
-                      </label>
-
-
-                      <label class="check-card">
-
-                        <input
-                          type="checkbox"
-                          name="allergies"
-                          value="Fish"
-                        />
-
-                        <span>
-                          Fish
-                        </span>
-
-                      </label>
-
-
-                      <label class="check-card">
-
-                        <input
-                          type="checkbox"
-                          name="allergies"
-                          value="Shellfish"
-                        />
-
-                        <span>
-                          Shellfish
-                        </span>
-
-                      </label>
-
-                    </div>
-
-
-                    <label
-                      for="other-allergy"
-                      class="secondary-label"
-                    >
-                      Allergy not listed?
+                    <label for="other-allergy">
+                      Other allergy
                     </label>
 
                     <input
@@ -1479,470 +1226,248 @@
 
                   </div>
 
-                </details>
+                </div>
 
-              </div>
-
+              </details>
 
 
               <!-- DIETARY RESTRICTIONS -->
 
-              <div class="expandable-section">
+              <details class="expandable-section">
 
-                <details>
+                <summary>
+                  <span>Dietary restrictions</span>
+                  <span>+</span>
+                </summary>
 
-                  <summary>
+                <div class="expandable-content">
 
-                    <span>
-                      Dietary restrictions
-                    </span>
+                  <div class="checkbox-grid">
 
-                    <span class="summary-hint">
-                      Add if applicable
-                    </span>
+                    <label class="check-card">
+                      <input
+                        type="checkbox"
+                        name="dietary-restrictions"
+                        value="Gluten Free"
+                      />
+                      <span>Gluten Free</span>
+                    </label>
 
-                  </summary>
+                    <label class="check-card">
+                      <input
+                        type="checkbox"
+                        name="dietary-restrictions"
+                        value="Dairy Free"
+                      />
+                      <span>Dairy Free</span>
+                    </label>
 
+                    <label class="check-card">
+                      <input
+                        type="checkbox"
+                        name="dietary-restrictions"
+                        value="No Added Sugar"
+                      />
+                      <span>No Added Sugar</span>
+                    </label>
 
-                  <div class="details-content">
+                    <label class="check-card">
+                      <input
+                        type="checkbox"
+                        name="dietary-restrictions"
+                        value="Low Sodium"
+                      />
+                      <span>Low Sodium</span>
+                    </label>
 
-                    <p class="field-description">
-                      Tell us about dietary restrictions that should be
-                      considered when creating your plan.
-                    </p>
-
-
-                    <div
-                      id="dietary-restrictions"
-                      class="checkbox-group"
-                    >
-
-                      <label class="check-card">
-
-                        <input
-                          type="checkbox"
-                          name="dietary_restrictions"
-                          value="Gluten Free"
-                        />
-
-                        <span>
-                          Gluten Free
-                        </span>
-
-                      </label>
-
-
-                      <label class="check-card">
-
-                        <input
-                          type="checkbox"
-                          name="dietary_restrictions"
-                          value="Dairy Free"
-                        />
-
-                        <span>
-                          Dairy Free
-                        </span>
-
-                      </label>
+                  </div>
 
 
-                      <label class="check-card">
+                  <div class="form-group">
 
-                        <input
-                          type="checkbox"
-                          name="dietary_restrictions"
-                          value="No Added Sugar"
-                        />
-
-                        <span>
-                          No Added Sugar
-                        </span>
-
-                      </label>
-
-
-                      <label class="check-card">
-
-                        <input
-                          type="checkbox"
-                          name="dietary_restrictions"
-                          value="Low Sodium"
-                        />
-
-                        <span>
-                          Low Sodium
-                        </span>
-
-                      </label>
-
-                    </div>
-
-
-                    <label
-                      for="other-restriction"
-                      class="secondary-label"
-                    >
-                      Something else?
+                    <label for="other-restriction">
+                      Other restriction
                     </label>
 
                     <input
                       type="text"
                       id="other-restriction"
                       name="other_restriction"
-                      placeholder="Enter another dietary restriction"
+                      placeholder="Enter another restriction"
                     />
 
                   </div>
 
-                </details>
+                </div>
 
-              </div>
+              </details>
 
-
-
-              <!-- ADDITIONAL NOTES -->
-
-              <div class="form-group">
-
-                <label for="additional-notes">
-                  Anything else we should know?
-                </label>
-
-                <p class="field-description">
-                  Share anything that could help us personalize your plan.
-                </p>
-
-                <textarea
-                  id="additional-notes"
-                  name="additional_notes"
-                  rows="4"
-                  placeholder="For example: foods you especially enjoy, foods you cannot eat, or anything else..."
-                ></textarea>
-
-              </div>
+            </div>
 
 
-              <div class="navigation">
+            <!-- NOTES -->
 
-                <button
-                  type="button"
-                  class="back-button"
-                  data-back="3"
-                >
-                  ← Back
-                </button>
+            <div class="form-group">
 
-                <button
-                  type="submit"
-                  class="generate-button"
-                >
-                  Generate My Plan
-                  <span>→</span>
-                </button>
+              <label for="additional-notes">
+                Additional notes
+              </label>
 
-              </div>
+              <textarea
+                id="additional-notes"
+                name="additional_notes"
+                rows="4"
+                placeholder="Anything else you'd like NutriGen to know?"
+              ></textarea>
 
-            </section>
-
-          </form>
-
-
-
-          <!-- MESSAGE -->
-
-          <div
-            id="message"
-            aria-live="polite"
-          ></div>
-
-
-
-          <!-- =================================================
-               PROFILE / RESULT
-               ================================================= -->
-
-          <section
-            id="profile-output"
-            class="hidden"
-          >
-
-            <div class="result-header">
-
-              <span class="result-label">
-                YOUR PROFILE
-              </span>
-
-              <h2>
-                Your Nutrition Profile
-              </h2>
-
-              <p>
-                Here's the information we'll use to personalize
-                your nutrition experience.
+              <p class="field-description">
+                Optional when you select No. If you select Yes,
+                your notes can also describe a restriction not listed above.
               </p>
 
             </div>
 
 
-            <div class="profile-summary-grid">
-
-              <div class="profile-summary-card">
-
-                <span>
-                  Goal
-                </span>
-
-                <strong id="result-goal">
-                  —
-                </strong>
-
-              </div>
+            <div
+              id="message"
+              class="message"
+              aria-live="polite"
+            ></div>
 
 
-              <div class="profile-summary-card">
+            <div class="navigation-buttons">
 
-                <span>
-                  Current Weight
-                </span>
+              <button
+                type="button"
+                class="secondary-button back-button"
+                data-back="3"
+              >
+                ← Back
+              </button>
 
-                <strong id="result-current-weight">
-                  —
-                </strong>
-
-              </div>
-
-
-              <div class="profile-summary-card">
-
-                <span>
-                  Target Weight
-                </span>
-
-                <strong id="result-target-weight">
-                  —
-                </strong>
-
-              </div>
-
-
-              <div class="profile-summary-card">
-
-                <span>
-                  Diet
-                </span>
-
-                <strong id="result-diet">
-                  —
-                </strong>
-
-              </div>
+              <button
+                type="submit"
+                class="primary-button"
+              >
+                Build My Profile
+                <span>→</span>
+              </button>
 
             </div>
-
-
-
-            <!-- MEAL PLAN PREVIEW -->
-
-            <div class="meal-plan-section">
-
-              <div class="meal-plan-header">
-
-                <div>
-
-                  <span class="result-label">
-                    PERSONALIZED MEAL PLAN
-                  </span>
-
-                  <h2>
-                    Your meals, built around you.
-                  </h2>
-
-                </div>
-
-              </div>
-
-
-              <div class="meal-plan-grid">
-
-
-                <article class="meal-card">
-
-                  <span class="meal-time">
-                    BREAKFAST
-                  </span>
-
-                  <h3>
-                    Your personalized breakfast
-                  </h3>
-
-                  <p>
-                    Your breakfast recommendation will appear here
-                    based on your profile.
-                  </p>
-
-                  <div class="meal-meta">
-
-                    <span>
-                      Calories —
-                    </span>
-
-                    <span>
-                      Protein —
-                    </span>
-
-                  </div>
-
-                </article>
-
-
-                <article class="meal-card">
-
-                  <span class="meal-time">
-                    LUNCH
-                  </span>
-
-                  <h3>
-                    Your personalized lunch
-                  </h3>
-
-                  <p>
-                    Your lunch recommendation will appear here
-                    based on your profile.
-                  </p>
-
-                  <div class="meal-meta">
-
-                    <span>
-                      Calories —
-                    </span>
-
-                    <span>
-                      Protein —
-                    </span>
-
-                  </div>
-
-                </article>
-
-
-                <article class="meal-card">
-
-                  <span class="meal-time">
-                    DINNER
-                  </span>
-
-                  <h3>
-                    Your personalized dinner
-                  </h3>
-
-                  <p>
-                    Your dinner recommendation will appear here
-                    based on your profile.
-                  </p>
-
-                  <div class="meal-meta">
-
-                    <span>
-                      Calories —
-                    </span>
-
-                    <span>
-                      Protein —
-                    </span>
-
-                  </div>
-
-                </article>
-
-
-                <article class="meal-card">
-
-                  <span class="meal-time">
-                    SNACK
-                  </span>
-
-                  <h3>
-                    Your personalized snack
-                  </h3>
-
-                  <p>
-                    Your snack recommendation will appear here
-                    based on your profile.
-                  </p>
-
-                  <div class="meal-meta">
-
-                    <span>
-                      Calories —
-                    </span>
-
-                    <span>
-                      Protein —
-                    </span>
-
-                  </div>
-
-                </article>
-
-              </div>
-
-            </div>
-
-
-
-            <!-- DEVELOPER DATA -->
-
-            <details class="developer-profile-data">
-
-              <summary>
-                View profile data
-              </summary>
-
-              <pre id="profile-json"></pre>
-
-            </details>
 
           </section>
 
-        </div>
-
-      </div>
-
-    </section>
+        </form>
 
 
+        <!-- =================================================
+             PROFILE OUTPUT
+        ================================================== -->
 
-    <!-- =====================================================
-         FOOTER
-         ===================================================== -->
+        <section
+          id="profile-output"
+          class="profile-output hidden"
+        >
+
+          <div class="success-icon">
+            ✓
+          </div>
+
+          <p class="eyebrow">
+            PROFILE READY
+          </p>
+
+          <h2>Your nutrition profile is ready.</h2>
+
+          <p>
+            Your information has been collected successfully.
+          </p>
+
+
+          <div class="profile-summary">
+
+            <div>
+              <span>Goal</span>
+              <strong id="output-goal">—</strong>
+            </div>
+
+            <div>
+              <span>Current Weight</span>
+              <strong id="output-current-weight">—</strong>
+            </div>
+
+            <div>
+              <span>Target Weight</span>
+              <strong id="output-target-weight">—</strong>
+            </div>
+
+            <div>
+              <span>Diet Type</span>
+              <strong id="output-diet">—</strong>
+            </div>
+
+            <div>
+              <span>Daily Calories</span>
+              <strong id="output-calories">—</strong>
+            </div>
+
+          </div>
+
+
+          <div class="meal-plan-preview">
+
+            <h3>Meal plan preview</h3>
+
+            <div class="meal-plan-grid">
+
+              <div class="meal-plan-card">
+                <span>Breakfast</span>
+                <strong>Personalized meal</strong>
+              </div>
+
+              <div class="meal-plan-card">
+                <span>Lunch</span>
+                <strong>Personalized meal</strong>
+              </div>
+
+              <div class="meal-plan-card">
+                <span>Dinner</span>
+                <strong>Personalized meal</strong>
+              </div>
+
+              <div class="meal-plan-card">
+                <span>Snack</span>
+                <strong>Personalized snack</strong>
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <details class="profile-json">
+
+            <summary>
+              View profile data
+            </summary>
+
+            <pre id="profile-json"></pre>
+
+          </details>
+
+        </section>
+
+      </main>
+
+    </div>
+
 
     <footer class="site-footer">
-
-      <div class="footer-brand">
-
-        <span class="brand-name">
-          NUTRIGEN
-        </span>
-
-        <p>
-          Personalized nutrition, built around you.
-        </p>
-
-      </div>
-
-
-      <div class="footer-note">
-
-        NutriGen is designed for general nutrition and wellness
-        planning. It is not a substitute for professional medical
-        or dietary advice.
-
-      </div>
-
+      <span>© 2026 NutriGen</span>
+      <span>Your preferences. Your goals. Your plan.</span>
     </footer>
 
-  </main>
+  </div>
 
 
   <script src="script.js"></script>

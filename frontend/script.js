@@ -1,843 +1,1342 @@
-/* =========================================================
-   NUTRIGEN
-   Frontend JavaScript
-   Day 4 - Multi-Step Form + Sidebar
-   ========================================================= */
-
-
 document.addEventListener("DOMContentLoaded", () => {
 
+  // =========================================================
+  // PAGE ELEMENTS
+  // =========================================================
 
-  /* =======================================================
-     ELEMENTS
-     ======================================================= */
+  const landingPage = document.getElementById("landing-page");
+  const personalizationPage = document.getElementById(
+    "personalization-page"
+  );
 
-  const landingPage =
-    document.getElementById("landing-page");
+  const form = document.getElementById("nutrition-form");
+  const profileOutput = document.getElementById("profile-output");
+  const messageBox = document.getElementById("message");
 
-  const personalizationPage =
-    document.getElementById("personalization-page");
+  const slides = document.querySelectorAll(".form-slide");
+  const sidebarSteps = document.querySelectorAll(".sidebar-step");
 
-  const form =
-    document.getElementById("nutrigen-form");
+  const nextButtons = document.querySelectorAll(".next-button");
+  const backButtons = document.querySelectorAll(".back-button");
 
-  const slides =
-    Array.from(document.querySelectorAll(".form-slide"));
+  const stepLabel = document.getElementById("step-label");
+  const stepName = document.getElementById("step-name");
+  const progressFill = document.getElementById("progress-fill");
 
-  const sidebarSteps =
-    Array.from(document.querySelectorAll(".sidebar-step"));
+  const restrictionDetails =
+    document.getElementById("restriction-details");
 
-  const progressFill =
-    document.getElementById("progress-fill");
+  const stepNames = [
+    "About You",
+    "Your Goal",
+    "Food Preferences",
+    "Health & Restrictions"
+  ];
 
-  const stepLabel =
-    document.getElementById("step-label");
-
-  const stepName =
-    document.getElementById("step-name");
-
-  const message =
-    document.getElementById("message");
-
-  const profileOutput =
-    document.getElementById("profile-output");
+  let currentStep = 1;
 
 
-  /* =======================================================
-     START BUTTONS
-     ======================================================= */
+  // =========================================================
+  // LANDING PAGE BUTTONS
+  // =========================================================
 
   const startButtons = [
     document.getElementById("start-plan-button"),
     document.getElementById("hero-start-button"),
     document.getElementById("how-it-works-start-button")
-  ].filter(Boolean);
+  ];
+
+  function openPersonalization() {
+    landingPage.classList.add("hidden");
+    personalizationPage.classList.remove("hidden");
+
+    showSlide(1);
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  }
+
+  startButtons.forEach((button) => {
+    if (button) {
+      button.addEventListener("click", openPersonalization);
+    }
+  });
 
 
-  /* =======================================================
-     STEP INFORMATION
-     ======================================================= */
+  // =========================================================
+  // BACK TO HOME
+  // =========================================================
 
-  const stepNames = {
-    1: "About You",
-    2: "Your Goal",
-    3: "Food Preferences",
-    4: "Health & Restrictions"
-  };
+  const backToHome = document.getElementById("back-to-home");
+
+  if (backToHome) {
+    backToHome.addEventListener("click", () => {
+
+      personalizationPage.classList.add("hidden");
+      landingPage.classList.remove("hidden");
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+
+    });
+  }
 
 
-  let currentStep = 1;
+  // =========================================================
+  // SHOW SLIDE
+  // =========================================================
 
+  function showSlide(step) {
 
-  /* =======================================================
-     CONTROLLED SCROLLING
-     
-     IMPORTANT PROJECT REQUIREMENT:
-     Every Continue, Back and Sidebar navigation must
-     automatically scroll to the newly opened slide.
-     ======================================================= */
-
-  function scrollToElement(element, offset = 30) {
-
-    if (!element) {
+    if (step < 1 || step > slides.length) {
       return;
     }
 
+    currentStep = step;
+
+    slides.forEach((slide) => {
+
+      const slideNumber =
+        Number(slide.dataset.slide);
+
+      slide.classList.toggle(
+        "active",
+        slideNumber === step
+      );
+
+    });
+
+
+    sidebarSteps.forEach((sidebarStep) => {
+
+      const stepNumber =
+        Number(sidebarStep.dataset.step);
+
+      sidebarStep.classList.toggle(
+        "active",
+        stepNumber === step
+      );
+
+      sidebarStep.classList.toggle(
+        "completed",
+        stepNumber < step
+      );
+
+    });
+
+
+    if (stepLabel) {
+      stepLabel.textContent =
+        `Step ${step} of ${slides.length}`;
+    }
+
+
+    if (stepName) {
+      stepName.textContent =
+        stepNames[step - 1];
+    }
+
+
+    if (progressFill) {
+      progressFill.style.width =
+        `${(step / slides.length) * 100}%`;
+    }
+
+
+    clearMessage();
+
+
+    // =======================================================
+    // ALWAYS SCROLL TO THE FORM TOP
+    // =======================================================
+
     requestAnimationFrame(() => {
 
-      requestAnimationFrame(() => {
+      const formMain =
+        document.querySelector(".form-main");
 
-        const elementTop =
-          element.getBoundingClientRect().top +
+      if (formMain) {
+
+        const top =
+          formMain.getBoundingClientRect().top +
           window.scrollY -
-          offset;
+          20;
 
         window.scrollTo({
-          top: Math.max(0, elementTop),
+          top,
           behavior: "smooth"
         });
 
-      });
+      }
 
     });
 
   }
 
 
-  /* =======================================================
-     OPEN PERSONALIZATION
-     ======================================================= */
+  // =========================================================
+  // ERROR HELPERS
+  // =========================================================
 
-  function openPersonalization() {
+  function showFieldError(
+    input,
+    errorElement,
+    message
+  ) {
 
-    landingPage.classList.add("hidden");
+    if (input) {
+      input.classList.add("input-error");
+    }
 
-    personalizationPage.classList.remove("hidden");
+    if (errorElement) {
 
-    currentStep = 1;
+      errorElement.textContent =
+        message;
 
-    showStep(1, false);
+      errorElement.classList.add("show");
+    }
 
-    scrollToElement(personalizationPage, 20);
   }
 
 
-  startButtons.forEach((button) => {
+  function clearFieldError(
+    input,
+    errorElement
+  ) {
 
-    button.addEventListener(
-      "click",
-      openPersonalization
+    if (input) {
+      input.classList.remove("input-error");
+    }
+
+    if (errorElement) {
+
+      errorElement.textContent = "";
+
+      errorElement.classList.remove(
+        "show"
+      );
+
+    }
+
+  }
+
+
+  function clearMessage() {
+
+    if (messageBox) {
+
+      messageBox.textContent = "";
+
+      messageBox.classList.remove(
+        "show"
+      );
+
+    }
+
+  }
+
+
+  function showMessage(message) {
+
+    if (messageBox) {
+
+      messageBox.textContent =
+        message;
+
+      messageBox.classList.add(
+        "show"
+      );
+
+    }
+
+  }
+
+
+  // =========================================================
+  // SLIDE 1 VALIDATION
+  // =========================================================
+
+  function validateSlide1() {
+
+    let valid = true;
+
+    const name =
+      document.getElementById("name");
+
+    const age =
+      document.getElementById("age");
+
+    const height =
+      document.getElementById("height");
+
+    const nameError =
+      document.getElementById("name-error");
+
+    const ageError =
+      document.getElementById("age-error");
+
+    const heightError =
+      document.getElementById("height-error");
+
+
+    clearFieldError(
+      name,
+      nameError
+    );
+
+    clearFieldError(
+      age,
+      ageError
+    );
+
+    clearFieldError(
+      height,
+      heightError
+    );
+
+
+    // NAME
+
+    const nameValue =
+      name.value.trim();
+
+    if (!nameValue) {
+
+      showFieldError(
+        name,
+        nameError,
+        "Please enter your name."
+      );
+
+      valid = false;
+
+    } else if (nameValue.length < 2) {
+
+      showFieldError(
+        name,
+        nameError,
+        "Name should contain at least 2 characters."
+      );
+
+      valid = false;
+    }
+
+
+    // AGE
+
+    const ageValue =
+      Number(age.value);
+
+    if (!age.value) {
+
+      showFieldError(
+        age,
+        ageError,
+        "Please enter your age."
+      );
+
+      valid = false;
+
+    } else if (
+      !Number.isInteger(ageValue) ||
+      ageValue < 1 ||
+      ageValue > 120
+    ) {
+
+      showFieldError(
+        age,
+        ageError,
+        "Age must be between 1 and 120 years."
+      );
+
+      valid = false;
+    }
+
+
+    // HEIGHT
+
+    const heightValue =
+      Number(height.value);
+
+    if (!height.value) {
+
+      showFieldError(
+        height,
+        heightError,
+        "Please enter your height."
+      );
+
+      valid = false;
+
+    } else if (
+      heightValue < 50 ||
+      heightValue > 250
+    ) {
+
+      showFieldError(
+        height,
+        heightError,
+        "Height must be between 50 and 250 cm."
+      );
+
+      valid = false;
+    }
+
+
+    return valid;
+  }
+
+
+  // =========================================================
+  // SLIDE 2 VALIDATION
+  // =========================================================
+
+  function validateSlide2() {
+
+    let valid = true;
+
+    const currentWeight =
+      document.getElementById(
+        "current-weight"
+      );
+
+    const targetWeight =
+      document.getElementById(
+        "target-weight"
+      );
+
+    const calories =
+      document.getElementById(
+        "daily-calories"
+      );
+
+
+    const currentWeightError =
+      document.getElementById(
+        "current-weight-error"
+      );
+
+    const targetWeightError =
+      document.getElementById(
+        "target-weight-error"
+      );
+
+    const caloriesError =
+      document.getElementById(
+        "calories-error"
+      );
+
+
+    clearFieldError(
+      currentWeight,
+      currentWeightError
+    );
+
+    clearFieldError(
+      targetWeight,
+      targetWeightError
+    );
+
+    clearFieldError(
+      calories,
+      caloriesError
+    );
+
+
+    const currentValue =
+      Number(currentWeight.value);
+
+    const targetValue =
+      Number(targetWeight.value);
+
+    const caloriesValue =
+      Number(calories.value);
+
+
+    // CURRENT WEIGHT
+
+    if (!currentWeight.value) {
+
+      showFieldError(
+        currentWeight,
+        currentWeightError,
+        "Please enter your current weight."
+      );
+
+      valid = false;
+
+    } else if (
+      currentValue < 20 ||
+      currentValue > 300
+    ) {
+
+      showFieldError(
+        currentWeight,
+        currentWeightError,
+        "Current weight must be between 20 and 300 kg."
+      );
+
+      valid = false;
+    }
+
+
+    // TARGET WEIGHT
+
+    if (!targetWeight.value) {
+
+      showFieldError(
+        targetWeight,
+        targetWeightError,
+        "Please enter your target weight."
+      );
+
+      valid = false;
+
+    } else if (
+      targetValue < 20 ||
+      targetValue > 300
+    ) {
+
+      showFieldError(
+        targetWeight,
+        targetWeightError,
+        "Target weight must be between 20 and 300 kg."
+      );
+
+      valid = false;
+    }
+
+
+    // GOAL CONSISTENCY
+
+    const selectedGoal =
+      document.querySelector(
+        'input[name="goal"]:checked'
+      );
+
+    const goal =
+      selectedGoal
+        ? selectedGoal.value
+        : "";
+
+
+    if (
+      currentWeight.value &&
+      targetWeight.value &&
+      currentValue >= 20 &&
+      currentValue <= 300 &&
+      targetValue >= 20 &&
+      targetValue <= 300
+    ) {
+
+      if (
+        goal === "Weight Loss" &&
+        targetValue >= currentValue
+      ) {
+
+        showFieldError(
+          targetWeight,
+          targetWeightError,
+          "For Weight Loss, target weight must be lower than current weight."
+        );
+
+        valid = false;
+      }
+
+
+      if (
+        goal === "Weight Gain" &&
+        targetValue <= currentValue
+      ) {
+
+        showFieldError(
+          targetWeight,
+          targetWeightError,
+          "For Weight Gain, target weight must be higher than current weight."
+        );
+
+        valid = false;
+      }
+
+
+      if (
+        goal === "Maintain Weight" &&
+        targetValue !== currentValue
+      ) {
+
+        showFieldError(
+          targetWeight,
+          targetWeightError,
+          "For Maintain Weight, target weight must match current weight."
+        );
+
+        valid = false;
+      }
+
+    }
+
+
+    // CALORIES
+
+    if (!calories.value) {
+
+      showFieldError(
+        calories,
+        caloriesError,
+        "Please enter your daily calorie target."
+      );
+
+      valid = false;
+
+    } else if (
+      caloriesValue < 1000 ||
+      caloriesValue > 6000
+    ) {
+
+      showFieldError(
+        calories,
+        caloriesError,
+        "Daily calories must be between 1000 and 6000 kcal."
+      );
+
+      valid = false;
+    }
+
+
+    return valid;
+  }
+
+
+  // =========================================================
+  // SLIDE 3 VALIDATION
+  // =========================================================
+
+  function validateSlide3() {
+
+    const dietType =
+      document.querySelector(
+        'input[name="diet-type"]:checked'
+      );
+
+    const dietError =
+      document.getElementById(
+        "diet-type-error"
+      );
+
+
+    if (dietError) {
+
+      dietError.textContent = "";
+
+      dietError.classList.remove(
+        "show"
+      );
+
+    }
+
+
+    if (!dietType) {
+
+      if (dietError) {
+
+        dietError.textContent =
+          "Please select a diet type before continuing.";
+
+        dietError.classList.add(
+          "show"
+        );
+
+      }
+
+      return false;
+    }
+
+
+    return true;
+  }
+
+
+  // =========================================================
+  // SLIDE 4 — SHOW / HIDE DETAILS
+  // =========================================================
+
+  function updateRestrictionDetails() {
+
+    const selected =
+      document.querySelector(
+        'input[name="has-restrictions"]:checked'
+      );
+
+    if (!restrictionDetails) {
+      return;
+    }
+
+
+    if (
+      selected &&
+      selected.value === "Yes"
+    ) {
+
+      restrictionDetails.classList.remove(
+        "hidden"
+      );
+
+    } else {
+
+      restrictionDetails.classList.add(
+        "hidden"
+      );
+
+    }
+
+  }
+
+
+  // =========================================================
+  // CLEAR RESTRICTION DETAILS
+  // =========================================================
+
+  function clearRestrictionDetails() {
+
+    document
+      .querySelectorAll(
+        'input[name="allergies"], input[name="dietary-restrictions"]'
+      )
+      .forEach((input) => {
+        input.checked = false;
+      });
+
+
+    const otherAllergy =
+      document.getElementById(
+        "other-allergy"
+      );
+
+    const otherRestriction =
+      document.getElementById(
+        "other-restriction"
+      );
+
+
+    if (otherAllergy) {
+      otherAllergy.value = "";
+    }
+
+    if (otherRestriction) {
+      otherRestriction.value = "";
+    }
+
+
+    document
+      .querySelectorAll(
+        ".expandable-section"
+      )
+      .forEach((section) => {
+        section.removeAttribute("open");
+      });
+
+  }
+
+
+  // =========================================================
+  // SLIDE 4 VALIDATION
+  // =========================================================
+
+  function validateSlide4() {
+
+    const restrictionChoice =
+      document.querySelector(
+        'input[name="has-restrictions"]:checked'
+      );
+
+    const restrictionError =
+      document.getElementById(
+        "restriction-choice-error"
+      );
+
+
+    if (restrictionError) {
+
+      restrictionError.textContent = "";
+
+      restrictionError.classList.remove(
+        "show"
+      );
+
+    }
+
+
+    // USER MUST ANSWER YES OR NO
+
+    if (!restrictionChoice) {
+
+      if (restrictionError) {
+
+        restrictionError.textContent =
+          "Please select Yes or No before generating your plan.";
+
+        restrictionError.classList.add(
+          "show"
+        );
+
+      }
+
+      showMessage(
+        "Please answer the allergies and dietary restrictions question before generating your profile."
+      );
+
+      return false;
+    }
+
+
+    // NO = VALID
+
+    if (
+      restrictionChoice.value === "No"
+    ) {
+
+      return true;
+    }
+
+
+    // YES = REQUIRE DETAILS
+
+    const allergies =
+      document.querySelectorAll(
+        'input[name="allergies"]:checked'
+      );
+
+    const restrictions =
+      document.querySelectorAll(
+        'input[name="dietary-restrictions"]:checked'
+      );
+
+
+    const otherAllergy =
+      document
+        .getElementById("other-allergy")
+        .value
+        .trim();
+
+
+    const otherRestriction =
+      document
+        .getElementById("other-restriction")
+        .value
+        .trim();
+
+
+    const additionalNotes =
+      document
+        .getElementById("additional-notes")
+        .value
+        .trim();
+
+
+    const hasRestriction =
+      allergies.length > 0 ||
+      restrictions.length > 0 ||
+      otherAllergy !== "" ||
+      otherRestriction !== "" ||
+      additionalNotes !== "";
+
+
+    if (!hasRestriction) {
+
+      if (restrictionError) {
+
+        restrictionError.textContent =
+          "You selected Yes, so please add at least one allergy, dietary restriction, or note.";
+
+        restrictionError.classList.add(
+          "show"
+        );
+
+      }
+
+      showMessage(
+        "Please provide at least one restriction or additional detail before generating your profile."
+      );
+
+      return false;
+    }
+
+
+    return true;
+  }
+
+
+  // =========================================================
+  // VALIDATE CURRENT STEP
+  // =========================================================
+
+  function validateStep(step) {
+
+    if (step === 1) {
+      return validateSlide1();
+    }
+
+    if (step === 2) {
+      return validateSlide2();
+    }
+
+    if (step === 3) {
+      return validateSlide3();
+    }
+
+    if (step === 4) {
+      return validateSlide4();
+    }
+
+    return true;
+  }
+
+
+  // =========================================================
+  // NEXT BUTTONS
+  // =========================================================
+
+  nextButtons.forEach((button) => {
+
+    button.addEventListener("click", () => {
+
+      const nextStep =
+        Number(button.dataset.next);
+
+
+      if (!validateStep(currentStep)) {
+        return;
+      }
+
+
+      if (nextStep) {
+        showSlide(nextStep);
+      }
+
+    });
+
+  });
+
+
+  // =========================================================
+  // BACK BUTTONS
+  // =========================================================
+
+  backButtons.forEach((button) => {
+
+    button.addEventListener("click", () => {
+
+      const backStep =
+        Number(button.dataset.back);
+
+
+      if (backStep) {
+        showSlide(backStep);
+      }
+
+    });
+
+  });
+
+
+  // =========================================================
+  // SIDEBAR NAVIGATION
+  // =========================================================
+
+  sidebarSteps.forEach((button) => {
+
+    button.addEventListener("click", () => {
+
+      const requestedStep =
+        Number(button.dataset.step);
+
+
+      // BACKWARDS = ALWAYS ALLOWED
+
+      if (
+        requestedStep < currentStep
+      ) {
+
+        showSlide(requestedStep);
+        return;
+
+      }
+
+
+      // SAME STEP
+
+      if (
+        requestedStep === currentStep
+      ) {
+
+        showSlide(requestedStep);
+        return;
+
+      }
+
+
+      // FORWARD = VALIDATE EACH PREVIOUS STEP
+
+      for (
+        let step = currentStep;
+        step < requestedStep;
+        step++
+      ) {
+
+        if (!validateStep(step)) {
+
+          showSlide(step);
+          return;
+
+        }
+
+      }
+
+
+      showSlide(requestedStep);
+
+    });
+
+  });
+
+
+  // =========================================================
+  // ENTER KEY NAVIGATION
+  // =========================================================
+
+  document.addEventListener(
+    "keydown",
+    (event) => {
+
+      if (event.key !== "Enter") {
+        return;
+      }
+
+
+      if (
+        personalizationPage.classList.contains(
+          "hidden"
+        )
+      ) {
+        return;
+      }
+
+
+      const activeElement =
+        document.activeElement;
+
+
+      // TEXTAREA → NORMAL NEW LINE
+
+      if (
+        activeElement &&
+        activeElement.tagName === "TEXTAREA"
+      ) {
+        return;
+      }
+
+
+      // BUTTON → DON'T INTERFERE
+
+      if (
+        activeElement &&
+        activeElement.tagName === "BUTTON"
+      ) {
+        return;
+      }
+
+
+      event.preventDefault();
+
+
+      if (!validateStep(currentStep)) {
+        return;
+      }
+
+
+      if (
+        currentStep < slides.length
+      ) {
+
+        showSlide(
+          currentStep + 1
+        );
+
+      } else {
+
+        submitProfile();
+
+      }
+
+    }
+  );
+
+
+  // =========================================================
+  // PREVENT NUMBER INPUT MOUSE-WHEEL CHANGES
+  // =========================================================
+
+  const numberInputs =
+    document.querySelectorAll(
+      'input[type="number"]'
+    );
+
+
+  numberInputs.forEach((input) => {
+
+    input.addEventListener(
+      "wheel",
+      (event) => {
+
+        if (
+          document.activeElement === input
+        ) {
+
+          event.preventDefault();
+
+        }
+
+      },
+      {
+        passive: false
+      }
     );
 
   });
 
 
-  /* =======================================================
-     SHOW STEP
-     ======================================================= */
+  // =========================================================
+  // RADIO / CHECKBOX HELPERS
+  // =========================================================
 
-  function showStep(
-    step,
-    shouldScroll = true
-  ) {
+  function getRadioValue(name) {
 
-    if (
-      step < 1 ||
-      step > slides.length
-    ) {
-      return;
-    }
-
-
-    currentStep = step;
-
-
-    /* -----------------------------------------------
-       Activate correct slide
-       ----------------------------------------------- */
-
-    slides.forEach((slide, index) => {
-
-      const isActive =
-        index + 1 === step;
-
-      slide.classList.toggle(
-        "active",
-        isActive
+    const selected =
+      document.querySelector(
+        `input[name="${name}"]:checked`
       );
 
-    });
 
-
-    /* -----------------------------------------------
-       Progress text
-       ----------------------------------------------- */
-
-    stepLabel.textContent =
-      `Step ${step} of ${slides.length}`;
-
-    stepName.textContent =
-      stepNames[step];
-
-
-    /* -----------------------------------------------
-       Progress bar
-       ----------------------------------------------- */
-
-    const percentage =
-      (step / slides.length) * 100;
-
-    progressFill.style.width =
-      `${percentage}%`;
-
-
-    /* -----------------------------------------------
-       Sidebar
-       ----------------------------------------------- */
-
-    updateSidebar(step);
-
-
-    /* -----------------------------------------------
-       Clear previous messages
-       ----------------------------------------------- */
-
-    clearMessage();
-
-
-    /* -----------------------------------------------
-       AUTOMATIC SCROLL
-       ----------------------------------------------- */
-
-    if (shouldScroll) {
-
-      const selectedSlide =
-        slides[step - 1];
-
-      scrollToElement(
-        selectedSlide,
-        30
-      );
-
-    }
+    return selected
+      ? selected.value
+      : "";
 
   }
 
 
-  /* =======================================================
-     SIDEBAR STATE
-     ======================================================= */
+  function getCheckedValues(name) {
 
-  function updateSidebar(step) {
-
-    sidebarSteps.forEach((sidebarStep) => {
-
-      const number =
-        Number(
-          sidebarStep.dataset.sidebarStep
-        );
-
-
-      sidebarStep.classList.remove(
-        "active",
-        "completed"
-      );
-
-
-      if (number === step) {
-
-        sidebarStep.classList.add(
-          "active"
-        );
-
-      }
-
-
-      if (number < step) {
-
-        sidebarStep.classList.add(
-          "completed"
-        );
-
-      }
-
-    });
+    return Array.from(
+      document.querySelectorAll(
+        `input[name="${name}"]:checked`
+      )
+    ).map(
+      (input) => input.value
+    );
 
   }
 
 
-  /* =======================================================
-     VALIDATE STEP
-     ======================================================= */
+  // =========================================================
+  // BUILD PROFILE
+  // =========================================================
 
-  function validateStep(step) {
+  function buildUserProfile() {
 
-    clearMessage();
-
-
-    /* =====================================================
-       STEP 1
-       ===================================================== */
-
-    if (step === 1) {
-
-      const name =
-        document.getElementById("name");
-
-      const age =
-        document.getElementById("age");
-
-
-      if (!name.value.trim()) {
-
-        showMessage(
-          "Please enter your name.",
-          "error"
-        );
-
-        name.focus();
-
-        return false;
-      }
-
-
-      const ageValue =
-        Number(age.value);
-
-
-      if (
-        !age.value ||
-        ageValue < 1 ||
-        ageValue > 120
-      ) {
-
-        showMessage(
-          "Please enter a valid age between 1 and 120.",
-          "error"
-        );
-
-        age.focus();
-
-        return false;
-      }
-
-    }
-
-
-    /* =====================================================
-       STEP 2
-       ===================================================== */
-
-    if (step === 2) {
-
-      const currentWeight =
-        document.getElementById(
-          "current-weight"
-        );
-
-      const targetWeight =
-        document.getElementById(
-          "target-weight"
-        );
-
-
-      const current =
-        Number(currentWeight.value);
-
-      const target =
-        Number(targetWeight.value);
-
-
-      /* Current weight */
-
-      if (
-        !currentWeight.value ||
-        current < 20 ||
-        current > 300
-      ) {
-
-        showMessage(
-          "Please enter a valid current weight between 20 and 300 kg.",
-          "error"
-        );
-
-        currentWeight.focus();
-
-        return false;
-      }
-
-
-      /* Target weight */
-
-      if (
-        !targetWeight.value ||
-        target < 20 ||
-        target > 300
-      ) {
-
-        showMessage(
-          "Please enter a valid target weight between 20 and 300 kg.",
-          "error"
-        );
-
-        targetWeight.focus();
-
-        return false;
-      }
-
-
-      /* Goal */
-
-      const selectedGoal =
-        document.querySelector(
-          'input[name="goal"]:checked'
-        );
-
-
-      if (!selectedGoal) {
-
-        showMessage(
-          "Please select your goal.",
-          "error"
-        );
-
-        return false;
-      }
-
-
-      const goal =
-        selectedGoal.value;
-
-
-      /* Weight loss */
-
-      if (
-        goal === "Weight Loss" &&
-        target >= current
-      ) {
-
-        showMessage(
-          "For weight loss, your target weight should be lower than your current weight.",
-          "error"
-        );
-
-        targetWeight.focus();
-
-        return false;
-      }
-
-
-      /* Weight gain */
-
-      if (
-        goal === "Weight Gain" &&
-        target <= current
-      ) {
-
-        showMessage(
-          "For weight gain, your target weight should be higher than your current weight.",
-          "error"
-        );
-
-        targetWeight.focus();
-
-        return false;
-      }
-
-
-      /* Maintain */
-
-      if (
-        goal === "Maintain Weight" &&
-        target !== current
-      ) {
-
-        showMessage(
-          "For maintaining weight, your target weight should match your current weight.",
-          "error"
-        );
-
-        targetWeight.focus();
-
-        return false;
-      }
-
-    }
-
-
-    /* =====================================================
-       STEP 3
-       ===================================================== */
-
-    if (step === 3) {
-
-      const selectedDiet =
-        document.querySelector(
-          'input[name="diet_type"]:checked'
-        );
-
-
-      if (!selectedDiet) {
-
-        showMessage(
-          "Please select your diet type.",
-          "error"
-        );
-
-        return false;
-      }
-
-    }
-
-
-    /* =====================================================
-       STEP 4
-       ===================================================== */
-
-    if (step === 4) {
-
-      /*
-       * All current Step 4 fields are optional.
-       *
-       * No blocking validation is required.
-       */
-
-    }
-
-
-    return true;
-
-  }
-
-
-  /* =======================================================
-     CONTINUE BUTTONS
-     ======================================================= */
-
-  document
-    .querySelectorAll(".next-button")
-    .forEach((button) => {
-
-      button.addEventListener(
-        "click",
-        () => {
-
-          const nextStep =
-            Number(button.dataset.next);
-
-
-          if (
-            !validateStep(currentStep)
-          ) {
-            return;
-          }
-
-
-          showStep(
-            nextStep,
-            true
-          );
-
-        }
-      );
-
-    });
-
-
-  /* =======================================================
-     BACK BUTTONS
-     ======================================================= */
-
-  document
-    .querySelectorAll(".back-button")
-    .forEach((button) => {
-
-      button.addEventListener(
-        "click",
-        () => {
-
-          const previousStep =
-            Number(button.dataset.back);
-
-
-          showStep(
-            previousStep,
-            true
-          );
-
-        }
-      );
-
-    });
-
-
-  /* =======================================================
-     SIDEBAR NAVIGATION
-     ======================================================= */
-
-  sidebarSteps.forEach(
-    (sidebarStep) => {
-
-      sidebarStep.addEventListener(
-        "click",
-        () => {
-
-          const requestedStep =
-            Number(
-              sidebarStep.dataset.sidebarStep
-            );
-
-
-          /* Already on this step */
-
-          if (
-            requestedStep === currentStep
-          ) {
-            return;
-          }
-
-
-          /* ---------------------------------------------
-             Going backward
-             --------------------------------------------- */
-
-          if (
-            requestedStep < currentStep
-          ) {
-
-            showStep(
-              requestedStep,
-              true
-            );
-
-            return;
-          }
-
-
-          /* ---------------------------------------------
-             Going forward
-             Validate every step in between.
-             --------------------------------------------- */
-
-          let stepToValidate =
-            currentStep;
-
-
-          while (
-            stepToValidate < requestedStep
-          ) {
-
-            if (
-              !validateStep(
-                stepToValidate
-              )
-            ) {
-
-              return;
-
-            }
-
-
-            stepToValidate++;
-
-          }
-
-
-          showStep(
-            requestedStep,
-            true
-          );
-
-        }
-      );
-
-    }
-  );
-
-
-  /* =======================================================
-     FORM SUBMISSION
-     ======================================================= */
-
-  form.addEventListener(
-    "submit",
-    (event) => {
-
-      event.preventDefault();
-
-
-      if (!validateStep(4)) {
-        return;
-      }
-
-
-      const profile =
-        collectProfileData();
-
-
-      displayProfile(profile);
-
-
-      profileOutput.classList.remove(
-        "hidden"
-      );
-
-
-      /* Automatically scroll to result */
-
-      scrollToElement(
-        profileOutput,
-        30
-      );
-
-    }
-  );
-
-
-  /* =======================================================
-     COLLECT PROFILE DATA
-     ======================================================= */
-
-  function collectProfileData() {
-
-    const formData =
-      new FormData(form);
-
-
-    const profile = {
+    return {
 
       name:
-        formData
-          .get("name")
-          ?.trim() || "",
+        document
+          .getElementById("name")
+          .value
+          .trim(),
 
 
       age:
         Number(
-          formData.get("age")
-        ) || null,
+          document
+            .getElementById("age")
+            .value
+        ),
+
+
+      height_cm:
+        Number(
+          document
+            .getElementById("height")
+            .value
+        ),
 
 
       gender:
-        formData.get("gender") || "",
+        getRadioValue("gender"),
 
 
       goal:
-        formData.get("goal") || "",
+        getRadioValue("goal"),
 
 
-      current_weight:
+      current_weight_kg:
         Number(
-          formData.get(
-            "current_weight"
-          )
-        ) || null,
+          document
+            .getElementById(
+              "current-weight"
+            )
+            .value
+        ),
 
 
-      target_weight:
+      target_weight_kg:
         Number(
-          formData.get(
-            "target_weight"
-          )
-        ) || null,
+          document
+            .getElementById(
+              "target-weight"
+            )
+            .value
+        ),
+
+
+      daily_calories_kcal:
+        Number(
+          document
+            .getElementById(
+              "daily-calories"
+            )
+            .value
+        ),
 
 
       diet_type:
-        formData.get(
-          "diet_type"
-        ) || "",
+        getRadioValue(
+          "diet-type"
+        ),
 
 
       food_preferences:
-        formData.getAll(
-          "food_preferences"
+        getCheckedValues(
+          "food-preferences"
         ),
 
 
       other_food_preference:
-        formData
-          .get(
-            "other_food_preference"
+        document
+          .getElementById(
+            "other-food-preference"
           )
-          ?.trim() || "",
+          .value
+          .trim(),
 
 
-      specific_foods:
-        formData
-          .get(
-            "specific_foods"
-          )
-          ?.trim() || "",
+      specific_foods: {
+
+        include:
+          document
+            .getElementById(
+              "include-foods"
+            )
+            .value
+            .trim(),
+
+
+        exclude:
+          document
+            .getElementById(
+              "exclude-foods"
+            )
+            .value
+            .trim()
+
+      },
+
+
+      has_restrictions:
+        getRadioValue(
+          "has-restrictions"
+        ),
 
 
       allergies:
-        formData.getAll(
+        getCheckedValues(
           "allergies"
         ),
 
 
       other_allergy:
-        formData
-          .get(
-            "other_allergy"
+        document
+          .getElementById(
+            "other-allergy"
           )
-          ?.trim() || "",
+          .value
+          .trim(),
 
 
       dietary_restrictions:
-        formData.getAll(
-          "dietary_restrictions"
+        getCheckedValues(
+          "dietary-restrictions"
         ),
 
 
       other_restriction:
-        formData
-          .get(
-            "other_restriction"
+        document
+          .getElementById(
+            "other-restriction"
           )
-          ?.trim() || "",
+          .value
+          .trim(),
 
 
       additional_notes:
-        formData
-          .get(
-            "additional_notes"
+        document
+          .getElementById(
+            "additional-notes"
           )
-          ?.trim() || ""
+          .value
+          .trim()
 
     };
-
-
-    return profile;
 
   }
 
 
-  /* =======================================================
-     DISPLAY PROFILE
-     ======================================================= */
+  // =========================================================
+  // DISPLAY PROFILE
+  // =========================================================
 
   function displayProfile(profile) {
 
-    const resultGoal =
+    const outputGoal =
       document.getElementById(
-        "result-goal"
+        "output-goal"
       );
 
-    const resultCurrentWeight =
+
+    const outputCurrentWeight =
       document.getElementById(
-        "result-current-weight"
+        "output-current-weight"
       );
 
-    const resultTargetWeight =
+
+    const outputTargetWeight =
       document.getElementById(
-        "result-target-weight"
+        "output-target-weight"
       );
 
-    const resultDiet =
+
+    const outputDiet =
       document.getElementById(
-        "result-diet"
+        "output-diet"
       );
+
+
+    const outputCalories =
+      document.getElementById(
+        "output-calories"
+      );
+
 
     const profileJson =
       document.getElementById(
@@ -845,38 +1344,42 @@ document.addEventListener("DOMContentLoaded", () => {
       );
 
 
-    if (resultGoal) {
+    if (outputGoal) {
 
-      resultGoal.textContent =
+      outputGoal.textContent =
         profile.goal || "—";
 
     }
 
 
-    if (resultCurrentWeight) {
+    if (outputCurrentWeight) {
 
-      resultCurrentWeight.textContent =
-        profile.current_weight !== null
-          ? `${profile.current_weight} kg`
-          : "—";
+      outputCurrentWeight.textContent =
+        `${profile.current_weight_kg} kg`;
 
     }
 
 
-    if (resultTargetWeight) {
+    if (outputTargetWeight) {
 
-      resultTargetWeight.textContent =
-        profile.target_weight !== null
-          ? `${profile.target_weight} kg`
-          : "—";
+      outputTargetWeight.textContent =
+        `${profile.target_weight_kg} kg`;
 
     }
 
 
-    if (resultDiet) {
+    if (outputDiet) {
 
-      resultDiet.textContent =
+      outputDiet.textContent =
         profile.diet_type || "—";
+
+    }
+
+
+    if (outputCalories) {
+
+      outputCalories.textContent =
+        `${profile.daily_calories_kcal} kcal`;
 
     }
 
@@ -892,148 +1395,83 @@ document.addEventListener("DOMContentLoaded", () => {
 
     }
 
-
-    /* -----------------------------------------------
-       Save profile locally.
-       This prepares the frontend for future
-       backend/API integration.
-       ----------------------------------------------- */
-
-    localStorage.setItem(
-      "nutrigen_user_profile",
-      JSON.stringify(profile)
-    );
-
   }
 
 
-  /* =======================================================
-     MESSAGE HANDLING
-     ======================================================= */
+  // =========================================================
+  // SUBMIT PROFILE
+  // =========================================================
 
-  function showMessage(
-    text,
-    type = "error"
-  ) {
+  function submitProfile() {
 
-    if (!message) {
-      return;
+    clearMessage();
+
+
+    // VALIDATE EVERY STEP ONE FINAL TIME
+
+    for (
+      let step = 1;
+      step <= slides.length;
+      step++
+    ) {
+
+      if (!validateStep(step)) {
+
+        showSlide(step);
+
+        return;
+
+      }
+
     }
 
 
-    message.textContent =
-      text;
-
-    message.className =
-      type;
+    const profile =
+      buildUserProfile();
 
 
-    /* Scroll validation message into view */
-
-    scrollToElement(
-      message,
-      100
-    );
-
-  }
+    displayProfile(profile);
 
 
-  function clearMessage() {
-
-    if (!message) {
-      return;
+    if (form) {
+      form.classList.add("hidden");
     }
 
 
-    message.textContent =
-      "";
+    if (profileOutput) {
 
-    message.className =
-      "";
-
-  }
-
-
-  /* =======================================================
-     WEIGHT INPUT LIMITS
-     ======================================================= */
-
-  const weightInputs = [
-
-    document.getElementById(
-      "current-weight"
-    ),
-
-    document.getElementById(
-      "target-weight"
-    )
-
-  ].filter(Boolean);
-
-
-  weightInputs.forEach(
-    (input) => {
-
-      input.addEventListener(
-        "input",
-        () => {
-
-          const value =
-            Number(input.value);
-
-
-          if (value > 300) {
-
-            input.value = 300;
-
-          }
-
-
-          if (value < 0) {
-
-            input.value = "";
-
-          }
-
-        }
+      profileOutput.classList.remove(
+        "hidden"
       );
 
+
+      requestAnimationFrame(() => {
+
+        profileOutput.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
+
+      });
+
     }
-  );
+
+  }
 
 
-  /* =======================================================
-     AGE INPUT LIMIT
-     ======================================================= */
+  // =========================================================
+  // FORM SUBMIT
+  // =========================================================
 
-  const ageInput =
-    document.getElementById(
-      "age"
-    );
+  if (form) {
 
+    form.addEventListener(
+      "submit",
+      (event) => {
 
-  if (ageInput) {
+        event.preventDefault();
 
-    ageInput.addEventListener(
-      "input",
-      () => {
-
-        const value =
-          Number(ageInput.value);
-
-
-        if (value > 120) {
-
-          ageInput.value = 120;
-
-        }
-
-
-        if (value < 0) {
-
-          ageInput.value = "";
-
-        }
+        submitProfile();
 
       }
     );
@@ -1041,13 +1479,243 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 
-  /* =======================================================
-     INITIAL STATE
-     ======================================================= */
+  // =========================================================
+  // REAL-TIME ERROR CLEANUP
+  // =========================================================
 
-  showStep(
-    1,
-    false
-  );
+  const allInputs =
+    document.querySelectorAll(
+      "input, textarea"
+    );
+
+
+  allInputs.forEach((input) => {
+
+    input.addEventListener(
+      "input",
+      () => {
+
+        input.classList.remove(
+          "input-error"
+        );
+
+
+        const errorElement =
+          document.getElementById(
+            `${input.id}-error`
+          );
+
+
+        if (errorElement) {
+
+          errorElement.textContent = "";
+
+          errorElement.classList.remove(
+            "show"
+          );
+
+        }
+
+
+        // Clear restriction validation
+        // when user starts providing details.
+
+        if (
+          input.name === "allergies" ||
+          input.name ===
+            "dietary-restrictions" ||
+          input.name ===
+            "other_allergy" ||
+          input.name ===
+            "other_restriction" ||
+          input.name ===
+            "additional_notes"
+        ) {
+
+          const restrictionError =
+            document.getElementById(
+              "restriction-choice-error"
+            );
+
+
+          if (restrictionError) {
+
+            restrictionError.textContent =
+              "";
+
+            restrictionError.classList.remove(
+              "show"
+            );
+
+          }
+
+
+          clearMessage();
+
+        }
+
+      }
+    );
+
+
+    input.addEventListener(
+      "change",
+      () => {
+
+        input.classList.remove(
+          "input-error"
+        );
+
+
+        const errorElement =
+          document.getElementById(
+            `${input.id}-error`
+          );
+
+
+        if (errorElement) {
+
+          errorElement.textContent =
+            "";
+
+          errorElement.classList.remove(
+            "show"
+          );
+
+        }
+
+
+        // DIET TYPE ERROR
+
+        if (
+          input.name ===
+          "diet-type"
+        ) {
+
+          const dietError =
+            document.getElementById(
+              "diet-type-error"
+            );
+
+
+          if (dietError) {
+
+            dietError.textContent =
+              "";
+
+            dietError.classList.remove(
+              "show"
+            );
+
+          }
+
+        }
+
+
+        // YES / NO RESTRICTION ERROR
+
+        if (
+          input.name ===
+          "has-restrictions"
+        ) {
+
+          const restrictionError =
+            document.getElementById(
+              "restriction-choice-error"
+            );
+
+
+          if (restrictionError) {
+
+            restrictionError.textContent =
+              "";
+
+            restrictionError.classList.remove(
+              "show"
+            );
+
+          }
+
+
+          clearMessage();
+
+
+          // SHOW DETAILS FOR YES
+
+          if (
+            input.value === "Yes" &&
+            input.checked
+          ) {
+
+            updateRestrictionDetails();
+
+          }
+
+
+          // HIDE + CLEAR DETAILS FOR NO
+
+          if (
+            input.value === "No" &&
+            input.checked
+          ) {
+
+            clearRestrictionDetails();
+
+            updateRestrictionDetails();
+
+          }
+
+        }
+
+      }
+    );
+
+  });
+
+
+  // =========================================================
+  // GOAL CHANGE
+  // =========================================================
+
+  const goalOptions =
+    document.querySelectorAll(
+      'input[name="goal"]'
+    );
+
+
+  goalOptions.forEach((goal) => {
+
+    goal.addEventListener(
+      "change",
+      () => {
+
+        const targetWeight =
+          document.getElementById(
+            "target-weight"
+          );
+
+
+        const targetWeightError =
+          document.getElementById(
+            "target-weight-error"
+          );
+
+
+        clearFieldError(
+          targetWeight,
+          targetWeightError
+        );
+
+      }
+    );
+
+  });
+
+
+  // =========================================================
+  // INITIAL STATE
+  // =========================================================
+
+  showSlide(1);
 
 });
