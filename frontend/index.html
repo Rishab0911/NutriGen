@@ -408,24 +408,140 @@
 
 
       <!-- Progress -->
+<!-- ===================================================
+     PERSONALIZATION LAYOUT
+==================================================== -->
 
-      <div class="progress-area">
+<div class="personalization-layout">
 
-        <div class="progress-text">
+  <!-- SIDEBAR -->
 
-          <span id="step-label">Step 1 of 4</span>
+  <aside class="form-sidebar">
 
-          <span id="step-name">About You</span>
+    <div class="sidebar-header">
 
-        </div>
+      <span class="sidebar-label">
+        YOUR PLAN
+      </span>
 
-        <div class="progress-bar">
+      <strong>Personalization</strong>
 
-          <div id="progress-fill"></div>
+    </div>
 
-        </div>
+
+    <div class="sidebar-steps">
+
+      <button
+        type="button"
+        class="sidebar-step active"
+        data-sidebar-step="1"
+      >
+
+        <span class="sidebar-step-number">
+          01
+        </span>
+
+        <span class="sidebar-step-content">
+          <strong>About You</strong>
+          <small>Basic information</small>
+        </span>
+
+      </button>
+
+
+      <button
+        type="button"
+        class="sidebar-step"
+        data-sidebar-step="2"
+      >
+
+        <span class="sidebar-step-number">
+          02
+        </span>
+
+        <span class="sidebar-step-content">
+          <strong>Your Goal</strong>
+          <small>What you want to achieve</small>
+        </span>
+
+      </button>
+
+
+      <button
+        type="button"
+        class="sidebar-step"
+        data-sidebar-step="3"
+      >
+
+        <span class="sidebar-step-number">
+          03
+        </span>
+
+        <span class="sidebar-step-content">
+          <strong>Food Preferences</strong>
+          <small>What works for you</small>
+        </span>
+
+      </button>
+
+
+      <button
+        type="button"
+        class="sidebar-step"
+        data-sidebar-step="4"
+      >
+
+        <span class="sidebar-step-number">
+          04
+        </span>
+
+        <span class="sidebar-step-content">
+          <strong>Health & Restrictions</strong>
+          <small>Important considerations</small>
+        </span>
+
+      </button>
+
+    </div>
+
+
+    <div class="sidebar-note">
+
+      <span>✦</span>
+
+      <p>
+        Your answers help shape a nutrition experience
+        around your individual needs.
+      </p>
+
+    </div>
+
+  </aside>
+
+
+  <!-- MAIN FORM AREA -->
+
+  <div class="form-main">
+
+    <!-- Progress -->
+
+    <div class="progress-area">
+
+      <div class="progress-text">
+
+        <span id="step-label">Step 1 of 4</span>
+
+        <span id="step-name">About You</span>
 
       </div>
+
+      <div class="progress-bar">
+
+        <div id="progress-fill"></div>
+
+      </div>
+
+    </div>
 
 
       <!-- ===================================================
@@ -1332,11 +1448,10 @@
           </div>
 
         </section>
+        </form>
 
-      </form>
 
-
-      <!-- Message -->
+<!-- Message -->
 
       <div
         id="message"

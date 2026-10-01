@@ -74,31 +74,119 @@ const stepNames = {
 
 
 /* =========================================================
-   LANDING PAGE → PERSONALIZATION
+   PAGE SCROLL HELPER
 ========================================================= */
 
-function openPersonalization() {
+/*
+   We use window.scrollTo() instead of scrollIntoView().
 
-  landingPage.classList.add("hidden");
+   This gives us more control over where the page stops and
+   prevents the browser from unexpectedly jumping to the top.
+*/
 
-  personalizationPage.classList.remove("hidden");
+function scrollToElement(element, offset = 25) {
+
+  if (!element) {
+    return;
+  }
 
 
-  showSlide(1);
+  const elementPosition =
+    element.getBoundingClientRect().top +
+    window.pageYOffset;
+
+
+  const targetPosition =
+    Math.max(
+      0,
+      elementPosition - offset
+    );
+
+
+  window.scrollTo({
+
+    top: targetPosition,
+
+    behavior: "smooth"
+
+  });
 
 }
 
 
-startButtons.forEach((button) => {
+/* =========================================================
+   LANDING PAGE → PERSONALIZATION
+========================================================= */
 
-  if (button) {
+function openPersonalization(event) {
 
-    button.addEventListener(
-      "click",
-      openPersonalization
-    );
+  if (event) {
+    event.preventDefault();
+  }
+
+
+  /* Hide landing page */
+
+  if (landingPage) {
+
+    landingPage.classList.add("hidden");
 
   }
+
+
+  /* Show personalization page */
+
+  if (personalizationPage) {
+
+    personalizationPage.classList.remove("hidden");
+
+  }
+
+
+  /* Always start from Slide 1 */
+
+  showSlide(1, false);
+
+
+  /*
+     Wait until the browser has applied the hidden/display
+     change before calculating the position.
+
+     This is important because the personalization section
+     cannot have a correct position while it is display:none.
+  */
+
+  requestAnimationFrame(() => {
+
+    requestAnimationFrame(() => {
+
+      scrollToElement(
+        personalizationPage,
+        20
+      );
+
+    });
+
+  });
+
+}
+
+
+/* =========================================================
+   START BUTTON EVENTS
+========================================================= */
+
+startButtons.forEach((button) => {
+
+  if (!button) {
+    return;
+  }
+
+
+  button.addEventListener(
+    "click",
+    openPersonalization
+  );
 
 });
 
@@ -107,18 +195,10 @@ startButtons.forEach((button) => {
    UPDATE SLIDE
 ========================================================= */
 
-function showSlide(slideNumber) {
-
-  /* Remove active state from all slides */
-
-  slides.forEach((slide) => {
-
-    slide.classList.remove("active");
-
-  });
-
-
-  /* Find the slide we want */
+function showSlide(
+  slideNumber,
+  shouldScroll = true
+) {
 
   const selectedSlide =
     document.getElementById(
@@ -127,18 +207,30 @@ function showSlide(slideNumber) {
 
 
   if (!selectedSlide) {
-
     return;
-
   }
 
 
-  /* Activate selected slide */
+  /* =======================================================
+     REMOVE ACTIVE FROM ALL SLIDES
+  ======================================================= */
+
+  slides.forEach((slide) => {
+
+    slide.classList.remove("active");
+
+  });
+
+
+  /* =======================================================
+     ACTIVATE SELECTED SLIDE
+  ======================================================= */
 
   selectedSlide.classList.add("active");
 
 
-  currentSlide = slideNumber;
+  currentSlide =
+    slideNumber;
 
 
   /* =======================================================
@@ -177,26 +269,70 @@ function showSlide(slideNumber) {
   }
 
 
-  /* Clear previous messages */
+  /* =======================================================
+     SIDEBAR STEP
+  ======================================================= */
+
+  const sidebarSteps =
+    document.querySelectorAll(
+      ".sidebar-step"
+    );
+
+
+  sidebarSteps.forEach((step) => {
+
+    step.classList.remove("active");
+
+  });
+
+
+  const activeSidebarStep =
+    document.querySelector(
+      `.sidebar-step[data-sidebar-step="${slideNumber}"]`
+    );
+
+
+  if (activeSidebarStep) {
+
+    activeSidebarStep.classList.add(
+      "active"
+    );
+
+  }
+
+
+  /* =======================================================
+     CLEAR OLD MESSAGE
+  ======================================================= */
 
   clearMessage();
 
 
   /* =======================================================
-     SCROLL TO CURRENT SLIDE
+     SCROLL TO SLIDE
   ======================================================= */
 
-  setTimeout(() => {
+  if (shouldScroll) {
 
-    selectedSlide.scrollIntoView({
+    /*
+       Give the browser a moment to apply the active class
+       before calculating the slide's position.
+    */
 
-      behavior: "smooth",
+    requestAnimationFrame(() => {
 
-      block: "start"
+      requestAnimationFrame(() => {
+
+        scrollToElement(
+          selectedSlide,
+          20
+        );
+
+      });
 
     });
 
-  }, 100);
+  }
 
 }
 
@@ -211,9 +347,7 @@ function showMessage(
 ) {
 
   if (!messageBox) {
-
     return;
-
   }
 
 
@@ -224,15 +358,28 @@ function showMessage(
   messageBox.className =
     type;
 
+
+  /*
+     Make sure the message is visible if validation
+     fails on a slide.
+  */
+
+  requestAnimationFrame(() => {
+
+    scrollToElement(
+      messageBox,
+      100
+    );
+
+  });
+
 }
 
 
 function clearMessage() {
 
   if (!messageBox) {
-
     return;
-
   }
 
 
@@ -252,22 +399,32 @@ function clearMessage() {
 
 function validateSlide1() {
 
+  const nameInput =
+    document.getElementById("name");
+
+
+  const ageInput =
+    document.getElementById("age");
+
+
+  if (!nameInput || !ageInput) {
+    return false;
+  }
+
+
   const name =
-    document
-      .getElementById("name")
-      .value
-      .trim();
+    nameInput.value.trim();
 
 
   const age =
     Number(
-      document
-        .getElementById("age")
-        .value
+      ageInput.value
     );
 
 
-  /* Name */
+  /* =======================================================
+     NAME
+  ======================================================= */
 
   if (!name) {
 
@@ -280,7 +437,9 @@ function validateSlide1() {
   }
 
 
-  /* Age */
+  /* =======================================================
+     AGE
+  ======================================================= */
 
   if (
     !age ||
@@ -314,7 +473,9 @@ function validateSlide2() {
     );
 
 
-  /* Make sure goal is selected */
+  /* =======================================================
+     GOAL
+  ======================================================= */
 
   if (!selectedGoal) {
 
@@ -331,21 +492,41 @@ function validateSlide2() {
     selectedGoal.value;
 
 
-  /* Get weights */
+  /* =======================================================
+     WEIGHT INPUTS
+  ======================================================= */
+
+  const currentWeightInput =
+    document.getElementById(
+      "current-weight"
+    );
+
+
+  const targetWeightInput =
+    document.getElementById(
+      "target-weight"
+    );
+
+
+  if (
+    !currentWeightInput ||
+    !targetWeightInput
+  ) {
+
+    return false;
+
+  }
+
 
   const currentWeight =
     Number(
-      document
-        .getElementById("current-weight")
-        .value
+      currentWeightInput.value
     );
 
 
   const targetWeight =
     Number(
-      document
-        .getElementById("target-weight")
-        .value
+      targetWeightInput.value
     );
 
 
@@ -368,7 +549,7 @@ function validateSlide2() {
 
 
   /* =======================================================
-     SAFE WEIGHT RANGE
+     SAFE CURRENT WEIGHT RANGE
   ======================================================= */
 
   if (
@@ -385,6 +566,10 @@ function validateSlide2() {
   }
 
 
+  /* =======================================================
+     SAFE TARGET WEIGHT RANGE
+  ======================================================= */
+
   if (
     targetWeight < 20 ||
     targetWeight > 300
@@ -400,7 +585,7 @@ function validateSlide2() {
 
 
   /* =======================================================
-     WEIGHT LOSS LOGIC
+     WEIGHT LOSS
   ======================================================= */
 
   if (
@@ -418,7 +603,7 @@ function validateSlide2() {
 
 
   /* =======================================================
-     WEIGHT GAIN LOGIC
+     WEIGHT GAIN
   ======================================================= */
 
   if (
@@ -436,7 +621,7 @@ function validateSlide2() {
 
 
   /* =======================================================
-     MAINTAIN WEIGHT LOGIC
+     MAINTAIN WEIGHT
   ======================================================= */
 
   if (
@@ -500,7 +685,10 @@ nextButtons.forEach((button) => {
 
   button.addEventListener(
     "click",
-    () => {
+    (event) => {
+
+      event.preventDefault();
+
 
       const nextSlide =
         Number(
@@ -508,7 +696,9 @@ nextButtons.forEach((button) => {
         );
 
 
-      /* Slide 1 */
+      /* ===================================================
+         SLIDE 1
+      =================================================== */
 
       if (
         currentSlide === 1
@@ -523,7 +713,9 @@ nextButtons.forEach((button) => {
       }
 
 
-      /* Slide 2 */
+      /* ===================================================
+         SLIDE 2
+      =================================================== */
 
       if (
         currentSlide === 2
@@ -538,7 +730,9 @@ nextButtons.forEach((button) => {
       }
 
 
-      /* Slide 3 */
+      /* ===================================================
+         SLIDE 3
+      =================================================== */
 
       if (
         currentSlide === 3
@@ -553,10 +747,13 @@ nextButtons.forEach((button) => {
       }
 
 
-      /* Move forward */
+      /* ===================================================
+         MOVE FORWARD
+      =================================================== */
 
       showSlide(
-        nextSlide
+        nextSlide,
+        true
       );
 
     }
@@ -579,7 +776,10 @@ backButtons.forEach((button) => {
 
   button.addEventListener(
     "click",
-    () => {
+    (event) => {
+
+      event.preventDefault();
+
 
       const previousSlide =
         Number(
@@ -588,8 +788,56 @@ backButtons.forEach((button) => {
 
 
       showSlide(
-        previousSlide
+        previousSlide,
+        true
       );
+
+    }
+  );
+
+});
+
+
+/* =========================================================
+   SIDEBAR STEP NAVIGATION
+========================================================= */
+
+const sidebarSteps =
+  document.querySelectorAll(
+    ".sidebar-step"
+  );
+
+
+sidebarSteps.forEach((step) => {
+
+  step.addEventListener(
+    "click",
+    () => {
+
+      const targetSlide =
+        Number(
+          step.dataset.sidebarStep
+        );
+
+
+      /*
+         Only allow navigation to a step that has already
+         been reached or is the current step.
+
+         This prevents someone from skipping straight to
+         Slide 4 without completing earlier information.
+      */
+
+      if (
+        targetSlide <= currentSlide
+      ) {
+
+        showSlide(
+          targetSlide,
+          true
+        );
+
+      }
 
     }
   );
@@ -639,7 +887,6 @@ function getCheckedValues(
 
 function buildUserProfile() {
 
-
   /* =======================================================
      PERSONAL INFORMATION
   ======================================================= */
@@ -659,20 +906,32 @@ function buildUserProfile() {
     );
 
 
-  const gender =
+  const genderInput =
     document.querySelector(
       'input[name="gender"]:checked'
-    ).value;
+    );
+
+
+  const gender =
+    genderInput
+      ? genderInput.value
+      : null;
 
 
   /* =======================================================
      GOAL INFORMATION
   ======================================================= */
 
-  const goal =
+  const goalInput =
     document.querySelector(
       'input[name="goal"]:checked'
-    ).value;
+    );
+
+
+  const goal =
+    goalInput
+      ? goalInput.value
+      : null;
 
 
   const currentWeight =
@@ -695,10 +954,16 @@ function buildUserProfile() {
      DIET INFORMATION
   ======================================================= */
 
-  const dietType =
+  const dietInput =
     document.querySelector(
       'input[name="diet_type"]:checked'
-    ).value;
+    );
+
+
+  const dietType =
+    dietInput
+      ? dietInput.value
+      : null;
 
 
   /* =======================================================
@@ -781,7 +1046,7 @@ function buildUserProfile() {
 
 
   /* =======================================================
-     RETURN COMPLETE PROFILE
+     COMPLETE PROFILE
   ======================================================= */
 
   return {
@@ -906,154 +1171,212 @@ function generateMealPlan(
   profile
 ) {
 
-  const breakfast =
-    document.getElementById(
-      "meal-breakfast"
+  /*
+     Your current HTML does not have elements with:
+     #meal-breakfast
+     #meal-lunch
+     #meal-dinner
+     #meal-snack
+
+     So we safely find the meal cards instead.
+  */
+
+  const mealCards =
+    document.querySelectorAll(
+      ".meal-plan-grid .meal-card"
     );
 
 
-  const lunch =
-    document.getElementById(
-      "meal-lunch"
-    );
+  if (!mealCards.length) {
+
+    return;
+
+  }
 
 
-  const dinner =
-    document.getElementById(
-      "meal-dinner"
-    );
-
-
-  const snack =
-    document.getElementById(
-      "meal-snack"
-    );
+  let meals = [];
 
 
   /* =======================================================
-     VEGAN PLAN
+     VEGAN
   ======================================================= */
 
   if (
     profile.diet_type === "Vegan"
   ) {
 
-    if (breakfast) {
+    meals = [
 
-      breakfast.textContent =
-        "Oats with banana, berries and plant-based milk";
+      {
+        title:
+          "Oats with banana, berries and plant-based milk",
 
-    }
+        description:
+          "A balanced plant-based breakfast with whole grains and fruit."
+      },
 
+      {
+        title:
+          "Chickpea and quinoa power bowl with vegetables",
 
-    if (lunch) {
+        description:
+          "A protein-rich plant-based lunch built around legumes and grains."
+      },
 
-      lunch.textContent =
-        "Chickpea and quinoa power bowl with vegetables";
+      {
+        title:
+          "Lentil curry with brown rice and vegetables",
 
-    }
+        description:
+          "A filling plant-based dinner with lentils, grains and vegetables."
+      },
 
+      {
+        title:
+          "Fruit with a small handful of seeds",
 
-    if (dinner) {
+        description:
+          "A simple plant-based snack with fruit and healthy fats."
+      }
 
-      dinner.textContent =
-        "Lentil curry with brown rice and vegetables";
-
-    }
-
-
-    if (snack) {
-
-      snack.textContent =
-        "Fruit with a small handful of seeds";
-
-    }
-
-
-    return;
+    ];
 
   }
 
 
   /* =======================================================
-     VEGETARIAN PLAN
+     VEGETARIAN
   ======================================================= */
 
-  if (
+  else if (
     profile.diet_type === "Vegetarian"
   ) {
 
-    if (breakfast) {
+    meals = [
 
-      breakfast.textContent =
-        "Vegetable omelette with whole-grain toast";
+      {
+        title:
+          "Vegetable omelette with whole-grain toast",
 
-    }
+        description:
+          "A protein-rich vegetarian breakfast with vegetables and whole grains."
+      },
 
+      {
+        title:
+          "Paneer and vegetable grain bowl",
 
-    if (lunch) {
+        description:
+          "A balanced vegetarian lunch combining paneer, grains and vegetables."
+      },
 
-      lunch.textContent =
-        "Paneer and vegetable grain bowl";
+      {
+        title:
+          "Dal with brown rice, vegetables and curd",
 
-    }
+        description:
+          "A balanced vegetarian dinner with lentils, grains and dairy."
+      },
 
+      {
+        title:
+          "Greek yogurt with fruit and seeds",
 
-    if (dinner) {
+        description:
+          "A simple vegetarian snack with protein, fruit and seeds."
+      }
 
-      dinner.textContent =
-        "Dal with brown rice, vegetables and curd";
-
-    }
-
-
-    if (snack) {
-
-      snack.textContent =
-        "Greek yogurt with fruit and seeds";
-
-    }
-
-
-    return;
+    ];
 
   }
 
 
   /* =======================================================
-     NON-VEGETARIAN PLAN
+     NON-VEGETARIAN
   ======================================================= */
 
-  if (breakfast) {
+  else {
 
-    breakfast.textContent =
-      "Eggs with whole-grain toast and fresh fruit";
+    meals = [
+
+      {
+        title:
+          "Eggs with whole-grain toast and fresh fruit",
+
+        description:
+          "A protein-rich breakfast with eggs, whole grains and fruit."
+      },
+
+      {
+        title:
+          "Grilled chicken with rice and mixed vegetables",
+
+        description:
+          "A balanced lunch combining lean protein, grains and vegetables."
+      },
+
+      {
+        title:
+          "Fish with roasted vegetables and whole grains",
+
+        description:
+          "A protein-rich dinner with fish, vegetables and whole grains."
+      },
+
+      {
+        title:
+          "Greek yogurt with fruit and nuts",
+
+        description:
+          "A snack combining protein, fruit and healthy fats."
+      }
+
+    ];
 
   }
 
 
-  if (lunch) {
+  /* =======================================================
+     UPDATE CARDS
+  ======================================================= */
 
-    lunch.textContent =
-      "Grilled chicken with rice and mixed vegetables";
+  mealCards.forEach(
+    (card, index) => {
 
-  }
-
-
-  if (dinner) {
-
-    dinner.textContent =
-      "Fish with roasted vegetables and whole grains";
-
-  }
+      const meal =
+        meals[index];
 
 
-  if (snack) {
+      if (!meal) {
+        return;
+      }
 
-    snack.textContent =
-      "Greek yogurt with fruit and nuts";
 
-  }
+      const title =
+        card.querySelector("h3");
+
+
+      const description =
+        card.querySelector("p");
+
+
+      if (title) {
+
+        title.textContent =
+          meal.title;
+
+      }
+
+
+      if (description) {
+
+        description.textContent =
+          meal.description;
+
+      }
+
+    }
+  );
 
 }
 
@@ -1062,119 +1385,136 @@ function generateMealPlan(
    FORM SUBMISSION
 ========================================================= */
 
-form.addEventListener(
-  "submit",
-  (event) => {
+if (form) {
 
-    /* Stop normal form submission */
+  form.addEventListener(
+    "submit",
+    (event) => {
 
-    event.preventDefault();
+      /* ===================================================
+         STOP NORMAL SUBMISSION
+      =================================================== */
 
-
-    /* =====================================================
-       FINAL VALIDATION
-    ===================================================== */
-
-    if (!validateSlide2()) {
-
-      showMessage(
-        "Please check your goal and weight information."
-      );
-
-      showSlide(2);
-
-      return;
-
-    }
+      event.preventDefault();
 
 
-    /* =====================================================
-       BUILD USER PROFILE
-    ===================================================== */
+      /* ===================================================
+         FINAL VALIDATION
+      =================================================== */
 
-    const userProfile =
-      buildUserProfile();
+      if (!validateSlide1()) {
 
+        showSlide(1, true);
 
-    /* =====================================================
-       SUCCESS MESSAGE
-    ===================================================== */
-
-    showMessage(
-      `Your profile is ready, ${userProfile.name}.`,
-      "success"
-    );
-
-
-    /* =====================================================
-       SHOW RESULT
-    ===================================================== */
-
-    if (profileOutput) {
-
-      profileOutput.classList.remove(
-        "hidden"
-      );
-
-    }
-
-
-    /* =====================================================
-       UPDATE RESULT SUMMARY
-    ===================================================== */
-
-    updateResultSummary(
-      userProfile
-    );
-
-
-    /* =====================================================
-       GENERATE MEAL PLAN
-    ===================================================== */
-
-    generateMealPlan(
-      userProfile
-    );
-
-
-    /* =====================================================
-       DISPLAY COMPLETE PROFILE
-    ===================================================== */
-
-    if (profileJson) {
-
-      profileJson.textContent =
-        JSON.stringify(
-          userProfile,
-          null,
-          2
-        );
-
-    }
-
-
-    /* =====================================================
-       SCROLL TO RESULT
-    ===================================================== */
-
-    setTimeout(() => {
-
-      if (profileOutput) {
-
-        profileOutput.scrollIntoView({
-
-          behavior: "smooth",
-
-          block: "start"
-
-        });
+        return;
 
       }
 
-    }, 100);
 
-  }
-);
+      if (!validateSlide2()) {
+
+        showSlide(2, true);
+
+        return;
+
+      }
+
+
+      if (!validateSlide3()) {
+
+        showSlide(3, true);
+
+        return;
+
+      }
+
+
+      /* ===================================================
+         BUILD PROFILE
+      =================================================== */
+
+      const userProfile =
+        buildUserProfile();
+
+
+      /* ===================================================
+         SUCCESS MESSAGE
+      =================================================== */
+
+      showMessage(
+        `Your profile is ready, ${userProfile.name}.`,
+        "success"
+      );
+
+
+      /* ===================================================
+         SHOW RESULT
+      =================================================== */
+
+      if (profileOutput) {
+
+        profileOutput.classList.remove(
+          "hidden"
+        );
+
+      }
+
+
+      /* ===================================================
+         UPDATE SUMMARY
+      =================================================== */
+
+      updateResultSummary(
+        userProfile
+      );
+
+
+      /* ===================================================
+         GENERATE MEAL PLAN
+      =================================================== */
+
+      generateMealPlan(
+        userProfile
+      );
+
+
+      /* ===================================================
+         DISPLAY JSON
+      =================================================== */
+
+      if (profileJson) {
+
+        profileJson.textContent =
+          JSON.stringify(
+            userProfile,
+            null,
+            2
+          );
+
+      }
+
+
+      /* ===================================================
+         SCROLL TO RESULT
+      =================================================== */
+
+      requestAnimationFrame(() => {
+
+        requestAnimationFrame(() => {
+
+          scrollToElement(
+            profileOutput,
+            20
+          );
+
+        });
+
+      });
+
+    }
+  );
+
+}
 
 
 /* =========================================================
@@ -1199,6 +1539,21 @@ if (personalizationPage) {
 }
 
 
-/* Start on Slide 1 */
+if (profileOutput) {
 
-showSlide(1);
+  profileOutput.classList.add(
+    "hidden"
+  );
+
+}
+
+
+/* =========================================================
+   INITIAL SLIDE
+========================================================= */
+
+showSlide(
+  1,
+  false
+);
+
