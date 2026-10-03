@@ -10,6 +10,16 @@ class UserProfile(BaseModel):
     goal: str
     diet: str
 
+class Meal(BaseModel):
+    meal: str
+    food: str
+    calories: float
+
+class MealPlanResponse(BaseModel):
+    status: str
+    daily_calories: float
+    meal_plan: list[Meal]
+    
 def calculate_calories(weight: float, goal: str):
         base_calories = weight * 30
 
@@ -26,31 +36,31 @@ def calculate_calories(weight: float, goal: str):
 def home():
     return {"message": "NutriGen Backend is Running!"}
 
-@app.post("/generate-meal")
+@app.post("/generate-meal", response_model=MealPlanResponse)
 def generate_meal(data: UserProfile):
+
     daily_calories = calculate_calories(data.weight, data.goal)
+
     return {
         "status": "success",
-        "message": "Dummy meal plan generated",
         "daily_calories": daily_calories,
         "meal_plan": [
             {
                 "meal": "Breakfast",
                 "food": "Oats with milk",
-                "calories": 400
+                "calories": 500
             },
             {
                 "meal": "Lunch",
                 "food": "Rice, dal and vegetables",
-                "calories": 600
+                "calories": 700
             },
             {
                 "meal": "Dinner",
                 "food": "Chapati with paneer",
-                "calories": 550
+                "calories": 600
             }
         ]
-
     }
 
 @app.get("/health")
