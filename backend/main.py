@@ -1,5 +1,6 @@
 from fastapi import FastAPI,HTTPException
 from pydantic import BaseModel,Field
+from nutrition import calculate_calories
 
 app = FastAPI()
 app = FastAPI()
@@ -19,19 +20,7 @@ class MealPlanResponse(BaseModel):
     status: str
     daily_calories: float
     meal_plan: list[Meal]
-    
-def calculate_calories(weight: float, goal: str):
-        base_calories = weight * 30
-
-        if goal == "weight loss":
-            return base_calories - 300
-
-        elif goal == "weight gain":
-            return base_calories + 300
-
-        else:
-            return base_calories
-
+ 
 @app.get("/")
 def home():
     return {"message": "NutriGen Backend is Running!"}
