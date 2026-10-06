@@ -1,6 +1,6 @@
 from fastapi import FastAPI,HTTPException
 from models import UserProfile, MealPlanResponse
-from nutrition import calculate_calories
+from nutrition import calculate_nutrition
 
 app = FastAPI()
 app = FastAPI()
@@ -9,31 +9,26 @@ app = FastAPI()
 def home():
     return {"message": "NutriGen Backend is Running!"}
 
-@app.post("/generate-meal", response_model=MealPlanResponse)
+@app.post(
+    "/generate-meal",
+    response_model=MealPlanResponse
+)
 def generate_meal(data: UserProfile):
 
-    daily_calories = calculate_calories(data.weight, data.goal)
+    nutrition = calculate_nutrition(
+        age=data.age,
+        height=data.height,
+        gender=data.gender,
+        weight=data.weight,
+        activity=data.activity,
+        goal=data.goal,
+        calories=data.calories,
+        preferences=data.preferences
+    )
 
     return {
         "status": "success",
-        "daily_calories": daily_calories,
-        "meal_plan": [
-            {
-                "meal": "Breakfast",
-                "food": "Oats with milk",
-                "calories": 500
-            },
-            {
-                "meal": "Lunch",
-                "food": "Rice, dal and vegetables",
-                "calories": 700
-            },
-            {
-                "meal": "Dinner",
-                "food": "Chapati with paneer",
-                "calories": 600
-            }
-        ]
+        **nutrition
     }
 
 @app.get("/health")
