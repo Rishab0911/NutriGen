@@ -1,17 +1,20 @@
+import os
 import pandas as pd
 
-df = pd.read_csv("data/raw/paper_nutrition.csv")
+# Teeno source load karo
+foundation = pd.read_csv("data/raw/foundation_nutrition.csv")
+sr_legacy = pd.read_csv("data/raw/sr_legacy_nutrition.csv")
+branded = pd.read_csv("data/raw/paper_nutrition.csv")
 
-print("Total rows:", len(df))
-print()
-print("Missing values per column:")
-print(df[["calories", "protein", "fat", "carbs"]].isna().sum())
-print()
+foundation = foundation.rename(columns={"description": "food"})
+sr_legacy = sr_legacy.rename(columns={"description": "food"})
+branded = branded.rename(columns={"description": "food"})[["food", "calories", "protein", "fat", "carbs"]]
 
-all_missing = df[["calories", "protein", "fat", "carbs"]].isna().all(axis=1).sum()
-print("rows that have all nutrients missing:", all_missing)
-print()
-print(df[["calories", "protein", "fat", "carbs"]].describe())
+foundation = foundation[["food", "calories", "protein", "fat", "carbs"]]
+sr_legacy = sr_legacy[["food", "calories", "protein", "fat", "carbs"]]
+
+df = pd.concat([foundation, sr_legacy, branded], ignore_index=True)
+print("Combine karne ke baad total rows:", len(df))
 
 before = len(df)
 
@@ -24,13 +27,15 @@ df = df[(df["protein"] <= 100) & (df["fat"] <= 100) & (df["carbs"] <= 100)]
 # Rule 3: calories 0-900 ke beech honi chahiye (per 100g ka realistic range)
 df = df[(df["calories"] >= 0) & (df["calories"] <= 900)]
 
-print("First rows:", before)
-print("Rows after cleaning:", len(df))
+# Duplicate food names hata do (pehli baar wali rakho)
+df = df.drop_duplicates(subset=["food"], keep="first")
 
-df = df.rename(columns={"description": "food"})
 df["quantity"] = 100
 df["unit"] = "g"
 df = df[["food", "quantity", "unit", "calories", "protein", "carbs", "fat"]]
 
+print("Cleaning ke baad rows:", len(df))
+
+os.makedirs("data/clean", exist_ok=True)
 df.to_csv("data/clean/nutrition_clean.csv", index=False)
 print("Saved to data/clean/nutrition_clean.csv")
