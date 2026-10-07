@@ -1,11 +1,7 @@
-from llm import get_client, MODEL
+from llm import send_prompt
 
-client = get_client()
-print("Client bana:", client is not None)
+response = send_prompt("Say hello in one short sentence.")
+print("Response 1:", response)
 
-response = client.models.generate_content(
-    model=MODEL,
-    contents="Say hello in one short sentence."
-)
-
-print("Response:", response.text)
+response2 = send_prompt("What is 2 + 2? Answer with just the number.")
+print("Response 2:", response2)
