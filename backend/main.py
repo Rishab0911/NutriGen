@@ -4,7 +4,8 @@ from nutrition import calculate_nutrition
 from ai import (
     prepare_ai_requirements,
     parse_ai_response,
-    generate_mock_ai_response
+    generate_mock_ai_response,
+    get_fallback_meal_plan
 )
 
 
@@ -21,10 +22,12 @@ def home():
 )
 
 @app.post("/generate-meal", response_model=MealPlanResponse)
-def generate_meal(data: UserProfile):
+def generate_meal(
+    data: UserProfile,
+    simulate_ai_failure: bool = False
+):
     profile = data.dict()
 
-    # Step 1: Calculate the user's nutrition targets.
     nutrition = calculate_nutrition(
         age=data.age,
         height=data.height,
@@ -36,26 +39,37 @@ def generate_meal(data: UserProfile):
         preferences=data.preferences
     )
 
-    # Step 2: Prepare profile and nutrition requirements.
     ai_result = prepare_ai_requirements(
         profile=profile,
         nutrition=nutrition
     )
 
-    # Step 3: Simulate the AI response.
-    response_text = generate_mock_ai_response(
-        ai_result["requirements"]
-    )
+    try:
+        # Temporary switch to test error handling in Swagger.
+        if simulate_ai_failure:
+            raise RuntimeError("Simulated AI failure")
 
-    # Step 4: Parse and validate the response structure.
-    parsed_response = parse_ai_response(response_text)
+        response_text = generate_mock_ai_response(
+            ai_result["requirements"]
+        )
 
-    # Step 5: Return nutrition and meal-plan data.
+        parsed_response = parse_ai_response(response_text)
+
+        meal_plan = parsed_response["meal_plan"]
+        ai_status = "success"
+
+    except Exception:
+        # Use the backup plan if generation or parsing fails.
+        fallback = get_fallback_meal_plan()
+        meal_plan = fallback["meal_plan"]
+        ai_status = "fallback"
+
     return {
         "status": "success",
         **nutrition,
-        "meal_plan": parsed_response["meal_plan"],
-        "ai_request": ai_result
+        "meal_plan": meal_plan,
+        "ai_request": ai_result,
+        "ai_status": ai_status
     }
 
 

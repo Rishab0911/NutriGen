@@ -102,3 +102,29 @@ def generate_mock_ai_response(requirements: dict) -> str:
     }
 
     return json.dumps(response)
+
+
+def get_fallback_meal_plan():
+    """
+    Return a basic backup meal plan if AI generation fails.
+    """
+
+    return {
+        "meal_plan": [
+            {
+                "meal": "Breakfast",
+                "food": "Oats with milk",
+                "calories": 400
+            },
+            {
+                "meal": "Lunch",
+                "food": "Rice, dal and vegetables",
+                "calories": 600
+            },
+            {
+                "meal": "Dinner",
+                "food": "Chapati with vegetables",
+                "calories": 550
+            }
+        ]
+    }
