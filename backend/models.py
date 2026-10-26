@@ -46,3 +46,4 @@ class MealPlanResponse(BaseModel):
     tdee: float
     daily_calories: float
     macros: Macros
+    ai_request: dict

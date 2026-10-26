@@ -1,6 +1,7 @@
 from fastapi import FastAPI,HTTPException
 from models import UserProfile, MealPlanResponse
 from nutrition import calculate_nutrition
+from ai import prepare_ai_requirements
 
 app = FastAPI()
 app = FastAPI()
@@ -13,7 +14,9 @@ def home():
     "/generate-meal",
     response_model=MealPlanResponse
 )
+@app.post("/generate-meal", response_model=MealPlanResponse)
 def generate_meal(data: UserProfile):
+    profile = data.dict()
 
     nutrition = calculate_nutrition(
         age=data.age,
@@ -26,9 +29,15 @@ def generate_meal(data: UserProfile):
         preferences=data.preferences
     )
 
+    ai_result = prepare_ai_requirements(
+        profile=profile,
+        nutrition=nutrition
+    )
+
     return {
         "status": "success",
-        **nutrition
+        **nutrition,
+        "ai_request": ai_result
     }
 
 @app.get("/health")
