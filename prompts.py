@@ -50,3 +50,32 @@ Preferences: {', '.join(preferences) if preferences else 'None'}
 The plan must include breakfast, lunch, snack and dinner, and end with daily totals.
 """
     return prompt
+JSON_FORMAT = """Respond ONLY with valid JSON in exactly this structure:
+{
+  "meals": [
+    {"meal": "Breakfast", "dish": "dish name", "calories": 400, "protein": 14, "carbs": 60, "fat": 12},
+    {"meal": "Lunch", "dish": "dish name", "calories": 500, "protein": 24, "carbs": 65, "fat": 16},
+    {"meal": "Snack", "dish": "dish name", "calories": 250, "protein": 8, "carbs": 25, "fat": 14},
+    {"meal": "Dinner", "dish": "dish name", "calories": 600, "protein": 34, "carbs": 70, "fat": 18}
+  ],
+  "totals": {"calories": 1750, "protein": 80, "carbs": 220, "fat": 60}
+}
+All numbers must be plain numbers (no units, no text)."""
+
+
+def build_json_meal_prompt(calories, protein, carbs, fat, diet, allergies=None, preferences=None):
+    allergies = allergies or []
+    preferences = preferences or []
+
+    request = f"""Create a one-day meal plan for this request:
+- Total calories: {calories} kcal
+- Total protein: {protein} g
+- Total carbs: {carbs} g
+- Total fat: {fat} g
+Diet type: {diet}
+Allergies to strictly avoid: {', '.join(allergies) if allergies else 'None'}
+Preferences: {', '.join(preferences) if preferences else 'None'}
+
+The plan must include breakfast, lunch, snack and dinner.
+"""
+    return request + "\n" + JSON_FORMAT
