@@ -71,3 +71,34 @@ def parse_ai_response(response_text: str):
             )
 
     return parsed_response
+
+import json
+
+
+def generate_mock_ai_response(requirements: dict) -> str:
+    """
+    Simulate an AI service returning a JSON meal plan.
+    Replace this function with the real Gemini call later.
+    """
+
+    response = {
+        "meal_plan": [
+            {
+                "meal": "Breakfast",
+                "food": "Vegetable oats",
+                "calories": 400
+            },
+            {
+                "meal": "Lunch",
+                "food": "Rice, dal and vegetables",
+                "calories": 600
+            },
+            {
+                "meal": "Dinner",
+                "food": "Chapati with mixed vegetables",
+                "calories": 550
+            }
+        ]
+    }
+
+    return json.dumps(response)

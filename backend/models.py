@@ -39,7 +39,11 @@ class Macros(BaseModel):
     carbs: float
     fat: float
 
-
+class Meal(BaseModel):
+    meal: str
+    food: str
+    calories: float
+    
 class MealPlanResponse(BaseModel):
     status: str
     bmr: float
@@ -47,3 +51,4 @@ class MealPlanResponse(BaseModel):
     daily_calories: float
     macros: Macros
     ai_request: dict
+    meal_plan: list[Meal]

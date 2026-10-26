@@ -1,8 +1,11 @@
 from fastapi import FastAPI,HTTPException
 from models import UserProfile, MealPlanResponse
 from nutrition import calculate_nutrition
-from ai import prepare_ai_requirements
-from ai import parse_ai_response
+from ai import (
+    prepare_ai_requirements,
+    parse_ai_response,
+    generate_mock_ai_response
+)
 
 
 app = FastAPI()
@@ -16,10 +19,12 @@ def home():
     "/generate-meal",
     response_model=MealPlanResponse
 )
+
 @app.post("/generate-meal", response_model=MealPlanResponse)
 def generate_meal(data: UserProfile):
     profile = data.dict()
 
+    # Step 1: Calculate the user's nutrition targets.
     nutrition = calculate_nutrition(
         age=data.age,
         height=data.height,
@@ -31,16 +36,28 @@ def generate_meal(data: UserProfile):
         preferences=data.preferences
     )
 
+    # Step 2: Prepare profile and nutrition requirements.
     ai_result = prepare_ai_requirements(
         profile=profile,
         nutrition=nutrition
     )
 
+    # Step 3: Simulate the AI response.
+    response_text = generate_mock_ai_response(
+        ai_result["requirements"]
+    )
+
+    # Step 4: Parse and validate the response structure.
+    parsed_response = parse_ai_response(response_text)
+
+    # Step 5: Return nutrition and meal-plan data.
     return {
         "status": "success",
         **nutrition,
+        "meal_plan": parsed_response["meal_plan"],
         "ai_request": ai_result
     }
+
 
 @app.get("/health")
 def health_check():
