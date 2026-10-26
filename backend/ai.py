@@ -37,3 +37,37 @@ def prepare_ai_requirements(profile: dict, nutrition: dict):
         "message": "Nutrition requirements prepared for AI",
         "requirements": ai_requirements
     }
+
+
+import json
+
+
+def parse_ai_response(response_text: str):
+    """
+    Convert an AI response from JSON text
+    into structured Python data.
+    """
+
+    try:
+        parsed_response = json.loads(response_text)
+    except json.JSONDecodeError as error:
+        raise ValueError("AI returned invalid JSON") from error
+
+    if not isinstance(parsed_response, dict):
+        raise ValueError("AI response must be a JSON object")
+
+    meal_plan = parsed_response.get("meal_plan")
+
+    if not isinstance(meal_plan, list):
+        raise ValueError("AI response must contain a meal_plan list")
+
+    for meal in meal_plan:
+        if not isinstance(meal, dict):
+            raise ValueError("Each meal must be a JSON object")
+
+        if not all(key in meal for key in ("meal", "food", "calories")):
+            raise ValueError(
+                "Each meal must contain meal, food and calories"
+            )
+
+    return parsed_response

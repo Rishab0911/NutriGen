@@ -2,6 +2,8 @@ from fastapi import FastAPI,HTTPException
 from models import UserProfile, MealPlanResponse
 from nutrition import calculate_nutrition
 from ai import prepare_ai_requirements
+from ai import parse_ai_response
+
 
 app = FastAPI()
 app = FastAPI()
