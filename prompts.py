@@ -1,3 +1,6 @@
+   
+from nutrition import search_food, find_matches
+from nutrition import search_food
 SYSTEM_PROMPT = """You are NutriGen, a personalized meal planning assistant.
 
 Your job is to generate practical, realistic meal plans based on a user's:
@@ -79,3 +82,112 @@ Preferences: {', '.join(preferences) if preferences else 'None'}
 The plan must include breakfast, lunch, snack and dinner.
 """
     return request + "\n" + JSON_FORMAT
+
+def build_nutrition_context(keywords, per_keyword=3):
+    lines = []
+    for keyword in keywords:
+        matches = search_food(keyword).head(per_keyword)
+        for _, row in matches.iterrows():
+            lines.append(
+                f"- {row['food']} (per 100 g): {row['calories']} kcal, "
+                f"protein {row['protein']} g, carbs {row['carbs']} g, fat {row['fat']} g"
+            )
+    return "\n".join(lines)
+
+# Words that mark foods we do not want to offer (restaurant dishes, baby food, etc.)
+ALWAYS_EXCLUDE = ["restaurant", "babyfood", "fast foods", "usda commodity",
+                  "giblets", "skin only", "rotisserie", "candies", "snacks", "salad",
+                  "bologna", "souffle", "mayonnaise", "tofu yogurt", "fat, turkey",
+                  "crabapples", "rose-apples", "sun-dried", "flour",
+                  "separable fat", "gravy", "pastrami", "denny's", "spaghetti",
+                  "sugar-apples", "honey roasted", "whole, dried"]
+
+# Everyday foods we search for in the database
+BASE_KEYWORDS = ["oats", "rice, brown", "lentils", "chickpeas", "beans, black",
+                 "quinoa", "tofu", "potatoes", "spinach", "broccoli", "tomatoes",
+                 "bananas", "apples", "almonds", "bread, whole-wheat"]
+VEG_KEYWORDS = ["yogurt", "milk, whole", "cheese, cottage", "egg, whole"]
+NONVEG_KEYWORDS = ["chicken, broiler", "salmon", "turkey", "shrimp", "tuna"]
+
+
+def get_keywords(profile):
+    # Pick which foods to search for, based on the user's diet
+    keywords = list(BASE_KEYWORDS)
+    diet = profile.get("diet", "")
+    if diet in ("Vegetarian", "Non-Vegetarian"):
+        keywords += VEG_KEYWORDS
+    if diet == "Non-Vegetarian":
+        keywords += NONVEG_KEYWORDS
+    return list(dict.fromkeys(keywords))
+
+
+def build_nutrition_context(keywords, exclude_words=None, per_keyword=3):
+    # Turns database rows into text lines that we can put inside the prompt
+    exclude_words = (exclude_words or []) + ALWAYS_EXCLUDE
+    lines = []
+    seen = set()
+    for keyword in keywords:
+        matches = search_food(keyword)
+        if matches.empty:
+            continue
+        keep = matches[~matches["food"].apply(lambda name: bool(find_matches(name, exclude_words)))]
+        keep = keep.assign(_len=keep["food"].str.len()).sort_values("_len")
+        for _, row in keep.head(per_keyword).iterrows():
+            if row["food"] in seen:
+                continue
+            seen.add(row["food"])
+            lines.append(
+                f"- {row['food']} (per 100 g): {row['calories']} kcal, "
+                f"protein {row['protein']} g, carbs {row['carbs']} g, fat {row['fat']} g"
+            )
+    return "\n".join(lines)
+
+    # New JSON format: Gemini gives foods and grams, not calories
+JSON_FORMAT_ITEMS = """Respond ONLY with valid JSON in exactly this structure:
+{
+  "meals": [
+    {"meal": "Breakfast", "dish": "dish name", "items": [{"food": "exact food name from the list", "grams": 80}]},
+    {"meal": "Lunch", "dish": "dish name", "items": [{"food": "exact food name from the list", "grams": 150}]},
+    {"meal": "Snack", "dish": "dish name", "items": [{"food": "exact food name from the list", "grams": 40}]},
+    {"meal": "Dinner", "dish": "dish name", "items": [{"food": "exact food name from the list", "grams": 200}]}
+  ]
+}
+"grams" must be a plain number. Do not include calories or totals, they are calculated separately."""
+
+
+def build_grounded_prompt(profile, nutrition_context, feedback=""):
+    allergies = profile.get("allergies", [])
+    preferences = profile.get("preferences", [])
+    cuisine = profile.get("cuisine", "")
+
+    prompt = f"""Create a one-day meal plan for this request:
+- Total calories: {profile['calories']} kcal
+- Total protein: {profile['protein']} g
+- Total carbs: {profile['carbs']} g
+- Total fat: {profile['fat']} g
+Diet type: {profile['diet']}
+Allergies to strictly avoid: {', '.join(allergies) if allergies else 'None'}
+Preferences: {', '.join(preferences) if preferences else 'None'}
+"""
+    if cuisine:
+        prompt += f"Cuisine preference: {cuisine}. Use familiar {cuisine} style dish names where possible.\n"
+    if "High Protein" in preferences:
+        prompt += "Protein is a priority: reach the protein target or slightly exceed it.\n"
+
+    prompt += f"""
+The plan must include breakfast, lunch, snack and dinner.
+
+Available foods with nutrition values per 100 g:
+{nutrition_context}
+
+Rules:
+- Build every meal ONLY from the foods listed above.
+- Copy each food name exactly as written in the list.
+- Choose the grams for each item so the whole day is close to the calorie, protein, carbs and fat targets (scale the per-100 g values by the grams).
+- Use 2 to 4 items per meal.
+
+"""
+    prompt += JSON_FORMAT_ITEMS
+    if feedback:
+        prompt += f"\n\nProblems found in the previous attempt, please fix them:\n{feedback}\n"
+    return prompt

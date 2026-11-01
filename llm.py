@@ -7,9 +7,11 @@ load_dotenv()
 
 MODEL = "gemini-3.5-flash-lite"
 
+
 def get_client():
     api_key = os.getenv("GEMINI_API_KEY")
     return genai.Client(api_key=api_key)
+
 
 def send_prompt(prompt_text, system_prompt=None):
     client = get_client()
@@ -20,6 +22,7 @@ def send_prompt(prompt_text, system_prompt=None):
         config=config
     )
     return response.text
+
 
 def send_prompt_json(prompt_text, system_prompt=None):
     client = get_client()

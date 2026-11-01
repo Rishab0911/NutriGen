@@ -1,4 +1,6 @@
+import re
 import pandas as pd
+
 
 def load_nutrition_data():#loads whole database
     df = pd.read_csv("data/clean/nutrition_clean.csv")
@@ -19,3 +21,8 @@ def search_food(keyword):#searches the food with its keyword
     df = load_nutrition_data()
     matches = df[df["food"].str.contains(keyword, case=False, na=False)]
     return matches
+
+def find_matches(text, words):
+    # Returns the words from the list that appear at the start of a word in the text
+    text = text.lower().replace("eggplant", "")
+    return [w for w in words if re.search(r"\b" + re.escape(w.lower()), text)]
