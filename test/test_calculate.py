@@ -180,3 +180,19 @@ def test_meal_rows_skip_unknown_meals():
     slots = [(0, 0), (1, 0)]
     rows = _meal_rows(plan, slots, [0.5, 0.5], 2000)
     assert len(rows) == 1
+
+def test_adjust_grams_caps_big_items():
+    from planner import adjust_grams, MAX_GRAMS
+    plan = {"meals": [{"meal": "Lunch", "dish": "x",
+                       "items": [{"food": FOOD, "grams": 600}]}]}
+    profile = {"calories": 2000, "protein": 110,
+               "carbs": 230, "fat": 65}
+    new = adjust_grams(plan, profile)
+    grams = new["meals"][0]["items"][0]["grams"]
+    assert grams <= MAX_GRAMS
+
+def test_fat_sources_are_offered():
+    from prompts import get_keywords
+    words = get_keywords({"diet": "Vegetarian"})
+    assert "oil, olive" in words
+    assert "avocados" in words

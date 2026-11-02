@@ -21,7 +21,8 @@ MIN_FACTOR = 0.5   # grams may shrink to half of what Gemini chose
 MAX_FACTOR = 2.0   # or grow to double
 ROUND_TO = 5       # round grams to the nearest 5 g
 REG_WEIGHT = 0.05  # small pull towards Gemini's original amounts
-MEAL_WEIGHT = 0.5
+MEAL_WEIGHT = 0.2
+MAX_GRAMS = 250
 MEAL_SHARES = {"breakfast": 0.25, "lunch": 0.35,
                "snack": 0.10, "dinner": 0.30}
 
@@ -82,8 +83,10 @@ def adjust_grams(plan, profile, min_factor=MIN_FACTOR, max_factor=MAX_FACTOR):
     matrix = np.vstack(parts)
     goal = np.concatenate(goal)
     solution = lsq_linear(matrix, goal,
-                          bounds=(start * min_factor, start * max_factor))
-
+                              bounds=(np.minimum(start * min_factor,
+                                             MAX_GRAMS / 2),
+                                  np.minimum(start * max_factor,
+                                             MAX_GRAMS)))
     new_plan = copy.deepcopy(plan)
     for (m, i), grams in zip(slots, solution.x):
         rounded = max(ROUND_TO, round(grams / ROUND_TO) * ROUND_TO)

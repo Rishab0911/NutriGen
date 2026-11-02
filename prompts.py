@@ -102,6 +102,7 @@ NONVEG_KEYWORDS = ["chicken, broiler", "salmon", "turkey", "shrimp", "tuna"]
 def get_keywords(profile):
     # Pick which foods to search for, based on the user's diet
     keywords = list(BASE_KEYWORDS)
+    keywords += FAT_KEYWORDS
     diet = profile.get("diet", "")
     if diet in ("Vegetarian", "Non-Vegetarian"):
         keywords += VEG_KEYWORDS
@@ -198,3 +199,7 @@ Rules:
     if feedback:
         prompt += f"\n\nProblems found in the previous attempt, please fix them:\n{feedback}\n"
     return prompt
+
+FAT_KEYWORDS = [
+    "oil, olive", "avocados", "seeds, flax", "seeds, chia",
+]
