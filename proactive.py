@@ -1,8 +1,10 @@
 import time
 from dataclasses import dataclass, field
 from datetime import datetime
-
 import schedule
+
+from nutrition import find_matches, restricted_words
+from prompts import PROACTIVE_SYSTEM_PROMPT, build_proactive_prompt
 
 LONG_GAP_HOURS = 5         # no meal logged for more than 5 hours
 AWAKE_START = 7            # no nudges before 7 am
@@ -181,3 +183,39 @@ def run_forever(scheduler, pause_seconds=30):
     while True:
         scheduler.run_pending()
         time.sleep(pause_seconds)
+
+MAX_MESSAGE_CHARS = 280
+
+
+def describe_state(state, now=None):
+    """The facts we give Gemini, as one plain line."""
+    parts = [
+        f"calories left today: {round(state.calories_remaining())} kcal",
+        f"protein left today: {round(state.protein_remaining())} g",
+    ]
+    gap = state.hours_since_last_meal(now)
+    if gap is not None:
+        parts.insert(0, f"hours since last meal: {round(gap, 1)}")
+    return "; ".join(parts)
+
+
+def write_message(state, action, ask_llm=None, now=None):
+    """Ask Gemini for a friendly version of the nudge. Falls back to the
+    template if the call fails or the text is empty, too long or unsafe."""
+    fallback = action["message"]
+    try:
+        if ask_llm is None:
+            from llm import send_prompt as ask_llm
+        prompt = build_proactive_prompt(
+            action, describe_state(state, now), state.diet,
+            state.allergies, state.preferences)
+        text = str(ask_llm(prompt, PROACTIVE_SYSTEM_PROMPT)).strip()
+    except Exception:
+        return fallback
+    if not text or len(text) > MAX_MESSAGE_CHARS:
+        return fallback
+    banned = restricted_words(
+        {"allergies": state.allergies, "diet": state.diet})
+    if find_matches(text, banned):
+        return fallback
+    return text

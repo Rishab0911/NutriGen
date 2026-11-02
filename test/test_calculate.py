@@ -355,3 +355,61 @@ def test_scheduler_registers_one_job_and_runs_it():
     assert len(scheduler.get_jobs()) == 1
     scheduler.run_all()
     assert len(sent) == 1
+
+
+from proactive import write_message
+
+
+def _nudge():
+    return {"trigger": "long_gap", "action": "remind_meal", "priority": 1,
+            "message": "TEMPLATE"}
+
+
+def test_write_message_uses_llm_text():
+    state = _user_state(800, 40, last_meal=datetime(2026, 11, 2, 8, 0))
+
+    def ask(prompt, system):
+        return "  Time for a bite, you got this!  "
+    result = write_message(state, _nudge(), ask_llm=ask)
+    assert result == "Time for a bite, you got this!"
+
+
+def test_write_message_falls_back_when_llm_fails():
+    state = _user_state()
+
+    def ask(prompt, system):
+        raise RuntimeError("API down")
+    assert write_message(state, _nudge(), ask_llm=ask) == "TEMPLATE"
+
+
+def test_write_message_falls_back_on_empty_text():
+    state = _user_state()
+    assert write_message(state, _nudge(), ask_llm=lambda p, s: "  ") == "TEMPLATE"
+
+
+def test_write_message_falls_back_on_too_long_text():
+    state = _user_state()
+    long_text = "x" * 500
+    assert write_message(state, _nudge(),
+                         ask_llm=lambda p, s: long_text) == "TEMPLATE"
+
+
+def test_write_message_blocks_diet_violation():
+    state = _user_state()
+    state.diet = "Vegetarian"
+    ask = lambda p, s: "Try some chicken soup."
+    assert write_message(state, _nudge(), ask_llm=ask) == "TEMPLATE"
+
+
+def test_write_message_prompt_contains_facts():
+    state = _user_state(800, 40, last_meal=datetime(2026, 11, 2, 8, 0))
+    state.allergies = ["Nuts"]
+    seen = {}
+
+    def ask(prompt, system):
+        seen["prompt"] = prompt
+        return "Time to eat!"
+    now = datetime(2026, 11, 2, 14, 0)
+    write_message(state, _nudge(), ask_llm=ask, now=now)
+    assert "hours since last meal: 6.0" in seen["prompt"]
+    assert "Nuts" in seen["prompt"]
