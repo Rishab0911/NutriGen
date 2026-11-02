@@ -1,8 +1,7 @@
-
-
 import copy
 import difflib
 import re
+import time
 
 import numpy as np
 from scipy.optimize import lsq_linear
@@ -15,6 +14,7 @@ from nutrition import restricted_words, find_violations
 
 
 MAX_ATTEMPTS = 3
+RETRY_WAIT = 10  # seconds to wait after a failed Gemini call
 TOLERANCE = 10  # percent
 NUTRIENTS = ["calories", "protein", "carbs", "fat"]
 MIN_FACTOR = 0.5   # grams may shrink to half of what Gemini chose
@@ -25,6 +25,7 @@ MEAL_WEIGHT = 0.2
 MAX_GRAMS = 250
 MEAL_SHARES = {"breakfast": 0.25, "lunch": 0.35,
                "snack": 0.10, "dinner": 0.30}
+
 
 def _meal_rows(plan, slots, cal_per_gram, cal_target):
     """Extra solver rows: each meal's calories should be close
@@ -40,6 +41,8 @@ def _meal_rows(plan, slots, cal_per_gram, cal_target):
         if any(row):
             rows.append(np.array(row) / (share * cal_target))
     return rows
+
+
 def adjust_grams(plan, profile, min_factor=MIN_FACTOR, max_factor=MAX_FACTOR):
     """Keep Gemini's foods, but solve the grams so the whole day is as close
     as possible to all four targets. Returns a new plan."""
@@ -82,16 +85,15 @@ def adjust_grams(plan, profile, min_factor=MIN_FACTOR, max_factor=MAX_FACTOR):
         goal.insert(1, MEAL_WEIGHT * np.ones(len(meal_rows)))
     matrix = np.vstack(parts)
     goal = np.concatenate(goal)
-    solution = lsq_linear(matrix, goal,
-                              bounds=(np.minimum(start * min_factor,
-                                             MAX_GRAMS / 2),
-                                  np.minimum(start * max_factor,
-                                             MAX_GRAMS)))
+    lower = np.minimum(start * min_factor, MAX_GRAMS / 2)
+    upper = np.minimum(start * max_factor, MAX_GRAMS)
+    solution = lsq_linear(matrix, goal, bounds=(lower, upper))
     new_plan = copy.deepcopy(plan)
     for (m, i), grams in zip(slots, solution.x):
         rounded = max(ROUND_TO, round(grams / ROUND_TO) * ROUND_TO)
         new_plan["meals"][m]["items"][i]["grams"] = rounded
     return new_plan
+
 
 def offered_names(context):
     """Food names that were offered to Gemini in the prompt."""
@@ -172,6 +174,7 @@ def _score(result):
     penalty += 1000 * len(violations)
     return error + penalty
 
+
 def generate_meal_plan(profile, max_attempts=MAX_ATTEMPTS, tolerance=TOLERANCE):
     """Gemini picks foods, code solves the grams, the database gives the real
     totals. Retries with feedback until close enough to the targets."""
@@ -181,6 +184,8 @@ def generate_meal_plan(profile, max_attempts=MAX_ATTEMPTS, tolerance=TOLERANCE):
     names = offered_names(context)
     feedback = ""
     best = None
+    last_error = None
+    got_a_plan = False
 
     for attempt in range(1, max_attempts + 1):
         try:
@@ -193,16 +198,19 @@ def generate_meal_plan(profile, max_attempts=MAX_ATTEMPTS, tolerance=TOLERANCE):
             result = calculate_day(plan, profile)
             result["violations"] = find_violations(result, restricted)
         except Exception as error:
+            last_error = error
             feedback = "Last reply was unusable. Use the exact JSON structure."
             print(f"Attempt {attempt} failed: {error}")
+            time.sleep(RETRY_WAIT)  # Gemini is often busy (503), so wait
             continue
+        got_a_plan = True
         problems = check_plan(result, tolerance)
         score = _score(result)
         if not result["violations"] and (
                 best is None or score < best["score"]):
             best = {"result": result, "score": score,
                     "attempt": attempt, "problems": problems}
-            
+
         print(f"Attempt {attempt}: {len(problems)} problem(s), "
               f"error score {score:.1f}")
         if not problems:
@@ -215,8 +223,9 @@ def generate_meal_plan(profile, max_attempts=MAX_ATTEMPTS, tolerance=TOLERANCE):
         )
 
     if best is None:
-        raise RuntimeError(
-            "No plan passed the allergy and diet check.")
+        if not got_a_plan:
+            raise RuntimeError(f"Gemini request failed: {last_error}")
+        raise RuntimeError("No plan passed the allergy and diet check.")
     return {
         "result": best["result"],
         "passed": not best["problems"],
@@ -226,7 +235,7 @@ def generate_meal_plan(profile, max_attempts=MAX_ATTEMPTS, tolerance=TOLERANCE):
 
 
 if __name__ == "__main__":
-    sample =     sample = {
+    sample = {
         "calories": 2000, "protein": 110, "carbs": 230, "fat": 65,
         "diet": "Vegetarian", "allergies": ["Nuts", "Soy"],
         "preferences": ["High Protein"],
@@ -250,3 +259,4 @@ if __name__ == "__main__":
 
     print("\nPassed:", output["passed"], "| best attempt:", output["best_attempt"])
     print("Problems left:", output["problems_left"])
+    
