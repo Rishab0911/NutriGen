@@ -1,6 +1,5 @@
-   
 from nutrition import search_food, find_matches
-from nutrition import search_food
+
 SYSTEM_PROMPT = """You are NutriGen, a personalized meal planning assistant.
 
 Your job is to generate practical, realistic meal plans based on a user's:
@@ -83,16 +82,6 @@ The plan must include breakfast, lunch, snack and dinner.
 """
     return request + "\n" + JSON_FORMAT
 
-def build_nutrition_context(keywords, per_keyword=3):
-    lines = []
-    for keyword in keywords:
-        matches = search_food(keyword).head(per_keyword)
-        for _, row in matches.iterrows():
-            lines.append(
-                f"- {row['food']} (per 100 g): {row['calories']} kcal, "
-                f"protein {row['protein']} g, carbs {row['carbs']} g, fat {row['fat']} g"
-            )
-    return "\n".join(lines)
 
 # Words that mark foods we do not want to offer (restaurant dishes, baby food, etc.)
 ALWAYS_EXCLUDE = ["restaurant", "babyfood", "fast foods", "usda commodity",
@@ -142,7 +131,8 @@ def build_nutrition_context(keywords, exclude_words=None, per_keyword=3):
             )
     return "\n".join(lines)
 
-    # New JSON format: Gemini gives foods and grams, not calories
+
+# New JSON format: Gemini gives foods and grams, not calories
 JSON_FORMAT_ITEMS = """Respond ONLY with valid JSON in exactly this structure:
 {
   "meals": [
