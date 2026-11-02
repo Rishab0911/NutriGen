@@ -1,5 +1,8 @@
+import time
 from dataclasses import dataclass, field
 from datetime import datetime
+
+import schedule
 
 LONG_GAP_HOURS = 5         # no meal logged for more than 5 hours
 AWAKE_START = 7            # no nudges before 7 am
@@ -143,3 +146,38 @@ def decide_actions(triggers, state, now=None):
 def top_action(actions):
     """The single most important action, or None. One nudge per check."""
     return actions[0] if actions else None
+
+CHECK_EVERY_MINUTES = 30
+
+
+def run_check(state, now=None):
+    """One proactive check for one user. Returns the top action or None."""
+    triggers = detect_triggers(state, now)
+    actions = decide_actions(triggers, state, now)
+    return top_action(actions)
+
+
+def make_job(states, notify, clock=datetime.now):
+    """Build the function the scheduler runs on every tick."""
+    def job():
+        now = clock()
+        for state in states:
+            action = run_check(state, now)
+            if action:
+                notify(state, action)
+    return job
+
+
+def make_scheduler(states, notify, minutes=CHECK_EVERY_MINUTES,
+                   clock=datetime.now):
+    """A scheduler that checks every user every `minutes` minutes."""
+    scheduler = schedule.Scheduler()
+    scheduler.every(minutes).minutes.do(make_job(states, notify, clock))
+    return scheduler
+
+
+def run_forever(scheduler, pause_seconds=30):
+    """Keep running due checks. Stop it with Ctrl+C."""
+    while True:
+        scheduler.run_pending()
+        time.sleep(pause_seconds)

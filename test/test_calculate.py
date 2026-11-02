@@ -319,3 +319,39 @@ def test_over_calories_message_shows_amount():
 def test_top_action_returns_first_or_none():
     assert top_action([]) is None
     assert top_action([{"trigger": "a"}, {"trigger": "b"}]) == {"trigger": "a"}
+
+from proactive import run_check, make_job, make_scheduler
+
+
+def test_run_check_returns_top_action():
+    state = _user_state(800, 40, last_meal=datetime(2026, 11, 2, 8, 0))
+    action = run_check(state, datetime(2026, 11, 2, 14, 0))
+    assert action["trigger"] == "long_gap"
+
+
+def test_run_check_returns_none_when_nothing_to_do():
+    state = _user_state(800, 40, last_meal=datetime(2026, 11, 2, 10, 0))
+    assert run_check(state, datetime(2026, 11, 2, 14, 0)) is None
+
+
+def test_job_notifies_only_users_with_an_action():
+    needs = _user_state(800, 40, last_meal=datetime(2026, 11, 2, 8, 0))
+    fine = _user_state(800, 40, last_meal=datetime(2026, 11, 2, 10, 0))
+    sent = []
+    job = make_job([needs, fine], lambda s, a: sent.append((s, a)),
+                   clock=lambda: datetime(2026, 11, 2, 14, 0))
+    job()
+    assert len(sent) == 1
+    assert sent[0][0] is needs
+    assert sent[0][1]["trigger"] == "long_gap"
+
+
+def test_scheduler_registers_one_job_and_runs_it():
+    state = _user_state(800, 40, last_meal=datetime(2026, 11, 2, 8, 0))
+    sent = []
+    scheduler = make_scheduler([state], lambda s, a: sent.append(a),
+                               minutes=30,
+                               clock=lambda: datetime(2026, 11, 2, 14, 0))
+    assert len(scheduler.get_jobs()) == 1
+    scheduler.run_all()
+    assert len(sent) == 1
