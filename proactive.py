@@ -87,3 +87,59 @@ def detect_triggers(state, now=None):
         if state.protein_logged < low_pro:
             triggers.append("low_protein")
     return triggers
+
+RULES = {
+    "no_meal_yet": {
+        "action": "remind_meal", "priority": 1,
+        "message": "You haven't logged a meal yet today. "
+                   "Time for something to eat?",
+    },
+    "long_gap": {
+        "action": "remind_meal", "priority": 1,
+        "message": "It has been {hours} hours since your last meal. "
+                   "Time for a meal or snack?",
+    },
+    "over_calories": {
+        "action": "warn_over", "priority": 2,
+        "message": "You are {calories_over} kcal over today's target. "
+                   "Keep the rest of the day light.",
+    },
+    "low_calories": {
+        "action": "suggest_meal", "priority": 2,
+        "message": "You still have {calories_left} kcal left today. "
+                   "A proper meal is due.",
+    },
+    "low_protein": {
+        "action": "suggest_protein", "priority": 3,
+        "message": "You still need {protein_left} g of protein today. "
+                   "Add a protein-rich food.",
+    },
+}
+
+
+def decide_actions(triggers, state, now=None):
+    """Turn trigger names into actions, most important first."""
+    gap = state.hours_since_last_meal(now)
+    values = {
+        "hours": round(gap, 1) if gap is not None else 0,
+        "calories_left": round(state.calories_remaining()),
+        "protein_left": round(state.protein_remaining()),
+        "calories_over": round(-state.calories_remaining()),
+    }
+    actions = []
+    for trigger in triggers:
+        rule = RULES.get(trigger)
+        if rule is None:
+            continue
+        actions.append({
+            "trigger": trigger,
+            "action": rule["action"],
+            "priority": rule["priority"],
+            "message": rule["message"].format(**values),
+        })
+    return sorted(actions, key=lambda a: a["priority"])
+
+
+def top_action(actions):
+    """The single most important action, or None. One nudge per check."""
+    return actions[0] if actions else None

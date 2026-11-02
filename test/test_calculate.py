@@ -279,3 +279,43 @@ def test_trigger_over_calories():
     state = _user_state(2300, 90, last_meal=datetime(2026, 11, 2, 13, 0))
     now = datetime(2026, 11, 2, 14, 0)
     assert detect_triggers(state, now=now) == ["over_calories"]
+
+
+from proactive import RULES, decide_actions, top_action
+
+
+def test_every_trigger_has_a_rule():
+    assert set(RULES) == {"no_meal_yet", "long_gap", "over_calories",
+                          "low_calories", "low_protein"}
+
+
+def test_decide_actions_long_gap():
+    state = _user_state(800, 40, last_meal=datetime(2026, 11, 2, 8, 0))
+    now = datetime(2026, 11, 2, 14, 0)
+    actions = decide_actions(["long_gap"], state, now=now)
+    assert actions[0]["action"] == "remind_meal"
+    assert "6.0 hours" in actions[0]["message"]
+
+
+def test_decide_actions_sorted_by_priority():
+    state = _user_state(500, 20, last_meal=datetime(2026, 11, 2, 8, 0))
+    now = datetime(2026, 11, 2, 19, 0)
+    actions = decide_actions(["low_protein", "long_gap"], state, now=now)
+    assert [a["trigger"] for a in actions] == ["long_gap", "low_protein"]
+
+
+def test_decide_actions_skips_unknown_trigger():
+    state = _user_state()
+    assert decide_actions(["made_up"], state) == []
+
+
+def test_over_calories_message_shows_amount():
+    state = _user_state(2300, 90, last_meal=datetime(2026, 11, 2, 13, 0))
+    now = datetime(2026, 11, 2, 14, 0)
+    actions = decide_actions(["over_calories"], state, now=now)
+    assert "300" in actions[0]["message"]
+
+
+def test_top_action_returns_first_or_none():
+    assert top_action([]) is None
+    assert top_action([{"trigger": "a"}, {"trigger": "b"}]) == {"trigger": "a"}
