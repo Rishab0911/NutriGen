@@ -200,11 +200,14 @@ def generate_meal_plan(profile, max_attempts=MAX_ATTEMPTS, tolerance=TOLERANCE):
 
 
 if __name__ == "__main__":
-    sample = {
+    sample =     sample = {
         "calories": 2000, "protein": 110, "carbs": 230, "fat": 65,
         "diet": "Vegetarian", "allergies": ["Nuts", "Soy"],
         "preferences": ["High Protein"],
-    }
+        "cuisine": "Indian",
+        "protein_preference": ["Lentils", "Chickpeas"],
+    }  
+    
     output = generate_meal_plan(sample)
     result = output["result"]
 

@@ -107,6 +107,11 @@ def get_keywords(profile):
         keywords += VEG_KEYWORDS
     if diet == "Non-Vegetarian":
         keywords += NONVEG_KEYWORDS
+
+    wanted = profile.get("protein_preference") or []
+    if isinstance(wanted, str):
+        wanted = [wanted]
+    keywords = list(wanted) + keywords
     return list(dict.fromkeys(keywords))
 
 
@@ -160,7 +165,19 @@ Allergies to strictly avoid: {', '.join(allergies) if allergies else 'None'}
 Preferences: {', '.join(preferences) if preferences else 'None'}
 """
     if cuisine:
-        prompt += f"Cuisine preference: {cuisine}. Use familiar {cuisine} style dish names where possible.\n"
+        prompt += (
+            f"Cuisine preference: {cuisine}. "
+            f"Use familiar {cuisine} style dish names "
+            "where possible.\n")
+    wanted = profile.get("protein_preference") or []
+    if isinstance(wanted, str):
+        wanted = [wanted]
+    if wanted:
+        prompt += (
+            "Preferred protein foods: " + ", ".join(wanted)
+            + ". Use them if the diet and allergies allow.\n")
+
+
     if "High Protein" in preferences:
         prompt += "Protein is a priority: reach the protein target or slightly exceed it.\n"
 

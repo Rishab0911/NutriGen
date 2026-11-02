@@ -160,3 +160,16 @@ def test_allergen_foods_are_removed_from_prompt_context():
     context = build_nutrition_context(["almonds"], exclude_words=words)
     assert "almond" not in context.lower()
 
+def test_protein_preference_in_keywords_and_prompt():
+    from prompts import get_keywords, build_grounded_prompt
+    profile = {
+        "calories": 2000, "protein": 110, "carbs": 230,
+        "fat": 65, "diet": "Vegetarian", "allergies": [],
+        "preferences": [], "protein_preference": ["Lentils"],
+    }
+    assert get_keywords(profile)[0] == "Lentils"
+    prompt = build_grounded_prompt(profile, "- x")
+    assert "Preferred protein foods: Lentils" in prompt
+    del profile["protein_preference"]
+    plain = build_grounded_prompt(profile, "- x")
+    assert "Preferred protein" not in plain
