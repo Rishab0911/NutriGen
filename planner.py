@@ -21,8 +21,24 @@ MIN_FACTOR = 0.5   # grams may shrink to half of what Gemini chose
 MAX_FACTOR = 2.0   # or grow to double
 ROUND_TO = 5       # round grams to the nearest 5 g
 REG_WEIGHT = 0.05  # small pull towards Gemini's original amounts
+MEAL_WEIGHT = 0.5
+MEAL_SHARES = {"breakfast": 0.25, "lunch": 0.35,
+               "snack": 0.10, "dinner": 0.30}
 
-
+def _meal_rows(plan, slots, cal_per_gram, cal_target):
+    """Extra solver rows: each meal's calories should be close
+    to its share of the day's calorie target."""
+    rows = []
+    for m, meal in enumerate(plan.get("meals", [])):
+        name = str(meal.get("meal", "")).strip().lower()
+        share = MEAL_SHARES.get(name)
+        if share is None:
+            continue
+        row = [c if s[0] == m else 0.0
+               for s, c in zip(slots, cal_per_gram)]
+        if any(row):
+            rows.append(np.array(row) / (share * cal_target))
+    return rows
 def adjust_grams(plan, profile, min_factor=MIN_FACTOR, max_factor=MAX_FACTOR):
     """Keep Gemini's foods, but solve the grams so the whole day is as close
     as possible to all four targets. Returns a new plan."""
@@ -55,9 +71,16 @@ def adjust_grams(plan, profile, min_factor=MIN_FACTOR, max_factor=MAX_FACTOR):
     start = np.array(start)
     fit = np.array(columns).T / targets[:, None]
     pull = REG_WEIGHT * np.diag(1 / start)
-    matrix = np.vstack([fit, pull])
-    goal = np.concatenate([np.ones(len(NUTRIENTS)),
-                           REG_WEIGHT * np.ones(len(start))])
+    cal = [col[0] for col in columns]
+    meal_rows = _meal_rows(plan, slots, cal, targets[0])
+    parts = [fit, pull]
+    goal = [np.ones(len(NUTRIENTS)),
+            REG_WEIGHT * np.ones(len(start))]
+    if meal_rows:
+        parts.insert(1, MEAL_WEIGHT * np.array(meal_rows))
+        goal.insert(1, MEAL_WEIGHT * np.ones(len(meal_rows)))
+    matrix = np.vstack(parts)
+    goal = np.concatenate(goal)
     solution = lsq_linear(matrix, goal,
                           bounds=(start * min_factor, start * max_factor))
 
@@ -207,7 +230,6 @@ if __name__ == "__main__":
         "cuisine": "Indian",
         "protein_preference": ["Lentils", "Chickpeas"],
     }  
-    
     output = generate_meal_plan(sample)
     result = output["result"]
 

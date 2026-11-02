@@ -173,3 +173,10 @@ def test_protein_preference_in_keywords_and_prompt():
     del profile["protein_preference"]
     plain = build_grounded_prompt(profile, "- x")
     assert "Preferred protein" not in plain
+
+def test_meal_rows_skip_unknown_meals():
+    from planner import _meal_rows
+    plan = {"meals": [{"meal": "Breakfast"}, {"meal": "Brunch"}]}
+    slots = [(0, 0), (1, 0)]
+    rows = _meal_rows(plan, slots, [0.5, 0.5], 2000)
+    assert len(rows) == 1
