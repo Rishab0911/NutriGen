@@ -11,6 +11,8 @@ from llm import send_prompt_json
 from prompts import SYSTEM_PROMPT, get_keywords
 from prompts import build_nutrition_context, build_grounded_prompt
 from nutrition import calculate_day, calculate_item
+from nutrition import restricted_words, find_violations
+
 
 MAX_ATTEMPTS = 3
 TOLERANCE = 10  # percent
@@ -102,6 +104,12 @@ def repair_names(plan, names, cutoff=0.4):
 def check_plan(result, tolerance=TOLERANCE):
     """Return a list of problems found in a calculated plan (empty = plan is good)."""
     problems = []
+    bad = result.get("violations") or []
+    if bad:
+        problems.append(
+            "These break the user's allergy or diet rules and must "
+            "NOT be used, replace them: " + ", ".join(bad)
+        )
     if result["not_found"]:
         problems.append(
             "These foods are not in the list. Use only exact names "
@@ -133,13 +141,17 @@ def describe_plan(result):
 def _score(result):
     """Lower is better: total percent error, heavy penalty for unknown foods."""
     error = sum(abs(c["percent_error"] or 0) for c in result["comparison"].values())
-    return error + 100 * len(result["not_found"])
-
+    violations = result.get("violations") or []
+    penalty = 100 * len(result["not_found"])
+    penalty += 1000 * len(violations)
+    return error + penalty
 
 def generate_meal_plan(profile, max_attempts=MAX_ATTEMPTS, tolerance=TOLERANCE):
     """Gemini picks foods, code solves the grams, the database gives the real
     totals. Retries with feedback until close enough to the targets."""
-    context = build_nutrition_context(get_keywords(profile))
+    restricted = restricted_words(profile)
+    context = build_nutrition_context(
+        get_keywords(profile), exclude_words=restricted)
     names = offered_names(context)
     feedback = ""
     best = None
@@ -153,17 +165,18 @@ def generate_meal_plan(profile, max_attempts=MAX_ATTEMPTS, tolerance=TOLERANCE):
                 print("   Repaired names:", fixed)
             plan = adjust_grams(plan, profile)
             result = calculate_day(plan, profile)
+            result["violations"] = find_violations(result, restricted)
         except Exception as error:
             feedback = "Last reply was unusable. Use the exact JSON structure."
             print(f"Attempt {attempt} failed: {error}")
             continue
-
         problems = check_plan(result, tolerance)
         score = _score(result)
-        if best is None or score < best["score"]:
+        if not result["violations"] and (
+                best is None or score < best["score"]):
             best = {"result": result, "score": score,
                     "attempt": attempt, "problems": problems}
-
+            
         print(f"Attempt {attempt}: {len(problems)} problem(s), "
               f"error score {score:.1f}")
         if not problems:
@@ -176,8 +189,8 @@ def generate_meal_plan(profile, max_attempts=MAX_ATTEMPTS, tolerance=TOLERANCE):
         )
 
     if best is None:
-        raise RuntimeError("Could not generate a usable meal plan.")
-
+        raise RuntimeError(
+            "No plan passed the allergy and diet check.")
     return {
         "result": best["result"],
         "passed": not best["problems"],
@@ -189,7 +202,7 @@ def generate_meal_plan(profile, max_attempts=MAX_ATTEMPTS, tolerance=TOLERANCE):
 if __name__ == "__main__":
     sample = {
         "calories": 2000, "protein": 110, "carbs": 230, "fat": 65,
-        "diet": "Non-Vegetarian", "allergies": ["Peanuts"],
+        "diet": "Vegetarian", "allergies": ["Nuts", "Soy"],
         "preferences": ["High Protein"],
     }
     output = generate_meal_plan(sample)

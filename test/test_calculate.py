@@ -117,3 +117,46 @@ def test_repair_names_fixes_close_name_and_leaves_others():
     assert items[0]["food"] == "Rice, brown, parboiled, dry, UNCLE BEN'S"
     assert items[1]["food"] == "Mystery stuff"
     assert len(fixed) == 1
+
+from nutrition import restricted_words, find_violations
+from prompts import build_nutrition_context
+
+
+def test_restricted_words_peanut_allergy():
+    words = restricted_words({"allergies": ["Peanuts"], "diet": "Non-Vegetarian"})
+    assert "peanut" in words
+    assert "chicken" not in words
+
+
+def test_restricted_words_no_nuts_covers_all_nuts():
+    words = restricted_words({"allergies": ["no nuts"], "diet": "Vegetarian"})
+    assert "peanut" in words and "almond" in words and "cashew" in words
+
+
+def test_restricted_words_vegan_excludes_animal_foods():
+    words = restricted_words({"allergies": [], "diet": "Vegan"})
+    for w in ["chicken", "milk", "egg", "salmon", "honey"]:
+        assert w in words
+
+
+def test_restricted_words_unknown_allergy_uses_its_own_name():
+    words = restricted_words({"allergies": ["Mustard"], "diet": "Non-Vegetarian"})
+    assert "mustard" in words
+
+
+def test_find_violations_checks_foods_and_dish_names():
+    result = {"meals": [{"meal": "Lunch", "dish": "Peanut noodle bowl",
+                         "items": [{"food": FOOD}],
+                         "not_found": ["Peanut butter"]}]}
+    assert find_violations(result, ["peanut"]) == [
+        "Peanut noodle bowl", "Peanut butter"]
+    assert find_violations(result, []) == []
+
+
+def test_allergen_foods_are_removed_from_prompt_context():
+    words = restricted_words({"allergies": ["eggs"], "diet": "Vegetarian"})
+    assert build_nutrition_context(["egg, whole"], exclude_words=words) == ""
+    words = restricted_words({"allergies": ["no nuts"], "diet": "Vegetarian"})
+    context = build_nutrition_context(["almonds"], exclude_words=words)
+    assert "almond" not in context.lower()
+

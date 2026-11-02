@@ -127,3 +127,70 @@ def calculate_day(plan, profile):
         "comparison": comparison,
         "not_found": not_found,
     }
+
+NUT_WORDS = ["almond", "walnut", "cashew", "pecan", "pistachio", "hazelnut",
+             "macadamia", "brazil nut", "pine nut", "nuts"]
+DAIRY_WORDS = ["milk", "cheese", "yogurt", "yoghurt", "butter", "cream", "whey",
+               "casein", "curd", "kefir", "paneer", "ghee"]
+EGG_WORDS = ["egg"]
+SOY_WORDS = ["soy", "tofu", "tempeh", "edamame", "miso"]
+GLUTEN_WORDS = ["wheat", "bread", "barley", "rye", "pasta", "noodle", "oat",
+                "cereal", "couscous", "bulgur", "semolina", "flour"]
+FISH_WORDS = ["fish", "salmon", "tuna", "cod", "tilapia", "trout", "sardine",
+              "anchov", "mackerel", "halibut", "bass", "haddock", "pollock",
+              "catfish"]
+SHELLFISH_WORDS = ["shrimp", "prawn", "crab", "lobster", "crayfish", "clam",
+                   "oyster", "mussel", "scallop"]
+SESAME_WORDS = ["sesame", "tahini"]
+MEAT_WORDS = ["chicken", "beef", "pork", "lamb", "turkey", "duck", "bacon",
+              "ham", "sausage", "veal", "venison", "goat"]
+
+ALLERGEN_WORDS = {
+    "peanut": ["peanut"], "peanuts": ["peanut"],
+    "nut": ["peanut"] + NUT_WORDS, "nuts": ["peanut"] + NUT_WORDS,
+    "tree nut": NUT_WORDS, "tree nuts": NUT_WORDS,
+    "dairy": DAIRY_WORDS, "milk": DAIRY_WORDS, "lactose": DAIRY_WORDS,
+    "egg": EGG_WORDS, "eggs": EGG_WORDS,
+    "soy": SOY_WORDS, "soya": SOY_WORDS,
+    "gluten": GLUTEN_WORDS, "wheat": GLUTEN_WORDS,
+    "fish": FISH_WORDS, "shellfish": SHELLFISH_WORDS,
+    "sesame": SESAME_WORDS,
+}
+
+DIET_WORDS = {
+    "vegan": MEAT_WORDS + FISH_WORDS + SHELLFISH_WORDS + DAIRY_WORDS
+             + EGG_WORDS + ["honey", "gelatin"],
+    "vegetarian": MEAT_WORDS + FISH_WORDS + SHELLFISH_WORDS + ["gelatin"],
+}
+
+
+def restricted_words(profile):
+    """Words that must not appear in any food or dish name for this user."""
+    words = []
+    for allergy in profile.get("allergies") or []:
+        key = str(allergy).strip().lower()
+        if key.startswith("no "):
+            key = key[3:].strip()
+        if not key or key == "none":
+            continue
+        words += ALLERGEN_WORDS.get(key, [key, key.rstrip("s")])
+    diet = str(profile.get("diet", "")).strip().lower()
+    words += DIET_WORDS.get(diet, [])
+    return list(dict.fromkeys(w for w in words if w))
+
+
+def find_violations(result, words):
+    """Names in a calculated day (dish names, foods, unknown foods)
+    that contain a restricted word."""
+    if not words:
+        return []
+    bad = []
+    for meal in result.get("meals", []):
+        names = [meal.get("dish")]
+        names += [item["food"] for item in meal.get("items", [])]
+        names += list(meal.get("not_found", []))
+        for name in names:
+            if name and find_matches(str(name), words) and name not in bad:
+                bad.append(name)
+    return bad
+
