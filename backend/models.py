@@ -53,3 +53,4 @@ class MealPlanResponse(BaseModel):
     ai_request: dict
     meal_plan: list[Meal]
     ai_status: str
+    
