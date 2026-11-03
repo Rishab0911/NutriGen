@@ -196,3 +196,220 @@ def test_fat_sources_are_offered():
     words = get_keywords({"diet": "Vegetarian"})
     assert "oil, olive" in words
     assert "avocados" in words
+
+from datetime import datetime, timedelta
+from proactive import UserState, state_from_profile, detect_triggers
+
+
+def test_state_from_profile_copies_targets():
+    state = state_from_profile("u1", {"calories": 2000, "protein": 110,
+                                      "diet": "Vegetarian",
+                                      "allergies": ["Nuts"]})
+    assert state.calorie_target == 2000
+    assert state.allergies == ["Nuts"]
+    assert state.last_meal_time is None
+
+
+def test_log_meal_updates_totals_and_remaining():
+    state = UserState("u1", 2000, 110)
+    state.log_meal(500, 30)
+    state.log_meal(300, 20)
+    assert state.calories_logged == 800
+    assert state.calories_remaining() == 1200
+    assert state.protein_remaining() == 60
+
+
+def test_hours_since_last_meal():
+    state = UserState("u1", 2000, 110)
+    assert state.hours_since_last_meal() is None
+    start = datetime(2026, 11, 2, 8, 0)
+    state.log_meal(400, 20, when=start)
+    assert state.hours_since_last_meal(now=start + timedelta(hours=5)) == 5
+
+
+def test_reset_day_keeps_notification_history():
+    state = UserState("u1", 2000, 110)
+    state.log_meal(400, 20)
+    state.last_notified["long_gap"] = datetime(2026, 11, 2, 9, 0)
+    state.reset_day()
+    assert state.calories_logged == 0
+    assert state.last_meal_time is None
+    assert "long_gap" in state.last_notified
+
+
+def _user_state(calories=0, protein=0, last_meal=None):
+    state = UserState("u1", 2000, 100)
+    state.calories_logged = calories
+    state.protein_logged = protein
+    state.last_meal_time = last_meal
+    return state
+
+
+def test_trigger_long_gap():
+    state = _user_state(800, 40, last_meal=datetime(2026, 11, 2, 8, 0))
+    now = datetime(2026, 11, 2, 14, 0)
+    assert detect_triggers(state, now=now) == ["long_gap"]
+
+
+def test_no_trigger_when_gap_is_short():
+    state = _user_state(800, 40, last_meal=datetime(2026, 11, 2, 10, 0))
+    now = datetime(2026, 11, 2, 14, 0)
+    assert detect_triggers(state, now=now) == []
+
+
+def test_trigger_no_meal_yet_only_after_11am():
+    noon = datetime(2026, 11, 2, 12, 0)
+    nine = datetime(2026, 11, 2, 9, 0)
+    assert detect_triggers(_user_state(), now=noon) == ["no_meal_yet"]
+    assert detect_triggers(_user_state(), now=nine) == []
+
+
+def test_no_triggers_at_night():
+    late = datetime(2026, 11, 2, 23, 0)
+    assert detect_triggers(_user_state(), now=late) == []
+
+
+def test_evening_low_calories_and_protein():
+    state = _user_state(500, 20, last_meal=datetime(2026, 11, 2, 18, 0))
+    now = datetime(2026, 11, 2, 19, 0)
+    assert detect_triggers(state, now=now) == ["low_calories", "low_protein"]
+
+
+def test_trigger_over_calories():
+    state = _user_state(2300, 90, last_meal=datetime(2026, 11, 2, 13, 0))
+    now = datetime(2026, 11, 2, 14, 0)
+    assert detect_triggers(state, now=now) == ["over_calories"]
+
+
+from proactive import RULES, decide_actions, top_action
+
+
+def test_every_trigger_has_a_rule():
+    assert set(RULES) == {"no_meal_yet", "long_gap", "over_calories",
+                          "low_calories", "low_protein"}
+
+
+def test_decide_actions_long_gap():
+    state = _user_state(800, 40, last_meal=datetime(2026, 11, 2, 8, 0))
+    now = datetime(2026, 11, 2, 14, 0)
+    actions = decide_actions(["long_gap"], state, now=now)
+    assert actions[0]["action"] == "remind_meal"
+    assert "6.0 hours" in actions[0]["message"]
+
+
+def test_decide_actions_sorted_by_priority():
+    state = _user_state(500, 20, last_meal=datetime(2026, 11, 2, 8, 0))
+    now = datetime(2026, 11, 2, 19, 0)
+    actions = decide_actions(["low_protein", "long_gap"], state, now=now)
+    assert [a["trigger"] for a in actions] == ["long_gap", "low_protein"]
+
+
+def test_decide_actions_skips_unknown_trigger():
+    state = _user_state()
+    assert decide_actions(["made_up"], state) == []
+
+
+def test_over_calories_message_shows_amount():
+    state = _user_state(2300, 90, last_meal=datetime(2026, 11, 2, 13, 0))
+    now = datetime(2026, 11, 2, 14, 0)
+    actions = decide_actions(["over_calories"], state, now=now)
+    assert "300" in actions[0]["message"]
+
+
+def test_top_action_returns_first_or_none():
+    assert top_action([]) is None
+    assert top_action([{"trigger": "a"}, {"trigger": "b"}]) == {"trigger": "a"}
+
+from proactive import run_check, make_job, make_scheduler
+
+
+def test_run_check_returns_top_action():
+    state = _user_state(800, 40, last_meal=datetime(2026, 11, 2, 8, 0))
+    action = run_check(state, datetime(2026, 11, 2, 14, 0))
+    assert action["trigger"] == "long_gap"
+
+
+def test_run_check_returns_none_when_nothing_to_do():
+    state = _user_state(800, 40, last_meal=datetime(2026, 11, 2, 10, 0))
+    assert run_check(state, datetime(2026, 11, 2, 14, 0)) is None
+
+
+def test_job_notifies_only_users_with_an_action():
+    needs = _user_state(800, 40, last_meal=datetime(2026, 11, 2, 8, 0))
+    fine = _user_state(800, 40, last_meal=datetime(2026, 11, 2, 10, 0))
+    sent = []
+    job = make_job([needs, fine], lambda s, a: sent.append((s, a)),
+                   clock=lambda: datetime(2026, 11, 2, 14, 0))
+    job()
+    assert len(sent) == 1
+    assert sent[0][0] is needs
+    assert sent[0][1]["trigger"] == "long_gap"
+
+
+def test_scheduler_registers_one_job_and_runs_it():
+    state = _user_state(800, 40, last_meal=datetime(2026, 11, 2, 8, 0))
+    sent = []
+    scheduler = make_scheduler([state], lambda s, a: sent.append(a),
+                               minutes=30,
+                               clock=lambda: datetime(2026, 11, 2, 14, 0))
+    assert len(scheduler.get_jobs()) == 1
+    scheduler.run_all()
+    assert len(sent) == 1
+
+
+from proactive import write_message
+
+
+def _nudge():
+    return {"trigger": "long_gap", "action": "remind_meal", "priority": 1,
+            "message": "TEMPLATE"}
+
+
+def test_write_message_uses_llm_text():
+    state = _user_state(800, 40, last_meal=datetime(2026, 11, 2, 8, 0))
+
+    def ask(prompt, system):
+        return "  Time for a bite, you got this!  "
+    result = write_message(state, _nudge(), ask_llm=ask)
+    assert result == "Time for a bite, you got this!"
+
+
+def test_write_message_falls_back_when_llm_fails():
+    state = _user_state()
+
+    def ask(prompt, system):
+        raise RuntimeError("API down")
+    assert write_message(state, _nudge(), ask_llm=ask) == "TEMPLATE"
+
+
+def test_write_message_falls_back_on_empty_text():
+    state = _user_state()
+    assert write_message(state, _nudge(), ask_llm=lambda p, s: "  ") == "TEMPLATE"
+
+
+def test_write_message_falls_back_on_too_long_text():
+    state = _user_state()
+    long_text = "x" * 500
+    assert write_message(state, _nudge(),
+                         ask_llm=lambda p, s: long_text) == "TEMPLATE"
+
+
+def test_write_message_blocks_diet_violation():
+    state = _user_state()
+    state.diet = "Vegetarian"
+    ask = lambda p, s: "Try some chicken soup."
+    assert write_message(state, _nudge(), ask_llm=ask) == "TEMPLATE"
+
+
+def test_write_message_prompt_contains_facts():
+    state = _user_state(800, 40, last_meal=datetime(2026, 11, 2, 8, 0))
+    state.allergies = ["Nuts"]
+    seen = {}
+
+    def ask(prompt, system):
+        seen["prompt"] = prompt
+        return "Time to eat!"
+    now = datetime(2026, 11, 2, 14, 0)
+    write_message(state, _nudge(), ask_llm=ask, now=now)
+    assert "hours since last meal: 6.0" in seen["prompt"]
+    assert "Nuts" in seen["prompt"]

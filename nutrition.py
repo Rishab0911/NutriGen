@@ -156,6 +156,11 @@ ALLERGEN_WORDS = {
     "fish": FISH_WORDS, "shellfish": SHELLFISH_WORDS,
     "sesame": SESAME_WORDS,
 }
+RESTRICTION_WORDS = {
+    "no seafood": FISH_WORDS + SHELLFISH_WORDS,
+    "no red meat": ["beef", "lamb", "mutton", "veal", "steak", "venison", "goat"],
+    "no pork": ["pork", "bacon", "ham", "sausage"],
+}
 
 DIET_WORDS = {
     "vegan": MEAT_WORDS + FISH_WORDS + SHELLFISH_WORDS + DAIRY_WORDS
@@ -174,8 +179,17 @@ def restricted_words(profile):
         if not key or key == "none":
             continue
         words += ALLERGEN_WORDS.get(key, [key, key.rstrip("s")])
+    for restriction in profile.get("restrictions") or []:
+        words += RESTRICTION_WORDS.get(str(restriction).strip().lower(), [])
+    preferences = [str(p).strip().lower() for p in profile.get("preferences") or []]
+    if "dairy free" in preferences:
+        words += DAIRY_WORDS
     diet = str(profile.get("diet", "")).strip().lower()
     words += DIET_WORDS.get(diet, [])
+
+
+
+
     return list(dict.fromkeys(w for w in words if w))
 
 

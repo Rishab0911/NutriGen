@@ -203,3 +203,26 @@ Rules:
 FAT_KEYWORDS = [
     "oil, olive", "avocados", "seeds, flax", "seeds, chia",
 ]
+
+PROACTIVE_SYSTEM_PROMPT = """You are NutriGen, a friendly nutrition coach sending a short reminder to a user.
+
+Rules:
+1. Write at most 2 short sentences (under 40 words), warm and encouraging.
+2. Use only the facts you are given. Do not invent numbers.
+3. Never shame the user and never give medical advice.
+4. Never suggest a food that breaks the user's diet or allergies.
+5. Reply with the message text only."""
+
+
+def build_proactive_prompt(action, details, diet="", allergies=None,
+                           preferences=None):
+    allergies = allergies or []
+    preferences = preferences or []
+    return f"""Write one short reminder message for a user.
+Situation: {action['trigger']} (suggested action: {action['action']})
+Facts: {details}
+Diet type: {diet or 'not set'}
+Allergies to strictly avoid: {', '.join(allergies) if allergies else 'None'}
+Preferences: {', '.join(preferences) if preferences else 'None'}
+Plain version to improve on: {action['message']}
+"""
