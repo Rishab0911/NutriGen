@@ -65,7 +65,8 @@ def generate_meal(data: UserProfile):
         "fat": nutrition["macros"]["fat"],
         "diet": data.diet,
         "allergies": allergies,
-        "preferences": preferences
+        "preferences": preferences,
+        "restrictions": data.restrictions
     }
 
     # Step 3: Generate the meal plan using Aahana's planner
