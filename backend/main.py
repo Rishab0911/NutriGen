@@ -1,5 +1,6 @@
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
 from backend.models import UserProfile, MealPlanResponse
 from backend.nutrition import calculate_nutrition
@@ -9,7 +10,16 @@ from planner import generate_meal_plan
 
 app = FastAPI()
 
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://127.0.0.1:5500",
+        "http://localhost:5500"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 # ---------------- HOME ROUTE ----------------
 
 @app.get("/")
