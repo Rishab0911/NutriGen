@@ -1119,8 +1119,13 @@ document.addEventListener("DOMContentLoaded", () => {
      22. SUBMIT FORM — CALL BACKEND
      ======================================================= */
 
+  let isGenerating = false;
+
   formEl?.addEventListener("submit", async event => {
     event.preventDefault();
+
+    // Prevent duplicate submissions.
+    if (isGenerating) return;
 
     for (let index = 0; index < slides.length; index++) {
       if (!validateSlide(index)) {
@@ -1136,11 +1141,14 @@ document.addEventListener("DOMContentLoaded", () => {
       formEl
     );
 
-    const originalText =
-      submitButton?.textContent;
+    // Preserve the complete button, including its arrow.
+    const originalContent = submitButton?.innerHTML;
+
+    isGenerating = true;
 
     if (submitButton) {
       submitButton.disabled = true;
+      submitButton.setAttribute("aria-busy", "true");
       submitButton.textContent = "Generating your plan...";
     }
 
@@ -1161,15 +1169,16 @@ document.addEventListener("DOMContentLoaded", () => {
       );
 
     } finally {
+      isGenerating = false;
+
       if (submitButton) {
         submitButton.disabled = false;
-        submitButton.textContent =
-          originalText || "Build My Plan";
+        submitButton.removeAttribute("aria-busy");
+        submitButton.innerHTML =
+          originalContent || "Generate My Plan";
       }
     }
   });
-
-
   /* =======================================================
      23. LOAD SAVED BACKEND RESPONSE
      ======================================================= */
