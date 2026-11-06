@@ -10,10 +10,15 @@
     content="NutriGen creates personalized nutrition plans around your goals, preferences and lifestyle."
   />
 
+  <!-- Open Graph -->
+  <meta property="og:title" content="NutriGen — Personalized Nutrition" />
+  <meta property="og:description" content="Build a personalized nutrition plan around your goals, lifestyle and food preferences." />
+  <meta property="og:type" content="website" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap"
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600"
     rel="stylesheet"
   />
 
@@ -28,2018 +33,1462 @@
 
   <main id="landing-page">
 
-```
-<!-- Header -->
-<header class="site-header">
-
-  <a href="#" class="brand" id="home-brand" aria-label="NutriGen home">
-    <span class="brand-mark">N</span>
-    <span class="brand-name">NutriGen</span>
-  </a>
-
-  <nav class="main-nav" aria-label="Main navigation">
-    <a href="#features">Features</a>
-    <a href="#how-it-works">How It Works</a>
-    <a href="#features" class="nav-link-plan">Your Plan</a>
-    <button type="button" class="nav-cta" id="start-plan-button">
-      Build My Plan
-    </button>
-  </nav>
-
-</header>
-
-
-<!-- Hero -->
-<section class="hero-section">
-
-  <div class="hero-content">
-
-    <span class="eyebrow">PERSONALIZED NUTRITION</span>
-
-    <h1>
-      Nutrition that
-      <span>fits your life.</span>
-    </h1>
-
-    <p class="hero-description">
-      Build a nutrition plan around your goals, lifestyle, food preferences
-      and restrictions — without following a one-size-fits-all diet.
-    </p>
-
-    <div class="hero-actions">
-
-      <button type="button" class="primary-button" id="hero-start-button">
-        Build My Plan
-        <span aria-hidden="true">→</span>
-      </button>
-
-      <button type="button" class="secondary-button" id="hero-learn-button">
-        Explore NutriGen
-      </button>
-
-    </div>
-
-    <div class="hero-trust">
-      <span class="trust-dot"></span>
-      <span>Personalized around your information</span>
-    </div>
-
-  </div>
-
-
-  <!-- Hero Preview -->
-  <div class="hero-preview">
-
-    <div class="preview-glow"></div>
-
-    <div class="preview-card">
-
-      <div class="preview-card-top">
-        <span>YOUR DAILY PLAN</span>
-        <span class="preview-dot"></span>
-      </div>
-
-      <p class="preview-greeting">Your daily plan starts here.</p>
-
-      <h3>A plan made<br />for you.</h3>
-
-      <div class="preview-meal">
-
-        <div class="meal-icon">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M4 12h16M6 8h12M7 16h10" />
-            <circle cx="12" cy="12" r="9" />
-          </svg>
-        </div>
-
-        <div>
-          <span>BREAKFAST</span>
-          <strong>Protein Oats</strong>
-          <small>360 kcal · 16g protein</small>
-        </div>
-
-      </div>
-
-
-      <div class="preview-meal">
-
-        <div class="meal-icon">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M4 13h16" />
-            <path d="M6 13a6 6 0 0 1 12 0" />
-            <path d="M8 17h8" />
-            <path d="M9 20h6" />
-          </svg>
-        </div>
-
-        <div>
-          <span>LUNCH</span>
-          <strong>Power Bowl</strong>
-          <small>430 kcal · 16g protein</small>
-        </div>
-
-      </div>
-
-
-      <div class="preview-macro-row">
-
-        <div>
-          <strong>1</strong>
-          <span>Day Planned</span>
-        </div>
-
-        <div>
-          <strong>4</strong>
-          <span>Meals</span>
-        </div>
-
-        <div>
-          <strong>100%</strong>
-          <span>Personalised</span>
-        </div>
-
-      </div>
-
-    </div>
-
-  </div>
-
-</section>
-
-
-<!-- Value Strip -->
-<section class="value-strip">
-
-  <div>
-    <span class="value-icon" aria-hidden="true">
-      <svg viewBox="0 0 24 24">
-        <circle cx="12" cy="12" r="8" />
-        <path d="M12 8v8M8 12h8" />
-      </svg>
-    </span>
-    <strong>Goal-based</strong>
-    <span>Built around what you're trying to achieve.</span>
-  </div>
-
-  <div>
-    <span class="value-icon" aria-hidden="true">
-      <svg viewBox="0 0 24 24">
-        <path d="M5 7h14M5 12h14M5 17h14" />
-        <circle cx="9" cy="7" r="2" />
-        <circle cx="15" cy="12" r="2" />
-        <circle cx="11" cy="17" r="2" />
-      </svg>
-    </span>
-    <strong>Preference-aware</strong>
-    <span>Meals shaped around the foods you enjoy.</span>
-  </div>
-
-  <div>
-    <span class="value-icon" aria-hidden="true">
-      <svg viewBox="0 0 24 24">
-        <path d="M12 3l7 3v5c0 4.5-3 7.8-7 10-4-2.2-7-5.5-7-10V6l7-3z" />
-        <path d="M9 12l2 2 4-4" />
-      </svg>
-    </span>
-    <strong>Restriction-conscious</strong>
-    <span>Designed with your allergies and restrictions in mind.</span>
-  </div>
-
-</section>
-
-
-<!-- Features -->
-<section class="content-section" id="features">
-
-  <div class="section-heading">
-
-    <span class="eyebrow">WHY NUTRIGEN</span>
-
-    <h2>
-      A smarter way to
-      <em>plan your food.</em>
-    </h2>
-
-    <p>
-      Instead of giving everyone the same meal plan, NutriGen uses your
-      information to create something that feels personal.
-    </p>
-
-  </div>
-
-
-  <div class="feature-grid">
-
-    <article class="feature-card">
-
-      <span class="feature-number">01</span>
-
-      <div class="feature-icon">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="12" cy="12" r="8" />
-          <path d="M12 8v4l3 2" />
-        </svg>
-      </div>
-
-      <h3>Built around your goal.</h3>
-
-      <p>
-        Whether you're losing, gaining or maintaining weight, your plan
-        adapts around the goal you choose.
-      </p>
-
-    </article>
-
-
-    <article class="feature-card">
-
-      <span class="feature-number">02</span>
-
-      <div class="feature-icon">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M5 7h14M5 12h14M5 17h14" />
-          <circle cx="9" cy="7" r="2" />
-          <circle cx="15" cy="12" r="2" />
-          <circle cx="11" cy="17" r="2" />
-        </svg>
-      </div>
-
-      <h3>Your preferences matter.</h3>
-
-      <p>
-        Vegetarian, vegan, high-protein, low-carb and more — your choices
-        influence the meals you receive.
-      </p>
-
-    </article>
-
-
-    <article class="feature-card">
-
-      <span class="feature-number">03</span>
-
-      <div class="feature-icon">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M12 3l7 3v5c0 4.5-3 7.8-7 10-4-2.2-7-5.5-7-10V6l7-3z" />
-          <path d="M9 12l2 2 4-4" />
-        </svg>
-      </div>
-
-      <h3>Designed with restrictions in mind.</h3>
-
-      <p>
-        Allergies and dietary restrictions are considered while selecting
-        suitable meals for your plan.
-      </p>
-
-    </article>
-
-  </div>
-
-</section>
-
-
-<!-- How It Works -->
-<section class="content-section" id="how-it-works">
-
-  <div class="section-heading">
-
-    <span class="eyebrow">HOW IT WORKS</span>
-
-    <h2>
-      Four steps to a plan
-      <em>that fits.</em>
-    </h2>
-
-  </div>
-
-
-  <div class="steps-grid">
-
-    <article class="how-step">
-
-      <span>01</span>
-
-      <div>
-        <h3>Tell us about you</h3>
-        <p>Age, height, weight and other basic information.</p>
-      </div>
-
-    </article>
-
-
-    <article class="how-step">
-
-      <span>02</span>
-
-      <div>
-        <h3>Choose your goal</h3>
-        <p>Tell NutriGen whether you're losing, gaining or maintaining.</p>
-      </div>
-
-    </article>
-
-
-    <article class="how-step">
-
-      <span>03</span>
-
-      <div>
-        <h3>Set your preferences</h3>
-        <p>Choose your diet, food preferences, allergies and restrictions.</p>
-      </div>
-
-    </article>
-
-
-    <article class="how-step">
-
-      <span>04</span>
-
-      <div>
-        <h3>Get your plan</h3>
-        <p>Receive a personalized one-day meal plan based on your inputs.</p>
-      </div>
-
-    </article>
-
-  </div>
-
-
-  <div class="how-cta">
-
-    <div>
-      <span class="eyebrow">READY WHEN YOU ARE</span>
-
-      <h3>
-        Your food plan should work
-        <em>with</em> your life.
-      </h3>
-    </div>
-
-    <button type="button" class="primary-button" id="how-it-works-start-button">
-      Build My Plan
-      <span aria-hidden="true">→</span>
-    </button>
-
-  </div>
-
-</section>
-
-
-<!-- Footer -->
-<footer class="site-footer">
-
-  <div class="brand">
-    <span class="brand-mark">N</span>
-    <span class="brand-name">NutriGen</span>
-  </div>
-
-  <p>
-    Personalized nutrition, made simpler.
-  </p>
-
-</footer>
-```
-
-  </main>
-
-  <!-- =========================================================
-       PERSONALIZATION PAGE
-  ========================================================== -->
-
-  <main id="personalization-page" class="personalization-page hidden">
-
-```
-<!-- Back to landing -->
-<div class="personalization-topbar">
-
-  <button type="button" class="back-home-button" id="back-home-button">
-
-    <span class="back-home-icon" aria-hidden="true">
-      <svg viewBox="0 0 24 24">
-        <path d="M19 12H5" />
-        <path d="M11 6l-6 6 6 6" />
-      </svg>
-    </span>
-
-    <span>Back to NutriGen</span>
-
-  </button>
-
-  <div class="mini-brand">
-    <span class="brand-mark">N</span>
-    <span class="brand-name">NutriGen</span>
-  </div>
-
-</div>
-
-
-<div class="personalization-layout">
-
-  <!-- Sidebar -->
-  <aside class="progress-sidebar">
-
-    <div class="brand">
-      <span class="brand-mark">N</span>
-      <span class="brand-name">NutriGen</span>
-    </div>
-
-
-    <div class="sidebar-heading">
-
-      <span class="eyebrow">YOUR PROFILE</span>
-
-      <h2>
-        Let's make it
-        <em>personal.</em>
-      </h2>
-
-      <p>
-        A few details are all we need to shape your nutrition plan.
-      </p>
-
-    </div>
-
-
-    <div class="progress-container">
-
-      <div class="progress-label">
-        <span>YOUR PROGRESS</span>
-        <span id="progress-text">Step 1 of 4</span>
-      </div>
-
-      <div class="progress-track">
-        <div class="progress-fill" id="progress-fill"></div>
-      </div>
-
-    </div>
-
-
-    <div class="progress-steps">
-
-      <div class="progress-step active">
-        <div class="step-circle">1</div>
-
-        <div>
-          <strong>About You</strong>
-          <span>Basic information</span>
-        </div>
-      </div>
-
-
-      <div class="progress-step">
-        <div class="step-circle">2</div>
-
-        <div>
-          <strong>Your Goal</strong>
-          <span>What you want to achieve</span>
-        </div>
-      </div>
-
-
-      <div class="progress-step">
-        <div class="step-circle">3</div>
-
-        <div>
-          <strong>Food Preferences</strong>
-          <span>What you like to eat</span>
-        </div>
-      </div>
-
-
-      <div class="progress-step">
-        <div class="step-circle">4</div>
-
-        <div>
-          <strong>Health & Restrictions</strong>
-          <span>Important considerations</span>
-        </div>
-      </div>
-
-    </div>
-
-
-    <div class="sidebar-note">
-      <span aria-hidden="true">
-        <svg viewBox="0 0 24 24">
-          <path d="M12 3l7 3v5c0 4.5-3 7.8-7 10-4-2.2-7-5.5-7-10V6l7-3z" />
-          <path d="M9 12l2 2 4-4" />
-        </svg>
-      </span>
-
-      <p>
-        Your information stays in your browser and is used to personalize
-        your plan.
-      </p>
-    </div>
-
-  </aside>
-
-
-
-  <!-- Form Area -->
-  <section class="form-area">
-
-    <div class="form-header">
-
-      <span class="eyebrow">PERSONALIZATION</span>
-
-      <h1>Create your profile.</h1>
-
-      <p>
-        Tell us a little about yourself so we can make your plan more relevant.
-      </p>
-
-    </div>
-
-
-    <form id="nutrigen-form" class="form-card" novalidate>
-
-
-      <!-- =================================================
-           SLIDE 1 — ABOUT YOU
-      ================================================== -->
-
-      <section class="form-slide" id="slide-1">
-
-        <div class="slide-heading">
-
-          <span class="slide-number">01</span>
-
-          <div>
-            <span class="eyebrow">ABOUT YOU</span>
-            <h2>The basics first.</h2>
-            <p>
-              These details help us estimate your daily energy needs.
-            </p>
-          </div>
-
-        </div>
-
-
-        <div class="field">
-
-          <label for="name">Your name</label>
-
-          <input
-            type="text"
-            id="name"
-            name="name"
-            placeholder="Enter your name"
-            autocomplete="name"
-            required
-          />
-
-        </div>
-
-
-        <div class="field-row">
-
-          <div class="field">
-
-            <label for="age">Age</label>
-
-            <input
-              type="number"
-              id="age"
-              name="age"
-              min="1"
-              max="120"
-              step="1"
-              placeholder="e.g. 20"
-              required
-            />
-
-            <small>Enter your age in years.</small>
-
-          </div>
-
-
-          <div class="field">
-
-            <label for="height">Height</label>
-
-            <input
-              type="number"
-              id="height"
-              name="height"
-              min="50"
-              max="250"
-              step="0.1"
-              placeholder="e.g. 170"
-              required
-            />
-
-            <small>Height in centimetres.</small>
-
-          </div>
-
-        </div>
-
-
-        <div class="field">
-
-          <label>Gender</label>
-
-          <div class="choice-grid gender-grid">
-
-            <label class="choice-card">
-              <input type="radio" name="gender" value="Male" />
-
-              <span class="choice-content">
-                <span class="choice-icon">
-                  <svg viewBox="0 0 24 24">
-                    <circle cx="10" cy="14" r="5" />
-                    <path d="M14 10l6-6M15 4h5v5" />
-                  </svg>
-                </span>
-                <strong>Male</strong>
-              </span>
-
-            </label>
-
-
-            <label class="choice-card">
-              <input type="radio" name="gender" value="Female" />
-
-              <span class="choice-content">
-                <span class="choice-icon">
-                  <svg viewBox="0 0 24 24">
-                    <circle cx="12" cy="9" r="5" />
-                    <path d="M12 14v7M8 18h8" />
-                  </svg>
-                </span>
-                <strong>Female</strong>
-              </span>
-
-            </label>
-
-
-            <label class="choice-card">
-              <input type="radio" name="gender" value="Other" />
-
-              <span class="choice-content">
-                <span class="choice-icon">
-                  <svg viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="8" />
-                    <path d="M9 12h6M12 9v6" />
-                  </svg>
-                </span>
-                <strong>Other</strong>
-              </span>
-
-            </label>
-
-          </div>
-
-        </div>
-
-
-        <div class="privacy-note">
-
-          <span aria-hidden="true">
-            <svg viewBox="0 0 24 24">
-              <path d="M12 3l7 3v5c0 4.5-3 7.8-7 10-4-2.2-7-5.5-7-10V6l7-3z" />
-              <path d="M9 12l2 2 4-4" />
-            </svg>
-          </span>
-
-          <span>
-            Your information is sent to the NutriGen backend to generate
-            your personalized nutrition plan.
-          </span>
-
-        </div>
-
-
-        <div class="form-actions">
-
-          <button
-            type="button"
-            class="secondary-button back-home-button-inline"
-            id="slide-home-button"
-          >
-            ← Back to Home
-          </button>
-
-          <button type="button" class="primary-button continue-button">
-            Continue
-            <span aria-hidden="true">→</span>
-          </button>
-
-        </div>
-
-      </section>
-
-
-
-      <!-- =================================================
-           SLIDE 2 — GOAL
-      ================================================== -->
-
-      <section class="form-slide hidden" id="slide-2">
-
-        <div class="slide-heading">
-
-          <span class="slide-number">02</span>
-
-          <div>
-            <span class="eyebrow">YOUR GOAL</span>
-            <h2>Where are you headed?</h2>
-            <p>
-              Your goal influences the calorie target and meal portions.
-            </p>
-          </div>
-
-        </div>
-
-
-        <div class="field">
-
-          <label>Primary goal</label>
-
-          <div class="goal-grid">
-
-            <label class="goal-card">
-
-              <input
-                type="radio"
-                name="goal"
-                value="Weight Loss"
-                checked
-              />
-
-              <span class="goal-card-content">
-
-                <span class="goal-icon">
-                  <svg viewBox="0 0 24 24">
-                    <path d="M12 4v16M6 14l6 6 6-6" />
-                  </svg>
-                </span>
-
-                <strong>Weight Loss</strong>
-
-                <small>
-                  Gradually reduce body weight.
-                </small>
-
-              </span>
-
-            </label>
-
-
-            <label class="goal-card">
-
-              <input
-                type="radio"
-                name="goal"
-                value="Weight Gain"
-              />
-
-              <span class="goal-card-content">
-
-                <span class="goal-icon">
-                  <svg viewBox="0 0 24 24">
-                    <path d="M12 20V4M6 10l6-6 6 6" />
-                  </svg>
-                </span>
-
-                <strong>Weight Gain</strong>
-
-                <small>
-                  Support gradual weight gain.
-                </small>
-
-              </span>
-
-            </label>
-
-
-            <label class="goal-card">
-
-              <input
-                type="radio"
-                name="goal"
-                value="Maintain Weight"
-              />
-
-              <span class="goal-card-content">
-
-                <span class="goal-icon">
-                  <svg viewBox="0 0 24 24">
-                    <path d="M5 12h14" />
-                    <circle cx="12" cy="12" r="8" />
-                  </svg>
-                </span>
-
-                <strong>Maintain Weight</strong>
-
-                <small>
-                  Keep your weight steady.
-                </small>
-
-              </span>
-
-            </label>
-
-          </div>
-
-        </div>
-
-
-        <div class="field-row">
-
-          <div class="field">
-
-            <label for="current-weight">
-              Current weight
-            </label>
-
-            <input
-              type="number"
-              id="current-weight"
-              name="current-weight"
-              min="20"
-              max="300"
-              step="0.1"
-              placeholder="e.g. 70"
-              required
-            />
-
-            <small>Weight in kilograms.</small>
-
-          </div>
-
-
-          <div class="field">
-
-            <label for="target-weight">
-              Target weight
-            </label>
-
-            <input
-              type="number"
-              id="target-weight"
-              name="target-weight"
-              min="20"
-              max="300"
-              step="0.1"
-              placeholder="e.g. 65"
-              required
-            />
-
-            <small>Your desired target in kilograms.</small>
-
-          </div>
-
-        </div>
-
-
-        <div class="field">
-
-          <label for="daily-calories">
-            Daily calorie target
-            <span class="optional">OPTIONAL</span>
-          </label>
-
-          <input
-            type="number"
-            id="daily-calories"
-            name="daily-calories"
-            min="1000"
-            max="6000"
-            step="50"
-            placeholder="Leave blank to calculate automatically"
-          />
-
-          <small>
-            If left blank, NutriGen will estimate a target from your
-            information and activity level.
-          </small>
-
-        </div>
-
-
-        <div class="form-actions">
-
-          <button type="button" class="secondary-button back-button">
-            <span aria-hidden="true">←</span>
-            Back
-          </button>
-
-          <button type="button" class="primary-button continue-button">
-            Continue
-            <span aria-hidden="true">→</span>
-          </button>
-
-        </div>
-
-      </section>
-
-
-
-      <!-- =================================================
-           SLIDE 3 — FOOD PREFERENCES
-      ================================================== -->
-
-      <section class="form-slide hidden" id="slide-3">
-
-        <div class="slide-heading">
-
-          <span class="slide-number">03</span>
-
-          <div>
-            <span class="eyebrow">FOOD PREFERENCES</span>
-            <h2>Make it taste like you.</h2>
-            <p>
-              Choose the foods and nutrition styles that fit your lifestyle.
-            </p>
-          </div>
-
-        </div>
-
-
-        <div class="field">
-
-          <label>Diet</label>
-
-          <div class="diet-grid">
-
-            <label class="diet-card">
-
-              <input
-                type="radio"
-                name="diet"
-                value="Vegetarian"
-                checked
-              />
-
-              <span class="diet-content">
-
-                <span class="diet-icon">
-                  <svg viewBox="0 0 24 24">
-                    <path d="M12 20C7 17 5 12 7 7c5 0 10 3 10 8-1 2-3 4-5 5z" />
-                    <path d="M12 20c0-6 2-9 6-12" />
-                  </svg>
-                </span>
-
-                <strong>Vegetarian</strong>
-
-                <small>
-                  Plant-based foods with dairy and eggs where suitable.
-                </small>
-
-              </span>
-
-            </label>
-
-
-            <label class="diet-card">
-
-              <input
-                type="radio"
-                name="diet"
-                value="Non-Vegetarian"
-              />
-
-              <span class="diet-content">
-
-                <span class="diet-icon">
-                  <svg viewBox="0 0 24 24">
-                    <path d="M6 8c2-3 5-4 8-3 3 1 5 4 4 7-1 4-5 7-9 7-2 0-4-2-4-4 0-3 1-5 1-7z" />
-                    <path d="M15 9h.01M18 6l2-2" />
-                  </svg>
-                </span>
-
-                <strong>Non-Vegetarian</strong>
-
-                <small>
-                  Includes meat, poultry and seafood.
-                </small>
-
-              </span>
-
-            </label>
-
-
-            <label class="diet-card">
-
-              <input
-                type="radio"
-                name="diet"
-                value="Vegan"
-              />
-
-              <span class="diet-content">
-
-                <span class="diet-icon">
-                  <svg viewBox="0 0 24 24">
-                    <path d="M12 20C7 17 5 12 7 7c5 0 10 3 10 8-1 2-3 4-5 5z" />
-                    <path d="M12 20c0-6 2-9 6-12" />
-                  </svg>
-                </span>
-
-                <strong>Vegan</strong>
-
-                <small>
-                  Fully plant-based meals.
-                </small>
-
-              </span>
-
-            </label>
-
-          </div>
-
-        </div>
-
-
-        <div class="field">
-
-          <label>Nutrition preferences</label>
-
-          <div class="checkbox-grid preference-grid">
-
-            <label class="check-card">
-              <input
-                type="checkbox"
-                name="preferences"
-                value="High Protein"
-              />
-              <span>High Protein</span>
-            </label>
-
-            <label class="check-card">
-              <input
-                type="checkbox"
-                name="preferences"
-                value="Low Carb"
-              />
-              <span>Low Carb</span>
-            </label>
-
-            <label class="check-card">
-              <input
-                type="checkbox"
-                name="preferences"
-                value="High Fiber"
-              />
-              <span>High Fiber</span>
-            </label>
-
-            <label class="check-card">
-              <input
-                type="checkbox"
-                name="preferences"
-                value="Low Fat"
-              />
-              <span>Low Fat</span>
-            </label>
-
-            <label class="check-card">
-              <input
-                type="checkbox"
-                name="preferences"
-                value="No Added Sugar"
-              />
-              <span>No Added Sugar</span>
-            </label>
-
-            <label class="check-card">
-              <input
-                type="checkbox"
-                name="preferences"
-                value="Dairy Free"
-              />
-              <span>Dairy Free</span>
-            </label>
-
-          </div>
-
-        </div>
-
-
-        <div class="field">
-
-          <label for="other-preference">
-            Other preference
-            <span class="optional">OPTIONAL</span>
-          </label>
-
-          <input
-            type="text"
-            id="other-preference"
-            name="other-preference"
-            placeholder="Anything else you'd like us to know?"
-          />
-
-        </div>
-
-
-        <div class="field-row">
-
-          <div class="field">
-
-            <label for="foods-to-include">
-              Foods to include
-              <span class="optional">OPTIONAL</span>
-            </label>
-
-            <input
-              type="text"
-              id="foods-to-include"
-              name="foods-to-include"
-              placeholder="e.g. paneer, tofu, oats"
-            />
-
-            <small>Separate foods with commas.</small>
-
-          </div>
-
-
-          <div class="field">
-
-            <label for="foods-to-avoid">
-              Foods to avoid
-              <span class="optional">OPTIONAL</span>
-            </label>
-
-            <input
-              type="text"
-              id="foods-to-avoid"
-              name="foods-to-avoid"
-              placeholder="e.g. mushrooms, peanuts"
-            />
-
-            <small>Separate foods with commas.</small>
-
-          </div>
-
-        </div>
-
-
-        <div class="form-actions">
-
-          <button type="button" class="secondary-button back-button">
-            <span aria-hidden="true">←</span>
-            Back
-          </button>
-
-          <button type="button" class="primary-button continue-button">
-            Continue
-            <span aria-hidden="true">→</span>
-          </button>
-
-        </div>
-
-      </section>
-
-
-
-      <!-- =================================================
-           SLIDE 4 — HEALTH & RESTRICTIONS
-      ================================================== -->
-
-      <section class="form-slide hidden" id="slide-4">
-
-        <div class="slide-heading">
-
-          <span class="slide-number">04</span>
-
-          <div>
-            <span class="eyebrow">HEALTH & RESTRICTIONS</span>
-            <h2>Anything we should know?</h2>
-            <p>
-              Help us avoid foods that don't work for you.
-            </p>
-          </div>
-
-        </div>
-
-
-        <div class="field">
-
-          <label>Common allergies</label>
-
-          <div class="checkbox-grid allergy-grid">
-
-            <label class="check-card allergy-card">
-              <input
-                type="checkbox"
-                name="allergies"
-                value="Milk"
-              />
-              <span>Milk</span>
-            </label>
-
-            <label class="check-card allergy-card">
-              <input
-                type="checkbox"
-                name="allergies"
-                value="Peanuts"
-              />
-              <span>Peanuts</span>
-            </label>
-
-            <label class="check-card allergy-card">
-              <input
-                type="checkbox"
-                name="allergies"
-                value="Tree Nuts"
-              />
-              <span>Tree Nuts</span>
-            </label>
-
-            <label class="check-card allergy-card">
-              <input
-                type="checkbox"
-                name="allergies"
-                value="Soy"
-              />
-              <span>Soy</span>
-            </label>
-
-            <label class="check-card allergy-card">
-              <input
-                type="checkbox"
-                name="allergies"
-                value="Gluten"
-              />
-              <span>Gluten</span>
-            </label>
-
-            <label class="check-card allergy-card">
-              <input
-                type="checkbox"
-                name="allergies"
-                value="Fish"
-              />
-              <span>Fish</span>
-            </label>
-
-            <label class="check-card allergy-card">
-              <input
-                type="checkbox"
-                name="allergies"
-                value="Shellfish"
-              />
-              <span>Shellfish</span>
-            </label>
-            <label class="check-card allergy-card">
-              <input type="checkbox" name="allergies" value="Eggs" />
-              <span>Eggs</span>
-              </label>
-
-          </div>
-
-        </div>
-
-
-        <div class="field">
-
-          <label for="other-allergy">
-            Other allergy
-            <span class="optional">OPTIONAL</span>
-          </label>
-
-          <input
-            type="text"
-            id="other-allergy"
-            name="other-allergy"
-            placeholder="Enter any allergy not listed above"
-          />
-
-        </div>
-
-
-        <div class="field">
-
-          <label>Dietary restrictions</label>
-
-          <div class="checkbox-grid restriction-grid">
-
-            <label class="check-card">
-              <input
-                type="checkbox"
-                name="restrictions"
-                value="No Seafood"
-              />
-              <span>No Seafood</span>
-            </label>
-
-            <label class="check-card">
-              <input
-                type="checkbox"
-                name="restrictions"
-                value="No Red Meat"
-              />
-              <span>No Red Meat</span>
-            </label>
-
-            <label class="check-card">
-              <input
-                type="checkbox"
-                name="restrictions"
-                value="No Pork"
-              />
-              <span>No Pork</span>
-            </label>
-
-            <label class="check-card">
-              <input
-                type="checkbox"
-                name="restrictions"
-                value="Low Sodium"
-              />
-              <span>Low Sodium</span>
-            </label>
-
-          </div>
-
-        </div>
-
-
-        <div class="privacy-note">
-
-          <span aria-hidden="true">
-            <svg viewBox="0 0 24 24">
-              <path d="M12 3l7 3v5c0 4.5-3 7.8-7 10-4-2.2-7-5.5-7-10V6l7-3z" />
-              <path d="M9 12l2 2 4-4" />
-            </svg>
-          </span>
-
-          <span>
-            Always verify ingredient labels yourself, especially when
-            managing a serious allergy.
-          </span>
-
-        </div>
-
-
-        <div class="form-actions">
-
-          <button type="button" class="secondary-button back-button">
-            <span aria-hidden="true">←</span>
-            Back
-          </button>
-
-          <button type="submit" class="primary-button generate-button">
-            Generate My Plan
-            <span aria-hidden="true">→</span>
-          </button>
-
-        </div>
-
-      </section>
-
-
-    </form>
-
-  </section>
-
-</div>
-```
-
-  </main>
-
-  <!-- =========================================================
-       PROFILE / PLAN OUTPUT
-  ========================================================== -->
-
-  <main id="profile-output" class="profile-output hidden">
-
-```
-<div class="output-container">
-
-
-  <!-- Output top navigation -->
-  <div class="output-topbar">
-
-    <button type="button" class="back-home-button" id="output-home-button">
-
-      <span class="back-home-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24">
-          <path d="M19 12H5" />
-          <path d="M11 6l-6 6 6 6" />
-        </svg>
-      </span>
-
-      <span>Back to NutriGen</span>
-
-    </button>
-
-
-    <div class="output-actions">
-
-      <button
-        type="button"
-        class="secondary-button"
-        id="edit-profile-button"
-      >
-        Edit Profile
-      </button>
-
-      <button
-        type="button"
-        class="secondary-button new-plan-button"
-        id="new-plan-button"
-      >
-        New Plan
-      </button>
-
-    </div>
-
-  </div>
-
-
-  <!-- Output header -->
-  <header class="output-header">
-
-    <span class="eyebrow">YOUR PERSONALIZED PLAN</span>
-
-    <div class="output-title-row">
-
-      <div>
-        <h1>Meals made for you.</h1>
-
-        <p id="profile-greeting">
-          Your personalized one-day nutrition plan.
+    <!-- Header -->
+    <header class="site-header">
+      <a href="#" class="brand" id="home-brand" aria-label="NutriGen home">
+        <span class="brand-mark">N</span>
+        <span class="brand-name">NutriGen</span>
+      </a>
+
+      <nav class="main-nav" aria-label="Main navigation">
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#features" class="nav-link-plan">Your Plan</a>
+        <button type="button" class="nav-cta" id="start-plan-button">
+          Build My Plan
+        </button>
+      </nav>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero-section">
+      <div class="hero-content">
+        <span class="eyebrow">PERSONALIZED NUTRITION</span>
+        <h1>
+          Nutrition that
+          <span>fits your life.</span>
+        </h1>
+        <p class="hero-description">
+          Build a nutrition plan around your goals, lifestyle, food preferences
+          and restrictions — without following a one-size-fits-all diet.
         </p>
+
+        <div class="hero-actions">
+          <button type="button" class="primary-button" id="hero-start-button">
+            Build My Plan
+            <span aria-hidden="true">→</span>
+          </button>
+          <button type="button" class="secondary-button" id="hero-learn-button">
+            Explore NutriGen
+          </button>
+        </div>
+
+        <div class="hero-trust">
+          <span class="trust-dot"></span>
+          <span>Personalized around your information</span>
+        </div>
       </div>
 
-      <span class="plan-status">
-        PERSONALIZED PLAN
-      </span>
+      <!-- Hero Preview -->
+      <div class="hero-preview">
+        <div class="preview-glow"></div>
+        <div class="preview-card">
+          <div class="preview-card-top">
+            <span>YOUR DAILY PLAN</span>
+            <span class="preview-dot"></span>
+          </div>
 
-    </div>
+          <p class="preview-greeting">Your daily plan starts here.</p>
+          <h3>A plan made<br />for you.</h3>
 
-  </header>
+          <div class="preview-meal">
+            <div class="meal-icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3v3M18.4 5.6l-2.1 2.1M5.6 5.6l2.1 2.1M2 14h20M5 14a7 7 0 0 0 14 0" />
+              </svg>
+            </div>
+            <div>
+              <span>BREAKFAST</span>
+              <strong>Protein Oats</strong>
+              <small>360 kcal · 16g protein</small>
+            </div>
+          </div>
 
+          <div class="preview-meal">
+            <div class="meal-icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="5" />
+                <path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" />
+              </svg>
+            </div>
+            <div>
+              <span>LUNCH</span>
+              <strong>Power Bowl</strong>
+              <small>430 kcal · 16g protein</small>
+            </div>
+          </div>
 
-  <!-- Profile summary -->
-  <section class="profile-summary-section">
+          <div class="preview-macro-row">
+            <div>
+              <strong>1</strong>
+              <span>Day Planned</span>
+            </div>
+            <div>
+              <strong>4</strong>
+              <span>Meals</span>
+            </div>
+            <div>
+              <strong>100%</strong>
+              <span>Personalised</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    <div class="section-heading compact">
+    <!-- Value Strip -->
+    <section class="value-strip">
+      <div>
+        <span class="value-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="8" />
+            <path d="M12 8v8M8 12h8" />
+          </svg>
+        </span>
+        <strong>Goal-based</strong>
+        <span>Built around what you're trying to achieve.</span>
+      </div>
 
       <div>
-        <span class="eyebrow">YOUR PROFILE</span>
-        <h2>Your plan at a glance.</h2>
-      </div>
-
-    </div>
-
-
-    <div class="profile-summary-grid">
-
-      <article class="summary-card highlight-card">
-
-        <span class="summary-label">NAME</span>
-
-        <strong id="output-name">—</strong>
-
-      </article>
-
-
-      <article class="summary-card">
-
-        <span class="summary-label">AGE</span>
-
-        <strong id="output-age">—</strong>
-
-      </article>
-
-
-      <article class="summary-card">
-
-        <span class="summary-label">HEIGHT</span>
-
-        <strong id="output-height">—</strong>
-
-      </article>
-
-
-      <article class="summary-card">
-
-        <span class="summary-label">GENDER</span>
-
-        <strong id="output-gender">—</strong>
-
-      </article>
-
-
-      <article class="summary-card">
-
-        <span class="summary-label">GOAL</span>
-
-        <strong id="output-goal">—</strong>
-
-      </article>
-
-
-      <article class="summary-card">
-
-        <span class="summary-label">CURRENT WEIGHT</span>
-
-        <strong id="output-current-weight">—</strong>
-
-      </article>
-
-
-      <article class="summary-card">
-
-        <span class="summary-label">TARGET WEIGHT</span>
-
-        <strong id="output-target-weight">—</strong>
-
-      </article>
-
-
-      <article class="summary-card">
-
-        <span class="summary-label">DAILY TARGET</span>
-
-        <strong id="output-calories">—</strong>
-
-      </article>
-
-
-      <article class="summary-card">
-
-        <span class="summary-label">DIET</span>
-
-        <strong id="output-diet">—</strong>
-
-      </article>
-
-
-      <article class="summary-card">
-
-        <span class="summary-label">PREFERENCES</span>
-
-        <strong id="output-preferences">—</strong>
-
-      </article>
-
-
-      <article class="summary-card">
-
-        <span class="summary-label">ALLERGIES</span>
-
-        <strong id="output-allergies">—</strong>
-
-      </article>
-
-    </div>
-
-  </section>
-
-
-
-  <!-- Daily target dashboard -->
-  <section class="nutrition-dashboard">
-
-    <div class="dashboard-heading">
-
-      <div>
-        <span class="eyebrow">DAILY NUTRITION</span>
-        <h2>Your Actual Daily Nutrition.</h2>
-      </div>
-
-      <p>
-        Your meals are portioned around this estimated daily target.
-      </p>
-
-    </div>
-
-
-    <div class="nutrition-metrics">
-
-      <article class="nutrition-metric">
-
-        <div class="metric-icon">
-          <svg viewBox="0 0 24 24">
-            <path d="M12 3c3 4 5 7 5 11a5 5 0 0 1-10 0c0-4 2-7 5-11z" />
-          </svg>
-        </div>
-
-        <div>
-          <span>CALORIES</span>
-          <strong id="dashboard-calories">—</strong>
-          <small>kcal / day</small>
-        </div>
-
-      </article>
-
-
-      <article class="nutrition-metric">
-
-        <div class="metric-icon">
-          <svg viewBox="0 0 24 24">
-            <path d="M6 5c2 0 3 2 3 4s-1 4-3 4-3-2-3-4 1-4 3-4z" />
-            <path d="M18 5c-2 0-3 2-3 4s1 4 3 4 3-2 3-4-1-4-3-4z" />
-            <path d="M6 13v6M18 13v6M4 19h4M16 19h4" />
-          </svg>
-        </div>
-
-        <div>
-          <span>PROTEIN</span>
-          <strong id="dashboard-protein">—</strong>
-          <small>grams / day</small>
-        </div>
-
-      </article>
-
-
-      <article class="nutrition-metric">
-
-        <div class="metric-icon">
+        <span class="value-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24">
             <path d="M5 7h14M5 12h14M5 17h14" />
             <circle cx="9" cy="7" r="2" />
             <circle cx="15" cy="12" r="2" />
             <circle cx="11" cy="17" r="2" />
           </svg>
-        </div>
-
-        <div>
-          <span>CARBOHYDRATES</span>
-          <strong id="dashboard-carbs">—</strong>
-          <small>grams / day</small>
-        </div>
-
-      </article>
-
-
-      <article class="nutrition-metric">
-
-        <div class="metric-icon">
-          <svg viewBox="0 0 24 24">
-            <path d="M12 4c3 2 5 5 5 8a5 5 0 0 1-10 0c0-3 2-6 5-8z" />
-            <path d="M12 8v8" />
-          </svg>
-        </div>
-
-        <div>
-          <span>FAT</span>
-          <strong id="dashboard-fat">—</strong>
-          <small>grams / day</small>
-        </div>
-
-      </article>
-
-    </div>
-
-  </section>
-
-
-
-  <!-- Meal Plan -->
-  <section class="meal-plan-section">
-
-    <div class="section-heading compact">
+        </span>
+        <strong>Preference-aware</strong>
+        <span>Meals shaped around the foods you enjoy.</span>
+      </div>
 
       <div>
-        <span class="eyebrow">YOUR ONE-DAY PLAN</span>
+        <span class="value-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 3l7 3v5c0 4.5-3 7.8-7 10-4-2.2-7-5.5-7-10V6l7-3z" />
+            <path d="M9 12l2 2 4-4" />
+          </svg>
+        </span>
+        <strong>Restriction-conscious</strong>
+        <span>Designed with your allergies and restrictions in mind.</span>
+      </div>
+    </section>
 
-        <h2>Meals made for you.</h2>
-
+    <!-- Features -->
+    <section class="content-section" id="features">
+      <div class="section-heading">
+        <span class="eyebrow">WHY NUTRIGEN</span>
+        <h2>
+          A smarter way to
+          <em>plan your food.</em>
+        </h2>
         <p>
-          Explore your personalized meals for the day.
+          Instead of giving everyone the same meal plan, NutriGen uses your
+          information to create something that feels personal.
         </p>
       </div>
 
-      <span class="plan-status">
-        PERSONALIZED PLAN
-      </span>
-
-    </div>
-
-
-    <!-- JS inserts day tabs here -->
-
-
-    <div class="meal-plan-wrapper">
-
-      <div class="meal-plan-day-heading">
-
-        <div>
-          <span class="day-label">DAY 1</span>
-          <h3 id="selected-day-title">Monday</h3>
-        </div>
-
-        <div class="day-summary-label">
-          <span>DAILY TOTAL</span>
-          <strong id="selected-day-calories">—</strong>
-        </div>
-
-      </div>
-
-
-      <!-- JS inserts day totals here -->
-
-
-      <div class="meal-plan-grid">
-
-        <!-- JS inserts meal cards here -->
-
-      </div>
-
-    </div>
-
-
-    <!-- Calculation explanation -->
-    <section class="plan-explanation">
-
-      <div class="explanation-header">
-
-        <div class="explanation-icon">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 3v18M3 12h18" />
-            <circle cx="12" cy="12" r="8" />
-          </svg>
-        </div>
-
-        <div>
-          <span class="eyebrow">THE METHOD</span>
-          <h2>How your plan was created.</h2>
+      <div class="feature-grid">
+        <article class="feature-card">
+          <span class="feature-number">01</span>
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="8" />
+              <path d="M12 8v4l3 2" />
+            </svg>
+          </div>
+          <h3>Built around your goal.</h3>
           <p>
-            NutriGen combines your information, goal and food preferences
-            to estimate a practical daily nutrition target.
+            Whether you're losing, gaining or maintaining weight, your plan
+            adapts around the goal you choose.
           </p>
-        </div>
-
-      </div>
-
-
-      <div class="explanation-grid">
-
-        <article class="explanation-card">
-
-          <span>01</span>
-
-          <div>
-            <h3>Your energy needs</h3>
-            <p>
-              Your age, height, weight and gender are used to estimate
-              your basal energy requirements.
-            </p>
-          </div>
-
         </article>
 
-
-        <article class="explanation-card">
-
-          <span>02</span>
-
-          <div>
-            <h3>Your activity</h3>
-            <p>
-              Your selected activity level helps estimate how much energy
-              you use throughout a typical day.
-            </p>
+        <article class="feature-card">
+          <span class="feature-number">02</span>
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 7h14M5 12h14M5 17h14" />
+              <circle cx="9" cy="7" r="2" />
+              <circle cx="15" cy="12" r="2" />
+              <circle cx="11" cy="17" r="2" />
+            </svg>
           </div>
-
-        </article>
-
-
-        <article class="explanation-card">
-
-          <span>03</span>
-
-          <div>
-            <h3>Your goal</h3>
-            <p>
-              Your selected goal adjusts the estimated target for weight
-              loss, gain or maintenance.
-            </p>
-          </div>
-
-        </article>
-
-
-        <article class="explanation-card">
-
-          <span>04</span>
-
-          <div>
-            <h3>Your food profile</h3>
-            <p>
-              Diet, preferences, allergies and restrictions influence which
-              meals can appear in your plan.
-            </p>
-          </div>
-
-        </article>
-
-      </div>
-
-
-      <div class="future-note">
-
-        <span aria-hidden="true">
-          <svg viewBox="0 0 24 24">
-            <path d="M12 3v18M3 12h18" />
-            <circle cx="12" cy="12" r="8" />
-          </svg>
-        </span>
-
-        <div>
-
-          <strong>Important note</strong>
-
+          <h3>Your preferences matter.</h3>
           <p>
-            These calculations are estimates for educational and planning
-            purposes. They are not medical advice. Always verify ingredient
-            labels and recipes yourself, especially if you have a serious
-            allergy or medical condition.
+            Vegetarian, vegan, high-protein, low-carb and more — your choices
+            influence the meals you receive.
           </p>
+        </article>
 
-        </div>
-
+        <article class="feature-card">
+          <span class="feature-number">03</span>
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 3l7 3v5c0 4.5-3 7.8-7 10-4-2.2-7-5.5-7-10V6l7-3z" />
+              <path d="M9 12l2 2 4-4" />
+            </svg>
+          </div>
+          <h3>Designed with restrictions in mind.</h3>
+          <p>
+            Allergies and dietary restrictions are considered while selecting
+            suitable meals for your plan.
+          </p>
+        </article>
       </div>
-
     </section>
 
-  </section>
+    <!-- How It Works -->
+    <section class="content-section" id="how-it-works">
+      <div class="section-heading">
+        <span class="eyebrow">HOW IT WORKS</span>
+        <h2>
+          Four steps to a plan
+          <em>that fits.</em>
+        </h2>
+      </div>
 
+      <div class="steps-grid">
+        <article class="how-step">
+          <span>01</span>
+          <div>
+            <h3>Tell us about you</h3>
+            <p>Age, height, weight and other basic information.</p>
+          </div>
+        </article>
 
+        <article class="how-step">
+          <span>02</span>
+          <div>
+            <h3>Choose your goal</h3>
+            <p>Tell NutriGen whether you're losing, gaining or maintaining.</p>
+          </div>
+        </article>
 
-  <!-- Bottom CTA -->
-  <section class="output-bottom-cta">
+        <article class="how-step">
+          <span>03</span>
+          <div>
+            <h3>Set your preferences</h3>
+            <p>Choose your diet, food preferences, allergies and restrictions.</p>
+          </div>
+        </article>
 
-    <div>
+        <article class="how-step">
+          <span>04</span>
+          <div>
+            <h3>Get your plan</h3>
+            <p>Receive a personalized one-day meal plan based on your inputs.</p>
+          </div>
+        </article>
+      </div>
 
-      <span class="eyebrow">MAKE IT YOURS</span>
+      <div class="how-cta">
+        <div>
+          <span class="eyebrow">READY WHEN YOU ARE</span>
+          <h3>
+            Your food plan should work
+            <em>with</em> your life.
+          </h3>
+        </div>
+        <button type="button" class="primary-button" id="how-it-works-start-button">
+          Build My Plan
+          <span aria-hidden="true">→</span>
+        </button>
+      </div>
+    </section>
 
-      <h2>
-        Want to change something
-        <em>about your plan?</em>
-      </h2>
-
-      <p>
-        Update your preferences and create a fresh personalized plan.
-      </p>
-
-    </div>
-
-
-    <div class="output-bottom-actions">
-
-      <button
-        type="button"
-        class="secondary-button"
-        id="edit-profile-button-bottom"
-      >
-        Edit My Profile
-      </button>
-
-      <button
-        type="button"
-        class="primary-button"
-        id="create-new-plan-bottom"
-      >
-        Create New Plan
-        <span aria-hidden="true">→</span>
-      </button>
-
-    </div>
-
-  </section>
-
-</div>
-
-
+    <!-- Footer -->
+    <footer class="site-footer">
+      <div class="brand">
+        <span class="brand-mark">N</span>
+        <span class="brand-name">NutriGen</span>
+      </div>
+      <p>Personalized nutrition, made simpler.</p>
+    </footer>
   </main>
 
   <!-- =========================================================
-       CHAT ASSISTANT
+       PERSONALIZATION PAGE
   ========================================================== -->
 
-<button
-type="button"
-class="chat-toggle"
-id="chat-toggle"
-aria-label="Open NutriGen assistant"
+  <div id="personalization-page" class="personalization-page hidden">
+    <!-- Back to landing -->
+    <div class="personalization-topbar">
+      <button type="button" class="back-home-button" id="back-home-button">
+        <span class="back-home-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M19 12H5" />
+            <path d="M11 6l-6 6 6 6" />
+          </svg>
+        </span>
+        <span>Back to NutriGen</span>
+      </button>
 
->
+      <div class="mini-brand">
+        <span class="brand-mark">N</span>
+        <span class="brand-name">NutriGen</span>
+      </div>
+    </div>
 
-```
-<svg viewBox="0 0 24 24" aria-hidden="true">
-```
+    <div class="personalization-layout">
+      <!-- Sidebar -->
+      <aside class="progress-sidebar">
+        <div class="brand">
+          <span class="brand-mark">N</span>
+          <span class="brand-name">NutriGen</span>
+        </div>
 
-```
-  <path d="M5 6h14v10H9l-4 4V6z" />
-  <path d="M9 10h6M9 13h4" />
-</svg>
-```
+        <div class="sidebar-heading">
+          <span class="eyebrow">YOUR PROFILE</span>
+          <h2>
+            Let's make it
+            <em>personal.</em>
+          </h2>
+          <p>A few details are all we need to shape your nutrition plan.</p>
+        </div>
 
-  </button>
+        <div class="progress-container">
+          <div class="progress-label">
+            <span>YOUR PROGRESS</span>
+            <span id="progress-text">Step 1 of 4</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+        </div>
 
-  <section
-    class="chat-panel hidden"
-    id="chat-panel"
-    aria-label="NutriGen assistant"
-  >
+        <!-- Clickable Step Navigation -->
+        <div class="progress-steps" id="progress-steps-list">
+          <div class="progress-step active" data-slide="0" role="button" tabindex="0">
+            <div class="step-circle">1</div>
+            <div>
+              <strong>About You</strong>
+              <span>Basic information</span>
+            </div>
+          </div>
 
-```
-<header class="chat-header">
+          <div class="progress-step" data-slide="1" role="button" tabindex="0">
+            <div class="step-circle">2</div>
+            <div>
+              <strong>Your Goal</strong>
+              <span>What you want to achieve</span>
+            </div>
+          </div>
 
-  <div>
+          <div class="progress-step" data-slide="2" role="button" tabindex="0">
+            <div class="step-circle">3</div>
+            <div>
+              <strong>Food Preferences</strong>
+              <span>What you like to eat</span>
+            </div>
+          </div>
 
-    <span class="chat-eyebrow">NUTRIGEN ASSISTANT</span>
+          <div class="progress-step" data-slide="3" role="button" tabindex="0">
+            <div class="step-circle">4</div>
+            <div>
+              <strong>Health & Restrictions</strong>
+              <span>Important considerations</span>
+            </div>
+          </div>
+        </div>
 
-    <strong>Your nutrition guide</strong>
+        <div class="sidebar-note">
+          <span aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 3l7 3v5c0 4.5-3 7.8-7 10-4-2.2-7-5.5-7-10V6l7-3z" />
+              <path d="M9 12l2 2 4-4" />
+            </svg>
+          </span>
+          <p>Your information is used to generate your personalized nutrition plan.</p>
+        </div>
+      </aside>
 
+      <!-- Form Area -->
+      <section class="form-area">
+        <div class="form-header">
+          <span class="eyebrow">PERSONALIZATION</span>
+          <h1>Create your profile.</h1>
+          <p>Tell us a little about yourself so we can make your plan more relevant.</p>
+        </div>
+
+        <!-- Error banner -->
+        <div class="api-error-banner hidden" id="api-error-banner" role="alert">
+          <span class="error-banner-icon" aria-hidden="true">⚠</span>
+          <div>
+            <strong>Couldn't generate your plan</strong>
+            <p id="api-error-message">Please check that the backend is running and try again.</p>
+          </div>
+          <button type="button" class="error-banner-close" id="api-error-close" aria-label="Dismiss error">×</button>
+        </div>
+
+        <form id="nutrigen-form" class="form-card" novalidate>
+          <!-- SLIDE 1 — ABOUT YOU -->
+          <section class="form-slide" id="slide-1">
+            <div class="slide-heading">
+              <span class="slide-number">01</span>
+              <div>
+                <span class="eyebrow">ABOUT YOU</span>
+                <h2>The basics first.</h2>
+                <p>These details help us estimate your resting metabolic rate (BMR).</p>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="name">Your name</label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                placeholder="Enter your name"
+                autocomplete="name"
+                required
+              />
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="age">Age</label>
+                <input
+                  type="number"
+                  id="age"
+                  name="age"
+                  min="1"
+                  max="120"
+                  step="1"
+                  placeholder="e.g. 20"
+                  required
+                />
+                <small>Enter your age in years.</small>
+              </div>
+
+              <div class="field">
+                <label for="height">Height</label>
+                <input
+                  type="number"
+                  id="height"
+                  name="height"
+                  min="50"
+                  max="250"
+                  step="0.1"
+                  placeholder="e.g. 170"
+                  required
+                />
+                <small>Height in centimetres.</small>
+              </div>
+            </div>
+
+            <div class="field">
+              <label aria-hidden="true">Gender</label>
+              <fieldset class="radio-fieldset">
+                <legend class="sr-only">Gender</legend>
+                <div class="choice-grid gender-grid">
+                  <label class="choice-card">
+                    <input type="radio" name="gender" value="Male" />
+                    <span class="choice-content">
+                      <span class="choice-icon">
+                        <svg viewBox="0 0 24 24">
+                          <circle cx="10" cy="14" r="5" />
+                          <path d="M14 10l6-6M15 4h5v5" />
+                        </svg>
+                      </span>
+                      <strong>Male</strong>
+                    </span>
+                  </label>
+
+                  <label class="choice-card">
+                    <input type="radio" name="gender" value="Female" />
+                    <span class="choice-content">
+                      <span class="choice-icon">
+                        <svg viewBox="0 0 24 24">
+                          <circle cx="12" cy="9" r="5" />
+                          <path d="M12 14v7M8 18h8" />
+                        </svg>
+                      </span>
+                      <strong>Female</strong>
+                    </span>
+                  </label>
+
+                  <label class="choice-card">
+                    <input type="radio" name="gender" value="Other" />
+                    <span class="choice-content">
+                      <span class="choice-icon">
+                        <svg viewBox="0 0 24 24">
+                          <circle cx="12" cy="12" r="8" />
+                          <path d="M9 12h6M12 9v6" />
+                        </svg>
+                      </span>
+                      <strong>Other</strong>
+                    </span>
+                  </label>
+                </div>
+              </fieldset>
+            </div>
+
+            <!-- Activity Level -->
+            <div class="field">
+              <label aria-hidden="true">Activity Level</label>
+              <fieldset class="radio-fieldset">
+                <legend class="sr-only">Activity Level</legend>
+                <div class="choice-grid activity-grid">
+                  <label class="choice-card">
+                    <input type="radio" name="activity" value="1.2" />
+                    <span class="choice-content">
+                      <strong>Mostly seated</strong>
+                      <small>Desk-based routine with little exercise</small>
+                    </span>
+                  </label>
+
+                  <label class="choice-card">
+                    <input type="radio" name="activity" value="1.375" checked />
+                    <span class="choice-content">
+                      <strong>Lightly active</strong>
+                      <small>Exercise around 1–3 days a week</small>
+                    </span>
+                  </label>
+
+                  <label class="choice-card">
+                    <input type="radio" name="activity" value="1.55" />
+                    <span class="choice-content">
+                      <strong>Moderately active</strong>
+                      <small>Exercise around 3–5 days a week</small>
+                    </span>
+                  </label>
+
+                  <label class="choice-card">
+                    <input type="radio" name="activity" value="1.725" />
+                    <span class="choice-content">
+                      <strong>Very active</strong>
+                      <small>Hard exercise around 6–7 days a week</small>
+                    </span>
+                  </label>
+                </div>
+              </fieldset>
+            </div>
+
+            <div class="privacy-note">
+              <span aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M12 3l7 3v5c0 4.5-3 7.8-7 10-4-2.2-7-5.5-7-10V6l7-3z" />
+                  <path d="M9 12l2 2 4-4" />
+                </svg>
+              </span>
+              <span>Your details are processed strictly to calculate your personalized macro targets and meals.</span>
+            </div>
+
+            <div class="form-actions">
+              <button
+                type="button"
+                class="secondary-button back-home-button-inline"
+                id="slide-home-button"
+              >
+                ← Back to Home
+              </button>
+              <button type="button" class="primary-button continue-button">
+                Continue
+                <span aria-hidden="true">→</span>
+              </button>
+            </div>
+          </section>
+
+          <!-- SLIDE 2 — GOAL -->
+          <section class="form-slide hidden" id="slide-2">
+            <div class="slide-heading">
+              <span class="slide-number">02</span>
+              <div>
+                <span class="eyebrow">YOUR GOAL</span>
+                <h2>Where are you headed?</h2>
+                <p>Your goal determines your calorie deficit, surplus, or maintenance balance.</p>
+              </div>
+            </div>
+
+            <div class="field">
+              <label aria-hidden="true">Primary goal</label>
+              <fieldset class="radio-fieldset">
+                <legend class="sr-only">Primary goal</legend>
+                <div class="goal-grid">
+                  <label class="goal-card">
+                    <input type="radio" name="goal" value="Weight Loss" checked />
+                    <span class="goal-card-content">
+                      <span class="goal-icon">
+                        <svg viewBox="0 0 24 24">
+                          <path d="M12 4v16M6 14l6 6 6-6" />
+                        </svg>
+                      </span>
+                      <strong>Weight Loss</strong>
+                      <small>Healthy caloric deficit.</small>
+                    </span>
+                  </label>
+
+                  <label class="goal-card">
+                    <input type="radio" name="goal" value="Weight Gain" />
+                    <span class="goal-card-content">
+                      <span class="goal-icon">
+                        <svg viewBox="0 0 24 24">
+                          <path d="M12 20V4M6 10l6-6 6 6" />
+                        </svg>
+                      </span>
+                      <strong>Weight Gain</strong>
+                      <small>Structured surplus.</small>
+                    </span>
+                  </label>
+
+                  <label class="goal-card">
+                    <input type="radio" name="goal" value="Maintain Weight" />
+                    <span class="goal-card-content">
+                      <span class="goal-icon">
+                        <svg viewBox="0 0 24 24">
+                          <path d="M5 12h14" />
+                          <circle cx="12" cy="12" r="8" />
+                        </svg>
+                      </span>
+                      <strong>Maintain Weight</strong>
+                      <small>Energy balance (TDEE).</small>
+                    </span>
+                  </label>
+                </div>
+              </fieldset>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="current-weight">Current weight</label>
+                <input
+                  type="number"
+                  id="current-weight"
+                  name="current-weight"
+                  min="20"
+                  max="300"
+                  step="0.1"
+                  placeholder="e.g. 70"
+                  required
+                />
+                <small>Weight in kilograms.</small>
+              </div>
+
+              <div class="field" id="target-weight-field">
+                <label for="target-weight">Target weight</label>
+                <input
+                  type="number"
+                  id="target-weight"
+                  name="target-weight"
+                  min="20"
+                  max="300"
+                  step="0.1"
+                  placeholder="e.g. 65"
+                  required
+                />
+                <small id="target-weight-hint">Your desired target in kilograms.</small>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="daily-calories">
+                Daily calorie target
+                <span class="optional">OPTIONAL</span>
+              </label>
+              <input
+                type="number"
+                id="daily-calories"
+                name="daily-calories"
+                min="1000"
+                max="6000"
+                step="50"
+                placeholder="Leave blank to calculate automatically"
+              />
+              <small>Leave blank to let NutriGen automatically compute your target.</small>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="secondary-button back-button">
+                <span aria-hidden="true">←</span>
+                Back
+              </button>
+              <button type="button" class="primary-button continue-button">
+                Continue
+                <span aria-hidden="true">→</span>
+              </button>
+            </div>
+          </section>
+
+          <!-- SLIDE 3 — FOOD PREFERENCES -->
+          <section class="form-slide hidden" id="slide-3">
+            <div class="slide-heading">
+              <span class="slide-number">03</span>
+              <div>
+                <span class="eyebrow">FOOD PREFERENCES</span>
+                <h2>Make it taste like you.</h2>
+                <p>Choose the dietary styles that fit your lifestyle.</p>
+              </div>
+            </div>
+
+            <div class="field">
+              <label aria-hidden="true">Diet</label>
+              <fieldset class="radio-fieldset">
+                <legend class="sr-only">Diet type</legend>
+                <div class="diet-grid">
+                  <label class="diet-card">
+                    <input type="radio" name="diet" value="Vegetarian" checked />
+                    <span class="diet-content">
+                      <span class="diet-icon">
+                        <svg viewBox="0 0 24 24">
+                          <path d="M12 20C7 17 5 12 7 7c5 0 10 3 10 8-1 2-3 4-5 5z" />
+                          <path d="M12 20c0-6 2-9 6-12" />
+                        </svg>
+                      </span>
+                      <strong>Vegetarian</strong>
+                      <small>Plant foods with dairy & eggs where suitable.</small>
+                    </span>
+                  </label>
+
+                  <label class="diet-card">
+                    <input type="radio" name="diet" value="Non-Vegetarian" />
+                    <span class="diet-content">
+                      <span class="diet-icon">
+                        <svg viewBox="0 0 24 24">
+                          <path d="M6 8c2-3 5-4 8-3 3 1 5 4 4 7-1 4-5 7-9 7-2 0-4-2-4-4 0-3 1-5 1-7z" />
+                          <path d="M15 9h.01M18 6l2-2" />
+                        </svg>
+                      </span>
+                      <strong>Non-Vegetarian</strong>
+                      <small>Includes poultry, meat, and seafood.</small>
+                    </span>
+                  </label>
+
+                  <label class="diet-card">
+                    <input type="radio" name="diet" value="Vegan" />
+                    <span class="diet-content">
+                      <span class="diet-icon">
+                        <svg viewBox="0 0 24 24">
+                          <path d="M12 20C7 17 5 12 7 7c5 0 10 3 10 8-1 2-3 4-5 5z" />
+                          <path d="M12 20c0-6 2-9 6-12" />
+                        </svg>
+                      </span>
+                      <strong>Vegan</strong>
+                      <small>100% plant-based recipes.</small>
+                    </span>
+                  </label>
+                </div>
+              </fieldset>
+            </div>
+
+            <div class="field">
+              <label aria-hidden="true">Nutrition preferences</label>
+              <fieldset class="radio-fieldset">
+                <legend class="sr-only">Nutrition preferences</legend>
+                <div class="checkbox-grid preference-grid">
+                  <label class="check-card">
+                    <input type="checkbox" name="preferences" value="High Protein" />
+                    <span>High Protein</span>
+                  </label>
+                  <label class="check-card">
+                    <input type="checkbox" name="preferences" value="Low Carb" />
+                    <span>Low Carb</span>
+                  </label>
+                  <label class="check-card">
+                    <input type="checkbox" name="preferences" value="High Fiber" />
+                    <span>High Fiber</span>
+                  </label>
+                  <label class="check-card">
+                    <input type="checkbox" name="preferences" value="Low Fat" />
+                    <span>Low Fat</span>
+                  </label>
+                  <label class="check-card">
+                    <input type="checkbox" name="preferences" value="No Added Sugar" />
+                    <span>No Added Sugar</span>
+                  </label>
+                  <label class="check-card">
+                    <input type="checkbox" name="preferences" value="Dairy Free" />
+                    <span>Dairy Free</span>
+                  </label>
+                </div>
+              </fieldset>
+            </div>
+
+            <div class="field">
+              <label for="other-preference">
+                Other preference
+                <span class="optional">OPTIONAL</span>
+              </label>
+              <input
+                type="text"
+                id="other-preference"
+                name="other-preference"
+                placeholder="Anything else you'd like us to know?"
+              />
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="foods-to-include">
+                  Foods to include
+                  <span class="optional">OPTIONAL</span>
+                </label>
+                <input
+                  type="text"
+                  id="foods-to-include"
+                  name="foods-to-include"
+                  placeholder="e.g. paneer, tofu, oats"
+                />
+                <small>Separate foods with commas.</small>
+              </div>
+
+              <div class="field">
+                <label for="foods-to-avoid">
+                  Foods to avoid
+                  <span class="optional">OPTIONAL</span>
+                </label>
+                <input
+                  type="text"
+                  id="foods-to-avoid"
+                  name="foods-to-avoid"
+                  placeholder="e.g. mushrooms, peanuts"
+                />
+                <small>Separate foods with commas.</small>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="secondary-button back-button">
+                <span aria-hidden="true">←</span>
+                Back
+              </button>
+              <button type="button" class="primary-button continue-button">
+                Continue
+                <span aria-hidden="true">→</span>
+              </button>
+            </div>
+          </section>
+
+          <!-- SLIDE 4 — HEALTH & RESTRICTIONS (Auto-reflowing grid) -->
+          <section class="form-slide hidden" id="slide-4">
+            <div class="slide-heading">
+              <span class="slide-number">04</span>
+              <div>
+                <span class="eyebrow">HEALTH & RESTRICTIONS</span>
+                <h2>Anything we should know?</h2>
+                <p>Select any allergies or medical dietary exclusions.</p>
+              </div>
+            </div>
+
+            <div class="field">
+              <label aria-hidden="true">Common allergies</label>
+              <fieldset class="radio-fieldset">
+                <legend class="sr-only">Common allergies</legend>
+                <div class="checkbox-grid allergy-grid auto-reflow-grid">
+                  <label class="check-card allergy-card" data-diet-filter="all">
+                    <input type="checkbox" name="allergies" value="Milk" />
+                    <span>Milk</span>
+                  </label>
+                  <label class="check-card allergy-card" data-diet-filter="all">
+                    <input type="checkbox" name="allergies" value="Peanuts" />
+                    <span>Peanuts</span>
+                  </label>
+                  <label class="check-card allergy-card" data-diet-filter="all">
+                    <input type="checkbox" name="allergies" value="Tree Nuts" />
+                    <span>Tree Nuts</span>
+                  </label>
+                  <label class="check-card allergy-card" data-diet-filter="all">
+                    <input type="checkbox" name="allergies" value="Soy" />
+                    <span>Soy</span>
+                  </label>
+                  <label class="check-card allergy-card" data-diet-filter="all">
+                    <input type="checkbox" name="allergies" value="Gluten" />
+                    <span>Gluten</span>
+                  </label>
+                  <label class="check-card allergy-card" data-diet-filter="non-veg">
+                    <input type="checkbox" name="allergies" value="Fish" />
+                    <span>Fish</span>
+                  </label>
+                  <label class="check-card allergy-card" data-diet-filter="non-veg">
+                    <input type="checkbox" name="allergies" value="Shellfish" />
+                    <span>Shellfish</span>
+                  </label>
+                  <label class="check-card allergy-card" data-diet-filter="all">
+                    <input type="checkbox" name="allergies" value="Eggs" />
+                    <span>Eggs</span>
+                  </label>
+                </div>
+              </fieldset>
+            </div>
+
+            <div class="field">
+              <label for="other-allergy">
+                Other allergy
+                <span class="optional">OPTIONAL</span>
+              </label>
+              <input
+                type="text"
+                id="other-allergy"
+                name="other-allergy"
+                placeholder="Enter any allergy not listed above"
+              />
+            </div>
+
+            <div class="field">
+              <label aria-hidden="true">Dietary restrictions</label>
+              <fieldset class="radio-fieldset">
+                <legend class="sr-only">Dietary restrictions</legend>
+                <div class="checkbox-grid restriction-grid auto-reflow-grid">
+                  <label class="check-card" data-diet-filter="non-veg">
+                    <input type="checkbox" name="restrictions" value="No Seafood" />
+                    <span>No Seafood</span>
+                  </label>
+                  <label class="check-card" data-diet-filter="non-veg">
+                    <input type="checkbox" name="restrictions" value="No Red Meat" />
+                    <span>No Red Meat</span>
+                  </label>
+                  <label class="check-card" data-diet-filter="non-veg">
+                    <input type="checkbox" name="restrictions" value="No Pork" />
+                    <span>No Pork</span>
+                  </label>
+                  <label class="check-card" data-diet-filter="all">
+                    <input type="checkbox" name="restrictions" value="Low Sodium" />
+                    <span>Low Sodium</span>
+                  </label>
+                </div>
+              </fieldset>
+            </div>
+
+            <!-- Custom Dietary Restriction Input -->
+            <div class="field">
+              <label for="other-restriction">
+                Other dietary restriction
+                <span class="optional">OPTIONAL</span>
+              </label>
+              <input
+                type="text"
+                id="other-restriction"
+                name="other-restriction"
+                placeholder="e.g. Halal, Kosher, Jain, No Onion/Garlic"
+              />
+            </div>
+
+            <div class="privacy-note">
+              <span aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M12 3l7 3v5c0 4.5-3 7.8-7 10-4-2.2-7-5.5-7-10V6l7-3z" />
+                  <path d="M9 12l2 2 4-4" />
+                </svg>
+              </span>
+              <span>Always verify ingredient packaging labels yourself, especially when managing severe allergies.</span>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="secondary-button back-button">
+                <span aria-hidden="true">←</span>
+                Back
+              </button>
+              <button type="submit" class="primary-button generate-button">
+                Generate My Plan
+                <span aria-hidden="true">→</span>
+              </button>
+            </div>
+          </section>
+        </form>
+      </section>
+    </div>
   </div>
+
+  <!-- =========================================================
+       PROFILE / PLAN OUTPUT
+  ========================================================== -->
+
+  <div id="profile-output" class="profile-output hidden">
+    <div class="output-container">
+
+      <!-- Output top navigation -->
+      <div class="output-topbar no-print">
+        <button type="button" class="back-home-button" id="output-home-button">
+          <span class="back-home-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M19 12H5" />
+              <path d="M11 6l-6 6 6 6" />
+            </svg>
+          </span>
+          <span>Back to NutriGen</span>
+        </button>
+
+        <div class="output-actions">
+          <button type="button" class="secondary-button" id="copy-plan-button">
+             Copy Plan
+          </button>
+          <button type="button" class="secondary-button" id="print-plan-button">
+             Print / PDF
+          </button>
+          <button type="button" class="secondary-button" id="edit-profile-button">
+            Edit Profile
+          </button>
+          <button type="button" class="secondary-button new-plan-button" id="new-plan-button">
+            New Plan
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick-Jump Section Navigator Dock (Stationary, Non-Blocking, No Grocery in dock) -->
+      <nav class="quick-jump-dock no-print" id="quick-jump-dock" aria-label="Quick jump navigation">
+        <button type="button" class="dock-pill active" data-target="profile-summary-section">Profile</button>
+        <button type="button" class="dock-pill" data-target="nutrition-dashboard">Macros</button>
+        <button type="button" class="dock-pill" data-target="personal-encouragement-card">Note</button>
+        <button type="button" class="dock-pill" data-target="meal-plan-section">Meals</button>
+        <button type="button" class="dock-pill" data-target="plan-explanation">Method</button>
+      </nav>
+
+      <!-- Output header -->
+      <header class="output-header">
+        <span class="eyebrow">YOUR NUTRITIONAL BLUEPRINT</span>
+        <div class="output-title-row">
+          <div>
+            <h1>Daily Calibrated Schedule.</h1>
+            <p id="profile-greeting">Your personalized one-day nutrition framework.</p>
+          </div>
+          <span class="plan-status">PERSONALIZED PLAN</span>
+        </div>
+      </header>
+
+      <!-- Profile summary -->
+      <section class="profile-summary-section" id="profile-summary-section">
+        <div class="section-heading compact">
+          <div>
+            <span class="eyebrow">METABOLIC PROFILE</span>
+            <h2>Your blueprint at a glance.</h2>
+          </div>
+        </div>
+
+        <div class="profile-summary-grid">
+          <article class="summary-card highlight-card">
+            <span class="summary-label">NAME</span>
+            <strong id="output-name">—</strong>
+          </article>
+
+          <article class="summary-card">
+            <span class="summary-label">AGE</span>
+            <strong id="output-age">—</strong>
+          </article>
+
+          <article class="summary-card">
+            <span class="summary-label">HEIGHT</span>
+            <strong id="output-height">—</strong>
+          </article>
+
+          <article class="summary-card">
+            <span class="summary-label">GENDER</span>
+            <strong id="output-gender">—</strong>
+          </article>
+
+          <article class="summary-card">
+            <span class="summary-label">GOAL</span>
+            <strong id="output-goal">—</strong>
+          </article>
+
+          <article class="summary-card">
+            <span class="summary-label">CURRENT WEIGHT</span>
+            <strong id="output-current-weight">—</strong>
+          </article>
+
+          <article class="summary-card">
+            <span class="summary-label">TARGET WEIGHT</span>
+            <strong id="output-target-weight">—</strong>
+          </article>
+
+          <article class="summary-card">
+            <span class="summary-label">DAILY TARGET</span>
+            <strong id="output-calories">—</strong>
+          </article>
+
+          <article class="summary-card">
+            <span class="summary-label">DIET</span>
+            <strong id="output-diet">—</strong>
+          </article>
+
+          <article class="summary-card">
+            <span class="summary-label">PREFERENCES</span>
+            <strong id="output-preferences">—</strong>
+          </article>
+
+          <article class="summary-card">
+            <span class="summary-label">ALLERGIES</span>
+            <strong id="output-allergies">—</strong>
+          </article>
+
+          <!-- Visual BMI Spectrum Card with Gauge Pointer -->
+          <article class="summary-card wide-summary bmi-spectrum-card" id="bmi-spectrum-card">
+            <div class="bmi-spectrum-header">
+              <span class="summary-label">BODY MASS INDEX (WHO CLASSIFICATION)</span>
+              <span class="bmi-status-pill" id="bmi-status-pill">● Normal (Healthy)</span>
+            </div>
+            <strong id="output-bmi">24.2 kg/m²</strong>
+            <div class="bmi-bar-track">
+              <div class="bmi-zone under"><span>Under (&lt;18.5)</span></div>
+              <div class="bmi-zone normal"><span>Normal (18.5–24.9)</span></div>
+              <div class="bmi-zone over"><span>Over (25–29.9)</span></div>
+              <div class="bmi-zone obese"><span>Obese (30+)</span></div>
+              <div class="bmi-pointer" id="bmi-pointer" style="left: 45%"></div>
+            </div>
+            <small id="bmi-desc-text">Healthy weight range for your height: 54 – 72 kg.</small>
+          </article>
+        </div>
+      </section>
+
+      <!-- Daily target dashboard -->
+      <section class="nutrition-dashboard" id="nutrition-dashboard">
+        <div class="dashboard-heading">
+          <div>
+            <span class="eyebrow">ENERGY BALANCE & MACROS</span>
+            <h2>Actual Meal Nutrition.</h2>
+          </div>
+          <div class="target-match-pill" id="target-match-pill">
+            ✓ Target Matched (±5% Range)
+          </div>
+        </div>
+
+        <div class="nutrition-metrics">
+          <article class="nutrition-metric">
+            <div class="metric-icon">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 3c3 4 5 7 5 11a5 5 0 0 1-10 0c0-4 2-7 5-11z" />
+              </svg>
+            </div>
+            <div>
+              <span>CALORIES DELIVERED</span>
+              <strong id="dashboard-calories">—</strong>
+              <small id="dashboard-cal-band">kcal / day</small>
+            </div>
+          </article>
+
+          <article class="nutrition-metric">
+            <div class="metric-icon">
+              <svg viewBox="0 0 24 24">
+                <path d="M6 5c2 0 3 2 3 4s-1 4-3 4-3-2-3-4 1-4 3-4z" />
+                <path d="M18 5c-2 0-3 2-3 4s1 4 3 4 3-2 3-4-1-4-3-4z" />
+                <path d="M6 13v6M18 13v6M4 19h4M16 19h4" />
+              </svg>
+            </div>
+            <div>
+              <span>PROTEIN</span>
+              <strong id="dashboard-protein">—</strong>
+              <small>grams / day</small>
+            </div>
+          </article>
+
+          <article class="nutrition-metric">
+            <div class="metric-icon">
+              <svg viewBox="0 0 24 24">
+                <path d="M5 7h14M5 12h14M5 17h14" />
+                <circle cx="9" cy="7" r="2" />
+                <circle cx="15" cy="12" r="2" />
+                <circle cx="11" cy="17" r="2" />
+              </svg>
+            </div>
+            <div>
+              <span>CARBOHYDRATES</span>
+              <strong id="dashboard-carbs">—</strong>
+              <small>grams / day</small>
+            </div>
+          </article>
+
+          <article class="nutrition-metric">
+            <div class="metric-icon">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 4c3 2 5 5 5 8a5 5 0 0 1-10 0c0-3 2-6 5-8z" />
+                <path d="M12 8v8" />
+              </svg>
+            </div>
+            <div>
+              <span>FAT</span>
+              <strong id="dashboard-fat">—</strong>
+              <small>grams / day</small>
+            </div>
+          </article>
+        </div>
+
+        <!-- Visual Macro Percentage Ratio Bar + Descriptions -->
+        <div class="macro-bar-container" id="macro-bar-container">
+          <div class="macro-bar-header">
+            <span>CALORIC MACRO DISTRIBUTION (ATWATER BALANCING)</span>
+            <span id="macro-bar-ratio-text">Protein 20% · Carbs 55% · Fat 25%</span>
+          </div>
+          <div class="macro-bar-track">
+            <div class="macro-segment protein" id="macro-seg-protein" style="width: 25%"></div>
+            <div class="macro-segment carbs" id="macro-seg-carbs" style="width: 50%"></div>
+            <div class="macro-segment fat" id="macro-seg-fat" style="width: 25%"></div>
+          </div>
+          <div class="macro-descriptions-grid">
+            <div class="macro-desc-item">
+              <div class="macro-header-line">
+                <span class="macro-icon-micro protein"></span>
+                <strong>Protein (<span id="macro-pct-protein">0%</span>)</strong>
+              </div>
+              <p>Preserves lean muscle mass & supports cellular satiety during daily energy expenditure.</p>
+            </div>
+            <div class="macro-desc-item">
+              <div class="macro-header-line">
+                <span class="macro-icon-micro carbs"></span>
+                <strong>Carbohydrates (<span id="macro-pct-carbs">0%</span>)</strong>
+              </div>
+              <p>Primary glucose fuel source for glycogen stores, sustained energy, and cognitive endurance.</p>
+            </div>
+            <div class="macro-desc-item">
+              <div class="macro-header-line">
+                <span class="macro-icon-micro fat"></span>
+                <strong>Dietary Fats (<span id="macro-pct-fat">0%</span>)</strong>
+              </div>
+              <p>Essential for lipid-soluble vitamin absorption (A, D, E, K) and endocrine hormone synthesis.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Warm Welcoming & Personal Encouragement Note -->
+      <section class="personal-encouragement-card" id="personal-encouragement-card">
+        <div class="encouragement-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 21a9 9 0 0 1-9-9c0-4.97 4.03-9 9-9 4.14 0 7.64 2.81 8.68 6.64.12.44-.22.86-.68.86h-4.32a3 3 0 0 0-2.83 2H11a2 2 0 0 0-2 2v2.5a1.5 1.5 0 0 0 3 0V14h3a3 3 0 0 0 3-3V9h1.5a1.5 1.5 0 0 1 1.5 1.5c0 5.8-4.7 10.5-10.5 10.5z"/>
+          </svg>
+        </div>
+        <div class="encouragement-content">
+          <span class="encouragement-eyebrow">A PERSONAL NOTE FOR YOU</span>
+          <h3 id="encouragement-title">Sustainable health is built one meal at a time.</h3>
+          <p id="encouragement-body">Healthy living isn't about rigid deprivation, guilt, or perfection—it's about fueling your body with balanced, delicious foods that respect your routine. Use this plan as your daily compass, stay hydrated, and celebrate taking this positive step today.</p>
+        </div>
+      </section>
+
+      <!-- Meal Plan Section -->
+      <section class="meal-plan-section" id="meal-plan-section">
+        <div class="section-heading compact">
+          <div>
+            <span class="eyebrow">DAILY MEAL SCHEDULE</span>
+            <h2>Today's Calibrated Meals.</h2>
+            <p>Portioned recipes with estimated timings and calorie allocations.</p>
+          </div>
+          <!-- Dedicated Grocery Button right here -->
+          <button type="button" class="secondary-button" id="toggle-grocery-button">
+            🛒 View Grocery Checklist (<span id="grocery-count">0</span>)
+          </button>
+        </div>
+
+        <!-- Collapsible Grocery Shopping Checklist -->
+        <div class="grocery-checklist-card hidden" id="grocery-checklist-card">
+          <div class="grocery-header">
+            <div>
+              <h3>🛒 Ingredient Shopping Checklist</h3>
+              <p>Aggregated ingredient weights for today's plan. Tick off items as you shop.</p>
+            </div>
+            <button type="button" class="grocery-close" id="grocery-close">×</button>
+          </div>
+          <div class="grocery-items-grid" id="grocery-items-grid">
+            <!-- JS inserts aggregated checklist items here -->
+          </div>
+        </div>
+
+        <div class="meal-plan-wrapper">
+          <div class="meal-plan-day-heading">
+            <div>
+              <span class="day-label">DAILY FRAMEWORK</span>
+              <h3 id="selected-day-title">Today's Fresh Meals</h3>
+            </div>
+            <div class="day-summary-label">
+              <span>TOTAL INTAKE</span>
+              <strong id="selected-day-calories">—</strong>
+            </div>
+          </div>
+
+          <div class="meal-plan-grid">
+            <!-- JS inserts meal cards here with dedicated SVG icons and swap actions -->
+          </div>
+        </div>
+
+        <!-- Calculation explanation -->
+        <section class="plan-explanation" id="plan-explanation">
+          <div class="explanation-header">
+            <div class="explanation-icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3v18M3 12h18" />
+                <circle cx="12" cy="12" r="8" />
+              </svg>
+            </div>
+            <div>
+              <span class="eyebrow">METHODOLOGY</span>
+              <h2>Scientific Formulation.</h2>
+              <p>How NutriGen determines your caloric requirements and portions meals.</p>
+            </div>
+          </div>
+
+          <div class="explanation-grid">
+            <article class="explanation-card">
+              <span>01</span>
+              <div>
+                <h3>BMR Estimation</h3>
+                <p>Calculated via the Mifflin-St Jeor equation using sex, age, weight, and height to model resting basal metabolism.</p>
+              </div>
+            </article>
+
+            <article class="explanation-card">
+              <span>02</span>
+              <div>
+                <h3>TDEE Activity Multiplier</h3>
+                <p>Physical activity coefficients (1.20 to 1.725) scale basal needs to reflect non-exercise activity and workout expenditure.</p>
+              </div>
+            </article>
+
+            <article class="explanation-card">
+              <span>03</span>
+              <div>
+                <h3>Energy Balance</h3>
+                <p>Deficit (loss), surplus (gain), or equilibrium (maintenance) is calculated using a standard thermodynamic tolerance buffer.</p>
+              </div>
+            </article>
+
+            <article class="explanation-card">
+              <span>04</span>
+              <div>
+                <h3>Macro Portions</h3>
+                <p>Nutrient ratios are balanced across 4 daily meals to stabilize blood glucose and promote sustained satiety.</p>
+              </div>
+            </article>
+          </div>
+
+          <!-- Regulatory & Clinical Disclaimer -->
+          <div class="future-note clinical-disclaimer-note">
+            <span aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 3l7 3v5c0 4.5-3 7.8-7 10-4-2.2-7-5.5-7-10V6l7-3z" />
+                <path d="M9 12l2 2 4-4" />
+              </svg>
+            </span>
+            <div>
+              <strong>Clinical & Educational Disclaimer</strong>
+              <p>NutriGen is an algorithmic meal planning and lifestyle educational platform. It does not provide medical diagnoses, treatment plans, or clinical dietary prescriptions. Individuals with metabolic disorders, diabetes, renal conditions, or severe food allergies should consult a registered dietitian (RD) or primary physician before adopting any caloric deficit regimen.</p>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <!-- Bottom CTA -->
+      <section class="output-bottom-cta no-print">
+        <div>
+          <span class="eyebrow">MAKE IT YOURS</span>
+          <h2>
+            Want to change something
+            <em>about your plan?</em>
+          </h2>
+          <p>Update your goals or dietary preferences and recalibrate your blueprint.</p>
+        </div>
+
+        <div class="output-bottom-actions">
+          <button type="button" class="secondary-button" id="edit-profile-button-bottom">
+            Edit My Profile
+          </button>
+          <button type="button" class="primary-button" id="create-new-plan-bottom">
+            Create New Plan
+            <span aria-hidden="true">→</span>
+          </button>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       CHAT ASSISTANT (FAQ & PLAN GUIDE)
+  ========================================================== -->
 
   <button
     type="button"
-    class="chat-close"
-    aria-label="Close assistant"
+    class="chat-toggle no-print"
+    id="chat-toggle"
+    aria-label="Open NutriGen plan assistant"
   >
-    ×
-  </button>
-
-</header>
-
-
-<div class="chat-messages" id="chat-messages">
-
-  <div class="chat-message bot">
-    Hi. I can help you understand your calories, macros, meals,
-    restrictions and personalized plan.
-  </div>
-
-</div>
-
-
-<form class="chat-form" id="chat-form">
-
-  <input
-    type="text"
-    id="chat-input"
-    placeholder="Ask about your plan..."
-    autocomplete="off"
-  />
-
-  <button type="submit" aria-label="Send message">
     <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M4 12l16-8-5 16-3-6-8-2z" />
-      <path d="M12 14l4-6" />
+      <path d="M5 6h14v10H9l-4 4V6z" />
+      <path d="M9 10h6M9 13h4" />
     </svg>
   </button>
 
-</form>
+  <section
+    class="chat-panel hidden no-print"
+    id="chat-panel"
+    aria-label="NutriGen plan assistant"
+  >
+    <header class="chat-header">
+      <div>
+        <span class="chat-eyebrow">PLAN GUIDE & FAQ</span>
+        <strong>NutriGen Assistant</strong>
+      </div>
+      <button type="button" class="chat-close" aria-label="Close assistant">×</button>
+    </header>
 
+    <div class="chat-messages" id="chat-messages">
+      <div class="chat-message bot">
+        Hello! I can explain your calorie targets, macro ratios, meal timings, or suggest alternatives. How can I help?
+      </div>
+    </div>
 
+    <!-- Quick Suggestion Action Chips -->
+    <div class="chat-chips-bar" id="chat-chips-bar">
+      <button type="button" class="chat-chip" data-question="What's for dinner?"> Dinner?</button>
+      <button type="button" class="chat-chip" data-question="Explain my macros"> My Macros</button>
+      <button type="button" class="chat-chip" data-question="What are my food restrictions?"> Restrictions</button>
+    </div>
+
+    <form class="chat-form" id="chat-form">
+      <input
+        type="text"
+        id="chat-input"
+        placeholder="Ask about your plan..."
+        autocomplete="off"
+      />
+      <button type="submit" aria-label="Send message">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 12l16-8-5 16-3-6-8-2z" />
+          <path d="M12 14l4-6" />
+        </svg>
+      </button>
+    </form>
   </section>
 
   <!-- =========================================================
-       SVG ICON DEFINITIONS
-       Hidden reusable icons for the upgraded interface.
+       FLOATING BACK TO TOP BUTTON
   ========================================================== -->
+  <button type="button" class="back-to-top hidden no-print" id="back-to-top" aria-label="Scroll back to top">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 19V5M5 12l7-7 7 7" />
+    </svg>
+    <span>Top</span>
+  </button>
 
-<svg
-xmlns="http://www.w3.org/2000/svg"
-style="position:absolute;width:0;height:0;overflow:hidden"
-aria-hidden="true"
+  <!-- Aria-live region for screen reader announcements -->
+  <div id="plan-announcer" aria-live="polite" aria-atomic="true" class="sr-only"></div>
 
->
+  <!-- Branded Luxury Light Animated Loading Screen with Progress Checkpoints -->
+  <div class="loading-overlay hidden" id="loading-overlay" role="status">
+    <div class="loading-brand-card">
+      <div class="loading-brand-ring">
+        <span class="loading-brand-mark">N</span>
+        <svg class="loading-ring-svg" viewBox="0 0 100 100">
+          <circle class="ring-bg" cx="50" cy="50" r="44" />
+          <circle class="ring-progress" cx="50" cy="50" r="44" />
+        </svg>
+      </div>
 
+      <div class="loading-brand-title">
+        <span class="loading-brand-text">NutriGen</span>
+        <span class="loading-brand-subtitle">INTELLIGENT CALIBRATION</span>
+      </div>
 
-<defs>
-  <symbol id="icon-arrow-right" viewBox="0 0 24 24">
-    <path d="M5 12h14" />
-    <path d="M13 6l6 6-6 6" />
-  </symbol>
+      <p id="loading-main-text" style="font-size:15px; font-weight:700; color:var(--g950); margin:0 0 12px;">Calculating Metabolic Targets…</p>
+      
+      <div class="laser-progress-track">
+        <div class="laser-progress-bar" id="laser-progress-bar"></div>
+      </div>
 
-  <symbol id="icon-arrow-left" viewBox="0 0 24 24">
-    <path d="M19 12H5" />
-    <path d="M11 6l-6 6 6 6" />
-  </symbol>
-
-  <symbol id="icon-check" viewBox="0 0 24 24">
-    <path d="M5 12l4 4L19 6" />
-  </symbol>
-
-  <symbol id="icon-shield" viewBox="0 0 24 24">
-    <path d="M12 3l7 3v5c0 4.5-3 7.8-7 10-4-2.2-7-5.5-7-10V6l7-3z" />
-    <path d="M9 12l2 2 4-4" />
-  </symbol>
-
-  <symbol id="icon-search" viewBox="0 0 24 24">
-    <circle cx="11" cy="11" r="6" />
-    <path d="M16 16l5 5" />
-  </symbol>
-
-</defs>
-
-
-  </svg>
+      <div class="loading-checklist" id="loading-checklist">
+        <div class="checklist-step active" id="l-step-1">⏳ Evaluating Mifflin-St Jeor BMR & TDEE...</div>
+        <div class="checklist-step" id="l-step-2">⏳ Filtering allergies & dietary restrictions...</div>
+        <div class="checklist-step" id="l-step-3">⏳ Balancing protein, carb & fat ratios...</div>
+        <div class="checklist-step" id="l-step-4">⏳ Portioning recipes into daily schedule...</div>
+      </div>
+    </div>
+  </div>
 
   <script src="script.js"></script>
-
 </body>
 </html>
