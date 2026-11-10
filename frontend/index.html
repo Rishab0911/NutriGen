@@ -1260,25 +1260,10 @@
             <h2>Today's Calibrated Meals.</h2>
             <p>Portioned recipes with estimated timings and calorie allocations.</p>
           </div>
-          <!-- Dedicated Grocery Button right here -->
-          <button type="button" class="secondary-button" id="toggle-grocery-button">
-            🛒 View Grocery Checklist (<span id="grocery-count">0</span>)
-          </button>
+          
         </div>
 
-        <!-- Collapsible Grocery Shopping Checklist -->
-        <div class="grocery-checklist-card hidden" id="grocery-checklist-card">
-          <div class="grocery-header">
-            <div>
-              <h3>🛒 Ingredient Shopping Checklist</h3>
-              <p>Aggregated ingredient weights for today's plan. Tick off items as you shop.</p>
-            </div>
-            <button type="button" class="grocery-close" id="grocery-close">×</button>
-          </div>
-          <div class="grocery-items-grid" id="grocery-items-grid">
-            <!-- JS inserts aggregated checklist items here -->
-          </div>
-        </div>
+        
 
         <div class="meal-plan-wrapper">
           <div class="meal-plan-day-heading">
@@ -1296,6 +1281,27 @@
             <!-- JS inserts meal cards here with dedicated SVG icons and swap actions -->
           </div>
         </div>
+        <!-- Grocery Checklist Button -->
+<div class="grocery-actions">
+  <button type="button" class="secondary-button" id="toggle-grocery-button">
+    🛒 View Grocery Checklist (<span id="grocery-count">0</span>)
+  </button>
+</div>
+
+<!-- Collapsible Grocery Shopping Checklist -->
+<div class="grocery-checklist-card hidden" id="grocery-checklist-card">
+  <div class="grocery-header">
+    <div>
+      <h3>🛒 Ingredient Shopping Checklist</h3>
+      <p>Aggregated ingredient weights for today's plan. Tick off items as you shop.</p>
+    </div>
+    <button type="button" class="grocery-close" id="grocery-close">×</button>
+  </div>
+
+  <div class="grocery-items-grid" id="grocery-items-grid">
+    <!-- JS inserts aggregated checklist items here -->
+  </div>
+</div>  
 
         <!-- Calculation explanation -->
         <section class="plan-explanation" id="plan-explanation">
@@ -1471,7 +1477,7 @@
 
       <div class="loading-brand-title">
         <span class="loading-brand-text">NutriGen</span>
-        <span class="loading-brand-subtitle">INTELLIGENT CALIBRATION</span>
+        <span class="loading-brand-subtitle">YOUR PERSONALIZED PLAN</span>
       </div>
 
       <p id="loading-main-text" style="font-size:15px; font-weight:700; color:var(--g950); margin:0 0 12px;">Calculating Metabolic Targets…</p>
@@ -1481,10 +1487,10 @@
       </div>
 
       <div class="loading-checklist" id="loading-checklist">
-        <div class="checklist-step active" id="l-step-1">⏳ Evaluating Mifflin-St Jeor BMR & TDEE...</div>
+        <div class="checklist-step active" id="l-step-1">⏳ Understanding your body's energy needs...</div>
         <div class="checklist-step" id="l-step-2">⏳ Filtering allergies & dietary restrictions...</div>
         <div class="checklist-step" id="l-step-3">⏳ Balancing protein, carb & fat ratios...</div>
-        <div class="checklist-step" id="l-step-4">⏳ Portioning recipes into daily schedule...</div>
+        <div class="checklist-step" id="l-step-4">⏳ Creating your personalized daily meals...</div>
       </div>
     </div>
   </div>
@@ -1492,3 +1498,4 @@
   <script src="script.js"></script>
 </body>
 </html>
+

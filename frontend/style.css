@@ -3838,3 +3838,19 @@ body::after { filter: none; animation: none; }
   word-spacing: 0.05em;    /* a little air between words */
   letter-spacing: -0.03em; /* slightly less tight than -0.04em */
 }
+/* =========================================================
+   GROCERY CHECKLIST — CENTRED BELOW MEAL CARDS
+   ========================================================= */
+
+.grocery-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 28px auto 18px;
+}
+
+.grocery-checklist-card {
+  width: 100%;
+  max-width: 850px;
+  margin: 18px auto 32px;
+}
