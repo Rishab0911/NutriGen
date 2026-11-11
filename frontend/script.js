@@ -1021,7 +1021,7 @@ document.addEventListener("wheel", (event) => {
     ).join("\n");
 
     const textToCopy = [
-      `🥗 NutriGen Daily Nutrition Blueprint for ${profile.name}`,
+      ` NutriGen Daily Nutrition Blueprint for ${profile.name}`,
       `Goal: ${profile.goal} (${profile.diet})`,
       `Daily Intake: ${fmt(day.totals.kcal)} kcal (Target: ${fmt(nutrition.kcal)} kcal)`,
       `Macros: Protein ${fmt(day.totals.protein)}g · Carbs ${fmt(day.totals.carbs)}g · Fat ${fmt(day.totals.fat)}g`,
