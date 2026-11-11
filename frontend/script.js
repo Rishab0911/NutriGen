@@ -6,6 +6,20 @@
    ========================================================= */
 
 document.addEventListener("DOMContentLoaded", () => {
+  /* =======================================================
+   PREVENT ACCIDENTAL NUMBER CHANGES ON MOUSE WHEEL
+   ======================================================= */
+
+document.addEventListener("wheel", (event) => {
+    const input = event.target.closest('input[type="number"]');
+
+    if (input && document.activeElement === input) {
+        input.blur();
+    }
+}, {
+    capture: true,
+    passive: true
+});
 
   /* =======================================================
      1. HELPERS
@@ -796,7 +810,7 @@ document.addEventListener("DOMContentLoaded", () => {
       grid.insertAdjacentHTML(
         "beforeend",
         createCard("MAINTENANCE (TDEE)", `${fmt(tdee)} kcal`) +
-        createCard("THERMODYNAMIC BALANCE", energySummaryText, true)
+        createCard("DAILY CALORIE BALANCE", energySummaryText, true)
       );
     }
   }
