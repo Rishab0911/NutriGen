@@ -20,6 +20,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 # ---------------- HOME ROUTE ----------------
 
 @app.get("/")
@@ -95,6 +96,17 @@ def generate_meal(data: UserProfile):
 
     # Step 4: Get the generated meal plan
     result = ai_output["result"]
+
+    if not ai_output["passed"]:
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "message": "Could not generate a fully validated meal plan.",
+                "ai_status": "partial",
+                "passed": False,
+                "problems_left": ai_output["problems_left"]
+            }
+        )
 
     if not result:
         raise HTTPException(
