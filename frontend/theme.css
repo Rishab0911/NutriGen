@@ -1,0 +1,252 @@
+/* =========================================================
+   NUTRIGEN — theme.css  (dark theme overrides + toggle button)
+   Load AFTER style.css. Light theme is untouched.
+   ========================================================= */
+
+/* ── Toggle button ── */
+.theme-toggle {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-mid);
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--g850);
+  transition:
+    transform var(--dur-md) var(--ease-out),
+    border-color var(--dur-sm) var(--ease),
+    background var(--dur-sm) var(--ease),
+    box-shadow var(--dur-md) var(--ease);
+}
+.theme-toggle:hover {
+  transform: translateY(-2px) rotate(-12deg);
+  border-color: var(--g500);
+  box-shadow: var(--shadow-sm);
+}
+.theme-toggle:active { transform: scale(0.92); }
+.theme-toggle svg {
+  grid-area: 1 / 1;
+  width: 19px;
+  height: 19px;
+  transition: opacity var(--dur-md) var(--ease), transform var(--dur-lg) var(--ease-spring);
+}
+.theme-toggle .icon-sun { opacity: 0; transform: rotate(-90deg) scale(0.5); }
+html[data-theme="dark"] .theme-toggle .icon-moon { opacity: 0; transform: rotate(90deg) scale(0.5); }
+html[data-theme="dark"] .theme-toggle .icon-sun  { opacity: 1; transform: none; }
+
+.output-actions .theme-toggle { width: 44px; height: 44px; }
+
+/* Smooth cross-fade only while switching */
+html.theme-transition,
+html.theme-transition *,
+html.theme-transition *::before,
+html.theme-transition *::after {
+  transition:
+    background-color 0.35s var(--ease),
+    border-color 0.35s var(--ease),
+    color 0.35s var(--ease),
+    box-shadow 0.35s var(--ease),
+    fill 0.35s var(--ease),
+    stroke 0.35s var(--ease) !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  html.theme-transition,
+  html.theme-transition *,
+  html.theme-transition *::before,
+  html.theme-transition *::after { transition: none !important; }
+}
+
+/* =========================================================
+   DARK THEME — CHARCOAL (Version 2)
+   ========================================================= */
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+
+  --ink: #f3f3f1;
+  --surface:   #17191c;
+  --surface-2: #1d2024;
+  --surface-3: #25292d;
+
+  --g950: #12382a;
+  --g900: #1a4a36;
+  --g850: #1f5a42;
+  --g800: #26694d;
+  --g750: #2d7a58;
+
+  --g700: #6fd1a0;
+  --g650: #62c08f;
+  --g600: #4fb07f;
+
+  --g350: #434d4a;
+  --g300: #343c3a;
+  --g200: #262c2b;
+  --g150: #1f2424;
+  --g100: #1a1e1f;
+  --g50:  #15181a;
+
+  --cream:      #0e1012;
+  --cream-mid:  #121518;
+  --cream-dark: #25292d;
+  --white:      #17191c;
+
+  --text:        #ececea;
+  --text-2:      #cfd2d0;
+  --soft:        #a7aca9;
+  --muted:       #868b89;
+  --placeholder: #5f6563;
+
+  --border:      #2a2e31;
+  --border-mid:  #363b3f;
+  --border-dark: #474d52;
+
+  --danger:        #ff8a7a;
+  --danger-bg:     #2b1613;
+  --danger-border: #5c2c26;
+  --amber-soft:    #2a2410;
+
+  --shadow-xs: 0 1px 4px rgba(0,0,0,0.35), 0 2px 8px rgba(0,0,0,0.25);
+  --shadow-sm: 0 4px 16px rgba(0,0,0,0.40), 0 2px 6px rgba(0,0,0,0.25);
+  --shadow-md: 0 8px 28px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.25);
+  --shadow-lg: 0 18px 56px rgba(0,0,0,0.50), 0 4px 14px rgba(0,0,0,0.30);
+  --shadow-xl: 0 30px 80px rgba(0,0,0,0.55), 0 6px 20px rgba(0,0,0,0.30);
+  --shadow-2xl:0 45px 110px rgba(0,0,0,0.60), 0 10px 30px rgba(0,0,0,0.35);
+  --shadow-green-sm: 0 6px 22px rgba(0,0,0,0.45);
+  --shadow-green-md: 0 14px 40px rgba(0,0,0,0.50);
+  --shadow-green-lg: 0 24px 60px rgba(0,0,0,0.55);
+}
+
+html[data-theme="dark"] ::selection { background: var(--g400); color: #06180e; }
+
+/* TEXT */
+html[data-theme="dark"] h1,
+html[data-theme="dark"] h2,
+html[data-theme="dark"] h3,
+html[data-theme="dark"] h4 { color: var(--ink); }
+
+html[data-theme="dark"] :is(
+  .brand-name, .preview-meal strong, .preview-macro-row strong, .value-strip strong,
+  .summary-card strong, .goal-card strong, .diet-card strong, .choice-content,
+  .nutrition-metric strong, .day-summary-label strong, .macro-desc-item strong,
+  .future-note strong, .grocery-header h3, .grocery-name, .loading-brand-text,
+  .output-meal-card h3, .how-step h3, .explanation-card h3, .loading-brand-mark,
+  .checklist-step.active, .secondary-button, .back-home-button, .chat-chip,
+  .dock-pill:hover, .day-tab:hover, .check-card:has(input:checked) span
+) { color: var(--ink); }
+
+html[data-theme="dark"] .field > label:first-child,
+html[data-theme="dark"] .field > label:not(.choice-card):not(.goal-card):not(.diet-card):not(.check-card) { color: var(--ink); }
+
+html[data-theme="dark"] .macro-line i { color: #cfe8da; }
+html[data-theme="dark"] .highlight-card strong { color: #fff; }
+html[data-theme="dark"] .theme-toggle { color: var(--g400); }
+
+/* SURFACES */
+html[data-theme="dark"] .site-header {
+  background: rgba(14, 16, 18, 0.82);
+  border-bottom-color: rgba(70, 76, 80, 0.35);
+}
+
+html[data-theme="dark"] :is(.secondary-button, .back-home-button, .theme-toggle) {
+  background: rgba(37, 41, 45, 0.8);
+}
+html[data-theme="dark"] .secondary-button:hover {
+  background: var(--surface-3);
+  color: var(--ink);
+  border-color: var(--g500);
+}
+
+html[data-theme="dark"] .preview-card {
+  background: linear-gradient(158deg, var(--surface-2), var(--surface));
+  border-color: var(--border-mid);
+}
+html[data-theme="dark"] .preview-meal { background: rgba(37, 41, 45, 0.7); }
+html[data-theme="dark"] .preview-macro-row > div { background: rgba(37, 41, 45, 0.55); }
+
+html[data-theme="dark"] .value-strip { background: var(--surface); border-color: var(--border); }
+
+html[data-theme="dark"] :where(.feature-card, .how-step, .summary-card, .nutrition-metric, .output-meal-card, .explanation-card) {
+  background: linear-gradient(160deg, var(--surface-2) 0%, var(--surface) 100%);
+}
+html[data-theme="dark"] .highlight-card {
+  background: linear-gradient(145deg, var(--g950), var(--g850));
+}
+
+html[data-theme="dark"] :is(
+  .form-card, .nutrition-dashboard, .plan-explanation, .chat-panel, .chat-form,
+  .chat-chips-bar, .grocery-checklist-card, .bmi-spectrum-card, .loading-brand-card, .back-to-top
+) { background: var(--surface); }
+
+html[data-theme="dark"] .back-to-top { color: var(--ink); }
+html[data-theme="dark"] .back-to-top:hover { background: var(--g700); color: #06180e; border-color: var(--g700); }
+
+html[data-theme="dark"] :where(.choice-card, .goal-card, .diet-card, .check-card) { background: var(--surface-2); }
+
+html[data-theme="dark"] .field input:hover,
+html[data-theme="dark"] .field input:focus,
+html[data-theme="dark"] .chat-form input:focus { background: var(--surface-2); }
+
+html[data-theme="dark"] .personal-encouragement-card,
+html[data-theme="dark"] .future-note {
+  background: linear-gradient(135deg, var(--surface-2), var(--surface));
+}
+
+html[data-theme="dark"] .chat-messages { background: linear-gradient(180deg, var(--cream-mid), var(--cream)); }
+html[data-theme="dark"] .chat-message.bot { background: var(--surface-2); }
+
+html[data-theme="dark"] .quick-jump-dock,
+html[data-theme="dark"] .plan-subnav { background: rgba(23, 25, 28, 0.95); }
+html[data-theme="dark"] .dock-pill:hover { background: var(--g100); }
+html[data-theme="dark"] .dock-pill.active { background: var(--g800); color: #fff; }
+
+html[data-theme="dark"] .grocery-item:hover { background: var(--surface-2); }
+
+html[data-theme="dark"] .plan-status::after {
+  background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.10) 50%, transparent 70%);
+}
+
+/* Loading screen */
+html[data-theme="dark"] .loading-overlay { background: rgba(14, 16, 18, 0.95); }
+html[data-theme="dark"] .loading-brand-card { border-color: var(--border-mid); }
+html[data-theme="dark"] .loading-ring-svg .ring-bg { stroke: rgba(255, 255, 255, 0.08); }
+html[data-theme="dark"] .laser-progress-track,
+html[data-theme="dark"] .loading-progress-bar { background: rgba(255, 255, 255, 0.08); }
+html[data-theme="dark"] #loading-main-text { color: var(--ink) !important; }
+
+/* Light-green fills need a dark glyph */
+html[data-theme="dark"] .value-strip > div:hover .value-icon,
+html[data-theme="dark"] .feature-card:hover .feature-icon,
+html[data-theme="dark"] .goal-card:has(input:checked) .goal-icon,
+html[data-theme="dark"] .goal-card.selected .goal-icon,
+html[data-theme="dark"] .diet-card:has(input:checked) .diet-icon,
+html[data-theme="dark"] .choice-card:has(input:checked) .choice-icon,
+html[data-theme="dark"] .how-step:hover > span,
+html[data-theme="dark"] .back-home-button:hover .back-home-icon,
+html[data-theme="dark"] .swap-meal-btn:hover,
+html[data-theme="dark"] .chat-chip:hover,
+html[data-theme="dark"] .progress-step.completed .step-circle { color: #06180e; }
+
+html[data-theme="dark"] .chat-chip:hover { background: var(--g700); }
+
+/* BMI, PILLS, ALERTS */
+html[data-theme="dark"] .bmi-zone { box-shadow: inset -2px 0 0 var(--surface); }
+html[data-theme="dark"] .bmi-zone.obese { box-shadow: none; }
+html[data-theme="dark"] .bmi-pointer { background: var(--ink); border-color: var(--surface); }
+html[data-theme="dark"] .bmi-pointer::before { background: var(--ink); }
+
+html[data-theme="dark"] .bmi-status-pill.under  { background: rgba(252, 211, 77, 0.14);  color: #fcd34d; }
+html[data-theme="dark"] .bmi-status-pill.normal { background: rgba(74, 222, 128, 0.14);  color: #86efac; }
+html[data-theme="dark"] .bmi-status-pill.over   { background: rgba(251, 146, 60, 0.14);  color: #fdba74; }
+html[data-theme="dark"] .bmi-status-pill.obese  { background: rgba(248, 113, 113, 0.14); color: #fca5a5; }
+
+html[data-theme="dark"] .target-match-pill.match-high {
+  background: rgba(74, 222, 128, 0.12); color: #86efac; border-color: rgba(74, 222, 128, 0.30);
+}
+html[data-theme="dark"] .target-match-pill.match-moderate {
+  background: rgba(232, 184, 75, 0.12); color: #f0c96a; border-color: rgba(232, 184, 75, 0.30);
+}
+html[data-theme="dark"] .nutrition-warning,
+html[data-theme="dark"] .calculation-alerts { color: #e8c775; }
