@@ -483,3 +483,62 @@ def test_write_message_blocks_dairy_for_dairy_free_user():
               "priority": 1, "message": "TEMPLATE"}
     ask = lambda prompt, system: "Try some cheese on toast."
     assert write_message(state, action, ask_llm=ask) == "TEMPLATE"
+from evaluation import check_structure, time_call
+
+
+def _good_plan_result():
+    nutrients = {"calories": 500.0, "protein": 30.0,
+                 "carbs": 50.0, "fat": 15.0}
+    item = dict(food="Rice, brown", grams=100.0, **nutrients)
+    meals = [
+        {"meal": name, "dish": "Test dish", "totals": dict(nutrients),
+         "items": [dict(item)], "not_found": []}
+        for name in ["Breakfast", "Lunch", "Snack", "Dinner"]
+    ]
+    comparison = {
+        n: {"target": 100, "actual": 100.0, "difference": 0.0,
+            "percent_error": 0.0}
+        for n in nutrients
+    }
+    return {"meals": meals, "day_totals": dict(nutrients),
+            "comparison": comparison, "not_found": []}
+
+
+def test_check_structure_accepts_good_result():
+    assert check_structure(_good_plan_result()) == []
+
+
+def test_check_structure_flags_missing_meal():
+    result = _good_plan_result()
+    result["meals"].pop()
+    assert any("meals" in p for p in check_structure(result))
+
+
+def test_check_structure_flags_missing_key():
+    result = _good_plan_result()
+    del result["day_totals"]
+    assert any("day_totals" in p for p in check_structure(result))
+
+
+def test_check_structure_flags_wrong_type():
+    result = _good_plan_result()
+    result["meals"][0]["items"][0]["grams"] = "100"
+    assert any("grams" in p for p in check_structure(result))
+
+
+def test_check_structure_flags_missing_dish_name():
+    result = _good_plan_result()
+    result["meals"][1]["dish"] = None
+    assert any("dish" in p for p in check_structure(result))
+
+
+def test_check_structure_allows_null_percent_error():
+    result = _good_plan_result()
+    result["comparison"]["calories"]["percent_error"] = None
+    assert check_structure(result) == []
+
+
+def test_time_call_returns_value_and_seconds():
+    value, seconds = time_call(lambda x: x * 2, 21)
+    assert value == 42
+    assert seconds >= 0
