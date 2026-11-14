@@ -21,3 +21,5 @@ if message == action["message"]:
     print("RESULT: fell back to the template (Gemini failed or the text was rejected)")
 else:
     print("RESULT: Gemini wrote the message")
+
+

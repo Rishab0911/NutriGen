@@ -1,6 +1,6 @@
 import time
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta 
+from datetime import date, datetime, timedelta
 import schedule
 
 from nutrition import find_matches, restricted_words
@@ -14,6 +14,17 @@ EVENING_HOUR = 18          # "evening" checks start at 6 pm
 LOW_CALORIE_SHARE = 0.5    # in the evening, below 50% of the calorie target
 LOW_PROTEIN_SHARE = 0.5    # in the evening, below 50% of the protein target
 OVER_CALORIE_SHARE = 1.1   # above 110% of the calorie target
+
+# Notification control
+MAX_NOTIFICATIONS_PER_DAY = 4
+DEFAULT_COOLDOWN_HOURS = 3
+COOLDOWN_HOURS = {         # do not repeat the same trigger for this long
+    "no_meal_yet": 3,
+    "long_gap": 3,
+    "low_calories": 3,
+    "low_protein": 4,
+    "over_calories": 6,
+}
 
 
 @dataclass
@@ -29,6 +40,9 @@ class UserState:
     protein_logged: float = 0.0
     last_meal_time: datetime = None
     last_notified: dict = field(default_factory=dict)
+    notifications_enabled: bool = True   # the user can switch nudges off
+    notifications_today: int = 0
+    day: date = None                     # the day the logs belong to
 
     def log_meal(self, calories, protein, when=None):
         self.calories_logged += calories
@@ -48,10 +62,20 @@ class UserState:
         return self.protein_target - self.protein_logged
 
     def reset_day(self):
-        """New day: clear the logs, keep the notification history."""
+        """New day: clear the logs and the daily notification count."""
         self.calories_logged = 0.0
         self.protein_logged = 0.0
         self.last_meal_time = None
+        self.notifications_today = 0
+
+    def start_day_if_new(self, now=None):
+        """Reset the daily logs and counters when the date changes."""
+        today = (now or datetime.now()).date()
+        if self.day is None:
+            self.day = today
+        elif today != self.day:
+            self.reset_day()
+            self.day = today
 
 
 def state_from_profile(user_id, profile):
@@ -152,11 +176,40 @@ def top_action(actions):
 CHECK_EVERY_MINUTES = 30
 
 
+def in_cooldown(state, trigger, now=None):
+    """True if this trigger was already sent too recently."""
+    last = state.last_notified.get(trigger)
+    if last is None:
+        return False
+    hours = COOLDOWN_HOURS.get(trigger, DEFAULT_COOLDOWN_HOURS)
+    return (now or datetime.now()) - last < timedelta(hours=hours)
+
+
+def can_notify(state, action, now=None):
+    """Notification control: may this action be sent right now?"""
+    if not state.notifications_enabled:
+        return False
+    if state.notifications_today >= MAX_NOTIFICATIONS_PER_DAY:
+        return False
+    return not in_cooldown(state, action["trigger"], now)
+
+
+def record_notification(state, action, now=None):
+    """Remember that this nudge was sent."""
+    state.last_notified[action["trigger"]] = now or datetime.now()
+    state.notifications_today += 1
+
+
 def run_check(state, now=None):
-    """One proactive check for one user. Returns the top action or None."""
+    """One proactive check for one user. Returns the most important action
+    that is allowed to be sent now, or None."""
+    now = now or datetime.now()
+    state.start_day_if_new(now)
     triggers = detect_triggers(state, now)
-    actions = decide_actions(triggers, state, now)
-    return top_action(actions)
+    for action in decide_actions(triggers, state, now):
+        if can_notify(state, action, now):
+            return action
+    return None
 
 
 def make_job(states, notify, clock=datetime.now):
@@ -167,6 +220,7 @@ def make_job(states, notify, clock=datetime.now):
             action = run_check(state, now)
             if action:
                 notify(state, action)
+                record_notification(state, action, now)
     return job
 
 

@@ -1,3 +1,7 @@
+import sys
+import os
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from nutrition import calculate_item, get_food
 
 FOOD = "Hummus, commercial"
