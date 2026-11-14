@@ -417,3 +417,69 @@ def test_write_message_prompt_contains_facts():
     write_message(state, _nudge(), ask_llm=ask, now=now)
     assert "hours since last meal: 6.0" in seen["prompt"]
     assert "Nuts" in seen["prompt"]
+
+
+from evaluation import absolute_error, percentage_error, mae
+from evaluation import evaluate_plan, summarize
+from proactive import UserState, write_message
+
+
+def _eval_result(cal, pro, carb, fat):
+    targets = {"calories": 2000, "protein": 100, "carbs": 200, "fat": 50}
+    actual = {"calories": cal, "protein": pro, "carbs": carb, "fat": fat}
+    comparison = {}
+    for n, target in targets.items():
+        diff = actual[n] - target
+        comparison[n] = {"target": target, "actual": actual[n],
+                         "difference": diff,
+                         "percent_error": round(diff / target * 100, 1)}
+    return {"comparison": comparison}
+
+
+def test_absolute_error_is_never_negative():
+    assert absolute_error(110, 100) == 10
+    assert absolute_error(90, 100) == 10
+
+
+def test_percentage_error_and_zero_target():
+    assert round(percentage_error(110, 100), 1) == 10.0
+    assert percentage_error(5, 0) is None
+
+
+def test_mae_ignores_none_and_empty():
+    assert mae([2, 4, 6]) == 4
+    assert mae([2, None, 4]) == 3
+    assert mae([]) is None
+
+
+def test_evaluate_plan_errors():
+    scored = evaluate_plan(_eval_result(1900, 109, 200, 46))
+    cal = scored["per_nutrient"]["calories"]
+    assert cal["absolute_error"] == 100
+    assert cal["percentage_error"] == 5.0
+    assert scored["per_nutrient"]["fat"]["percentage_error"] == 8.0
+    assert scored["mean_percentage_error"] == 5.5
+    assert scored["within_tolerance"] is True
+
+
+def test_evaluate_plan_flags_out_of_tolerance():
+    scored = evaluate_plan(_eval_result(1500, 100, 200, 50))
+    assert scored["within_tolerance"] is False
+
+
+def test_summarize_across_plans():
+    scores = [evaluate_plan(_eval_result(1900, 109, 200, 46)),
+              evaluate_plan(_eval_result(2100, 100, 200, 50))]
+    summary = summarize(scores)
+    assert summary["plans"] == 2
+    assert summary["mae"]["calories"] == 100
+    assert summary["mae"]["protein"] == 4.5
+    assert summary["within_tolerance_rate"] == 1.0
+
+
+def test_write_message_blocks_dairy_for_dairy_free_user():
+    state = UserState("u1", 2000, 100, preferences=["Dairy Free"])
+    action = {"trigger": "long_gap", "action": "remind_meal",
+              "priority": 1, "message": "TEMPLATE"}
+    ask = lambda prompt, system: "Try some cheese on toast."
+    assert write_message(state, action, ask_llm=ask) == "TEMPLATE"

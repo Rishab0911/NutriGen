@@ -268,8 +268,12 @@ def write_message(state, action, ask_llm=None, now=None):
         return fallback
     if not text or len(text) > MAX_MESSAGE_CHARS:
         return fallback
-    banned = restricted_words(
-        {"allergies": state.allergies, "diet": state.diet})
+       
+    banned = restricted_words({
+        "allergies": state.allergies,
+        "diet": state.diet,
+        "preferences": state.preferences,
+    })
     if find_matches(text, banned):
         return fallback
     return text
