@@ -1,6 +1,10 @@
 import time
+from datetime import datetime
 
 from jsonschema import Draft202012Validator
+
+from nutrition import find_violations, restricted_words
+from proactive import UserState, detect_triggers
 
 TOLERANCE = 10  # percent, the same limit the planner uses
 NUTRIENTS = ["calories", "protein", "carbs", "fat"]
@@ -145,3 +149,72 @@ def time_call(func, *args, **kwargs):
     start = time.perf_counter()
     value = func(*args, **kwargs)
     return value, round(time.perf_counter() - start, 2)
+
+def check_compliance(result, profile):
+    """Does the plan respect the user's allergies, diet and restrictions?"""
+    banned = restricted_words(profile)
+    violations = find_violations(result, banned)
+    return {"compliant": not violations, "violations": violations}
+
+
+def compliance_rate(checks):
+    """Share of plans that were compliant (0 to 1). None if no plans."""
+    if not checks:
+        return None
+    ok = sum(1 for c in checks if c["compliant"])
+    return round(ok / len(checks), 2)
+
+
+def _at(hour, minute=0):
+    return datetime(2026, 11, 14, hour, minute)
+
+
+def _case(name, now, calories, protein, last_meal, expected):
+    return {"name": name, "now": now, "calories": calories,
+            "protein": protein, "last_meal": last_meal,
+            "expected": expected}
+
+
+# Scenarios for a user with targets of 2000 kcal and 100 g protein.
+TRIGGER_CASES = [
+    _case("quiet before 11 am", _at(9), 0, 0, None, []),
+    _case("no meal yet at noon", _at(12), 0, 0, None, ["no_meal_yet"]),
+    _case("long gap", _at(14), 800, 40, _at(8), ["long_gap"]),
+    _case("short gap is fine", _at(14), 800, 40, _at(12), []),
+    _case("no nudges at night", _at(23), 0, 0, None, []),
+    _case("no nudges before waking", _at(6), 0, 0, None, []),
+    _case("evening low intake", _at(19), 500, 20, _at(18),
+          ["low_calories", "low_protein"]),
+    _case("over calories", _at(14), 2300, 90, _at(13), ["over_calories"]),
+    _case("on track in the evening", _at(19), 1500, 90, _at(17), []),
+    _case("several triggers", _at(20), 2300, 30, _at(12),
+          ["long_gap", "over_calories", "low_protein"]),
+]
+
+
+def _case_state(case):
+    state = UserState("eval", 2000, 100)
+    state.calories_logged = case["calories"]
+    state.protein_logged = case["protein"]
+    state.last_meal_time = case["last_meal"]
+    return state
+
+
+def evaluate_triggers(cases=None):
+    """Run detect_triggers on labeled scenarios and report its accuracy.
+    Only the set of triggers is compared, not their order."""
+    cases = TRIGGER_CASES if cases is None else cases
+    wrong = []
+    for case in cases:
+        got = sorted(detect_triggers(_case_state(case), case["now"]))
+        want = sorted(case["expected"])
+        if got != want:
+            wrong.append({"name": case["name"], "expected": want, "got": got})
+    total = len(cases)
+    correct = total - len(wrong)
+    return {
+        "cases": total,
+        "correct": correct,
+        "accuracy": round(correct / total, 2) if total else None,
+        "wrong": wrong,
+    }

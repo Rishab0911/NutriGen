@@ -542,3 +542,54 @@ def test_time_call_returns_value_and_seconds():
     value, seconds = time_call(lambda x: x * 2, 21)
     assert value == 42
     assert seconds >= 0
+
+from evaluation import check_compliance, compliance_rate, evaluate_triggers
+
+
+def _plan_with(dish, foods):
+    return {"meals": [{"meal": "Lunch", "dish": dish,
+                       "items": [{"food": f} for f in foods],
+                       "not_found": []}]}
+
+
+def test_compliance_flags_meat_for_vegetarian():
+    plan = _plan_with("Chicken curry", ["Rice, brown"])
+    profile = {"diet": "Vegetarian", "allergies": []}
+    check = check_compliance(plan, profile)
+    assert check["compliant"] is False
+    assert "Chicken curry" in check["violations"]
+
+
+def test_compliance_accepts_a_vegetarian_plan():
+    plan = _plan_with("Lentil dal", ["Lentils, raw", "Rice, brown"])
+    profile = {"diet": "Vegetarian", "allergies": []}
+    assert check_compliance(plan, profile)["compliant"] is True
+
+
+def test_compliance_flags_nut_allergy_in_food_names():
+    plan = _plan_with("Snack bowl", ["Nuts, almonds"])
+    profile = {"diet": "Non-Vegetarian", "allergies": ["Nuts"]}
+    check = check_compliance(plan, profile)
+    assert check["compliant"] is False
+    assert "Nuts, almonds" in check["violations"]
+
+
+def test_compliance_rate():
+    checks = [{"compliant": True}, {"compliant": False}]
+    assert compliance_rate(checks) == 0.5
+    assert compliance_rate([]) is None
+
+
+def test_trigger_cases_all_match_detect_triggers():
+    scored = evaluate_triggers()
+    assert scored["wrong"] == []
+    assert scored["accuracy"] == 1.0
+
+
+def test_evaluate_triggers_reports_wrong_cases():
+    bad = {"name": "bad", "now": datetime(2026, 11, 14, 12, 0),
+           "calories": 0, "protein": 0, "last_meal": None, "expected": []}
+    scored = evaluate_triggers([bad])
+    assert scored["accuracy"] == 0.0
+    assert scored["wrong"][0]["name"] == "bad"
+    assert scored["wrong"][0]["got"] == ["no_meal_yet"]
