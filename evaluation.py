@@ -311,8 +311,7 @@ def print_report(rows, summary):
 
 if __name__ == "__main__":
     all_profiles = load_profiles()
-    all_rows = run_evalu
-    ation(all_profiles)
+    all_rows = run_evaluation(all_profiles)
     run_summary = summarize_run(all_rows)
     print_report(all_rows, run_summary)
     save_results(all_rows, run_summary)
