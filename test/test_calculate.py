@@ -593,3 +593,79 @@ def test_evaluate_triggers_reports_wrong_cases():
     assert scored["accuracy"] == 0.0
     assert scored["wrong"][0]["name"] == "bad"
     assert scored["wrong"][0]["got"] == ["no_meal_yet"]
+
+    import json
+from evaluation import run_evaluation, summarize_run
+from evaluation import load_profiles, save_results
+
+
+def _fake_generate(profile):
+    if profile.get("diet") == "Impossible":
+        raise RuntimeError("no safe plan")
+    return {"result": _good_plan_result(), "passed": True,
+            "best_attempt": 1, "problems_left": []}
+
+
+def _two_profiles():
+    ok = {"calories": 2000, "protein": 100, "carbs": 200, "fat": 50,
+          "diet": "Non-Vegetarian", "allergies": [], "preferences": []}
+    bad = dict(ok, diet="Impossible")
+    return [{"name": "ok", "profile": ok}, {"name": "bad", "profile": bad}]
+
+
+def test_run_evaluation_scores_each_profile():
+    rows = run_evaluation(_two_profiles()[:1], generate=_fake_generate,
+                          pause_seconds=0)
+    assert rows[0]["ok"] is True
+    assert rows[0]["compliance"]["compliant"] is True
+    assert rows[0]["structure_problems"] == []
+    assert rows[0]["score"]["mean_percentage_error"] == 0.0
+
+
+def test_run_evaluation_records_failures():
+    rows = run_evaluation(_two_profiles()[1:], generate=_fake_generate,
+                          pause_seconds=0)
+    assert rows[0]["ok"] is False
+    assert "no safe plan" in rows[0]["error"]
+
+
+def test_summarize_run_counts_successes_and_failures():
+    rows = run_evaluation(_two_profiles(), generate=_fake_generate,
+                          pause_seconds=0)
+    summary = summarize_run(rows)
+    assert summary["profiles"] == 2
+    assert summary["generated"] == 1
+    assert [f["name"] for f in summary["failed"]] == ["bad"]
+    assert summary["planner_passed"] == 1
+    assert summary["structure_valid"] == 1
+    assert summary["compliance_rate"] == 1.0
+    assert summary["accuracy"]["within_tolerance_rate"] == 1.0
+
+
+def test_load_profiles_reads_json(tmp_path):
+    path = tmp_path / "p.json"
+    path.write_text(json.dumps(_two_profiles()), encoding="utf-8")
+    assert load_profiles(str(path)) == _two_profiles()
+
+
+def test_save_results_writes_json(tmp_path):
+    rows = run_evaluation(_two_profiles()[:1], generate=_fake_generate,
+                          pause_seconds=0)
+    summary = summarize_run(rows)
+    path = tmp_path / "out" / "r.json"
+    save_results(rows, summary, path=str(path))
+    saved = json.loads(path.read_text(encoding="utf-8"))
+    assert saved["summary"]["generated"] == 1
+    assert saved["rows"][0]["name"] == "ok"
+
+
+def test_test_profiles_file_is_well_formed():
+    profiles = load_profiles()
+    names = [p["name"] for p in profiles]
+    assert 10 <= len(profiles) <= 15
+    assert len(set(names)) == len(names)
+    for p in profiles:
+        profile = p["profile"]
+        for key in ["calories", "protein", "carbs", "fat", "diet"]:
+            assert key in profile
+        assert profile["diet"] in {"Vegetarian", "Non-Vegetarian", "Vegan"}

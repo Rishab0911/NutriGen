@@ -1,3 +1,7 @@
+import json
+import os
+import time
+
 import time
 from datetime import datetime
 
@@ -218,3 +222,97 @@ def evaluate_triggers(cases=None):
         "accuracy": round(correct / total, 2) if total else None,
         "wrong": wrong,
     }
+PROFILES_PATH = "data/test_profiles.json"
+RESULTS_PATH = "result/evaluation_results.json"
+
+
+def load_profiles(path=PROFILES_PATH):
+    with open(path, encoding="utf-8") as f:
+        return json.load(f)
+
+
+def run_evaluation(profiles, generate=None, pause_seconds=1):
+    """Run the planner on every profile and score each plan.
+    `generate` defaults to generate_meal_plan (tests pass a fake one)."""
+    if generate is None:
+        from planner import generate_meal_plan as generate
+    rows = []
+    for item in profiles:
+        profile = item["profile"]
+        row = {"name": item["name"]}
+        try:
+            output, seconds = time_call(generate, profile)
+        except Exception as error:
+            row.update({"ok": False, "error": str(error)})
+        else:
+            result = output["result"]
+            row.update({
+                "ok": True,
+                "seconds": seconds,
+                "passed": output["passed"],
+                "attempt": output["best_attempt"],
+                "score": evaluate_plan(result),
+                "structure_problems": check_structure(result),
+                "compliance": check_compliance(result, profile),
+            })
+        rows.append(row)
+        time.sleep(pause_seconds)
+    return rows
+
+
+def summarize_run(rows):
+    """Numbers for the whole run: accuracy, compliance, structure, speed."""
+    done = [r for r in rows if r["ok"]]
+    times = [r["seconds"] for r in done]
+    return {
+        "profiles": len(rows),
+        "generated": len(done),
+        "failed": [{"name": r["name"], "error": r["error"]}
+                   for r in rows if not r["ok"]],
+        "accuracy": summarize([r["score"] for r in done]),
+        "planner_passed": sum(1 for r in done if r["passed"]),
+        "compliance_rate": compliance_rate([r["compliance"] for r in done]),
+        "structure_valid": sum(1 for r in done if not r["structure_problems"]),
+        "mean_seconds": mae(times),
+        "max_seconds": max(times) if times else None,
+    }
+
+
+def save_results(rows, summary, path=RESULTS_PATH):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump({"summary": summary, "rows": rows}, f, indent=2)
+
+
+def print_report(rows, summary):
+    print(f"{'profile':26} {'passed':7} {'tries':5} {'err%':>5} "
+          f"{'safe':5} {'format':6} {'sec':>5}")
+    for r in rows:
+        if not r["ok"]:
+            print(f"{r['name']:26} FAILED: {r['error'][:60]}")
+            continue
+        err = str(r["score"]["mean_percentage_error"])
+        safe = str(r["compliance"]["compliant"])
+        fmt = str(not r["structure_problems"])
+        print(f"{r['name']:26} {str(r['passed']):7} {r['attempt']:<5} "
+              f"{err:>5} {safe:5} {fmt:6} {r['seconds']:>5}")
+    acc = summary["accuracy"]
+    print()
+    print("Generated:", summary["generated"], "of", summary["profiles"])
+    print("Planner passed (within 10%):", summary["planner_passed"])
+    print("Mean percentage error:", acc["mean_percentage_error"])
+    print("MAE per nutrient:", acc["mae"])
+    print("Allergy/diet compliance rate:", summary["compliance_rate"])
+    print("Structure valid:", summary["structure_valid"],
+          "of", summary["generated"])
+    print("Seconds per plan: mean", summary["mean_seconds"],
+          "| max", summary["max_seconds"])
+
+
+if __name__ == "__main__":
+    all_profiles = load_profiles()
+    all_rows = run_evalu
+    ation(all_profiles)
+    run_summary = summarize_run(all_rows)
+    print_report(all_rows, run_summary)
+    save_results(all_rows, run_summary)
