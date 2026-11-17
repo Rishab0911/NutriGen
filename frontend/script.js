@@ -646,7 +646,7 @@ document.addEventListener("wheel", (event) => {
     profile = profileData;
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000);
+    const timeoutId = setTimeout(() => controller.abort(), 180000);
     let response;
 
     try {

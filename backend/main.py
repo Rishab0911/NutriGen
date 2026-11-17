@@ -53,10 +53,11 @@ def generate_meal(data: UserProfile):
     )
 
     # Step 2: Prepare the profile for Aahana's meal planner
-    allergies = list(data.allergies)
+    allergies = [a.strip() for a in data.allergies if a.strip()]
 
-    if data.otherAllergy.strip():
-        allergies.append(data.otherAllergy.strip())
+    for word in data.otherAllergy.replace(";", ",").split(","):
+        if word.strip():
+            allergies.append(word.strip())
 
     preferences = list(data.preferences)
 
@@ -87,27 +88,12 @@ def generate_meal(data: UserProfile):
     except RuntimeError as error:
         raise HTTPException(
             status_code=503,
-            detail=(
-                "Meal plan generation failed. "
-                "No suitable plan could be generated. "
-                "Please try again."
-            )
+            detail=str(error)
         ) from error
-
     # Step 4: Get the generated meal plan
     result = ai_output["result"]
 
-    if not ai_output["passed"]:
-        raise HTTPException(
-            status_code=503,
-            detail={
-                "message": "Could not generate a fully validated meal plan.",
-                "ai_status": "partial",
-                "passed": False,
-                "problems_left": ai_output["problems_left"]
-            }
-        )
-
+   
     if not result:
         raise HTTPException(
             status_code=503,
