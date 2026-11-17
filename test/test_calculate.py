@@ -1,3 +1,8 @@
+import json
+import sys
+import os
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from nutrition import calculate_item, get_food
 
 FOOD = "Hummus, commercial"
@@ -413,3 +418,255 @@ def test_write_message_prompt_contains_facts():
     write_message(state, _nudge(), ask_llm=ask, now=now)
     assert "hours since last meal: 6.0" in seen["prompt"]
     assert "Nuts" in seen["prompt"]
+
+
+from evaluation import absolute_error, percentage_error, mae
+from evaluation import evaluate_plan, summarize
+from proactive import UserState, write_message
+
+
+def _eval_result(cal, pro, carb, fat):
+    targets = {"calories": 2000, "protein": 100, "carbs": 200, "fat": 50}
+    actual = {"calories": cal, "protein": pro, "carbs": carb, "fat": fat}
+    comparison = {}
+    for n, target in targets.items():
+        diff = actual[n] - target
+        comparison[n] = {"target": target, "actual": actual[n],
+                         "difference": diff,
+                         "percent_error": round(diff / target * 100, 1)}
+    return {"comparison": comparison}
+
+
+def test_absolute_error_is_never_negative():
+    assert absolute_error(110, 100) == 10
+    assert absolute_error(90, 100) == 10
+
+
+def test_percentage_error_and_zero_target():
+    assert round(percentage_error(110, 100), 1) == 10.0
+    assert percentage_error(5, 0) is None
+
+
+def test_mae_ignores_none_and_empty():
+    assert mae([2, 4, 6]) == 4
+    assert mae([2, None, 4]) == 3
+    assert mae([]) is None
+
+
+def test_evaluate_plan_errors():
+    scored = evaluate_plan(_eval_result(1900, 109, 200, 46))
+    cal = scored["per_nutrient"]["calories"]
+    assert cal["absolute_error"] == 100
+    assert cal["percentage_error"] == 5.0
+    assert scored["per_nutrient"]["fat"]["percentage_error"] == 8.0
+    assert scored["mean_percentage_error"] == 5.5
+    assert scored["within_tolerance"] is True
+
+
+def test_evaluate_plan_flags_out_of_tolerance():
+    scored = evaluate_plan(_eval_result(1500, 100, 200, 50))
+    assert scored["within_tolerance"] is False
+
+
+def test_summarize_across_plans():
+    scores = [evaluate_plan(_eval_result(1900, 109, 200, 46)),
+              evaluate_plan(_eval_result(2100, 100, 200, 50))]
+    summary = summarize(scores)
+    assert summary["plans"] == 2
+    assert summary["mae"]["calories"] == 100
+    assert summary["mae"]["protein"] == 4.5
+    assert summary["within_tolerance_rate"] == 1.0
+
+
+def test_write_message_blocks_dairy_for_dairy_free_user():
+    state = UserState("u1", 2000, 100, preferences=["Dairy Free"])
+    action = {"trigger": "long_gap", "action": "remind_meal",
+              "priority": 1, "message": "TEMPLATE"}
+    ask = lambda prompt, system: "Try some cheese on toast."
+    assert write_message(state, action, ask_llm=ask) == "TEMPLATE"
+from evaluation import check_structure, time_call
+
+
+def _good_plan_result():
+    nutrients = {"calories": 500.0, "protein": 30.0,
+                 "carbs": 50.0, "fat": 15.0}
+    item = dict(food="Rice, brown", grams=100.0, **nutrients)
+    meals = [
+        {"meal": name, "dish": "Test dish", "totals": dict(nutrients),
+         "items": [dict(item)], "not_found": []}
+        for name in ["Breakfast", "Lunch", "Snack", "Dinner"]
+    ]
+    comparison = {
+        n: {"target": 100, "actual": 100.0, "difference": 0.0,
+            "percent_error": 0.0}
+        for n in nutrients
+    }
+    return {"meals": meals, "day_totals": dict(nutrients),
+            "comparison": comparison, "not_found": []}
+
+
+def test_check_structure_accepts_good_result():
+    assert check_structure(_good_plan_result()) == []
+
+
+def test_check_structure_flags_missing_meal():
+    result = _good_plan_result()
+    result["meals"].pop()
+    assert any("meals" in p for p in check_structure(result))
+
+
+def test_check_structure_flags_missing_key():
+    result = _good_plan_result()
+    del result["day_totals"]
+    assert any("day_totals" in p for p in check_structure(result))
+
+
+def test_check_structure_flags_wrong_type():
+    result = _good_plan_result()
+    result["meals"][0]["items"][0]["grams"] = "100"
+    assert any("grams" in p for p in check_structure(result))
+
+
+def test_check_structure_flags_missing_dish_name():
+    result = _good_plan_result()
+    result["meals"][1]["dish"] = None
+    assert any("dish" in p for p in check_structure(result))
+
+
+def test_check_structure_allows_null_percent_error():
+    result = _good_plan_result()
+    result["comparison"]["calories"]["percent_error"] = None
+    assert check_structure(result) == []
+
+
+def test_time_call_returns_value_and_seconds():
+    value, seconds = time_call(lambda x: x * 2, 21)
+    assert value == 42
+    assert seconds >= 0
+
+from evaluation import check_compliance, compliance_rate, evaluate_triggers
+
+
+def _plan_with(dish, foods):
+    return {"meals": [{"meal": "Lunch", "dish": dish,
+                       "items": [{"food": f} for f in foods],
+                       "not_found": []}]}
+
+
+def test_compliance_flags_meat_for_vegetarian():
+    plan = _plan_with("Chicken curry", ["Rice, brown"])
+    profile = {"diet": "Vegetarian", "allergies": []}
+    check = check_compliance(plan, profile)
+    assert check["compliant"] is False
+    assert "Chicken curry" in check["violations"]
+
+
+def test_compliance_accepts_a_vegetarian_plan():
+    plan = _plan_with("Lentil dal", ["Lentils, raw", "Rice, brown"])
+    profile = {"diet": "Vegetarian", "allergies": []}
+    assert check_compliance(plan, profile)["compliant"] is True
+
+
+def test_compliance_flags_nut_allergy_in_food_names():
+    plan = _plan_with("Snack bowl", ["Nuts, almonds"])
+    profile = {"diet": "Non-Vegetarian", "allergies": ["Nuts"]}
+    check = check_compliance(plan, profile)
+    assert check["compliant"] is False
+    assert "Nuts, almonds" in check["violations"]
+
+
+def test_compliance_rate():
+    checks = [{"compliant": True}, {"compliant": False}]
+    assert compliance_rate(checks) == 0.5
+    assert compliance_rate([]) is None
+
+
+def test_trigger_cases_all_match_detect_triggers():
+    scored = evaluate_triggers()
+    assert scored["wrong"] == []
+    assert scored["accuracy"] == 1.0
+
+
+def test_evaluate_triggers_reports_wrong_cases():
+    bad = {"name": "bad", "now": datetime(2026, 11, 14, 12, 0),
+           "calories": 0, "protein": 0, "last_meal": None, "expected": []}
+    scored = evaluate_triggers([bad])
+    assert scored["accuracy"] == 0.0
+    assert scored["wrong"][0]["name"] == "bad"
+    assert scored["wrong"][0]["got"] == ["no_meal_yet"]
+
+    import json
+from evaluation import run_evaluation, summarize_run
+from evaluation import load_profiles, save_results
+
+
+def _fake_generate(profile):
+    if profile.get("diet") == "Impossible":
+        raise RuntimeError("no safe plan")
+    return {"result": _good_plan_result(), "passed": True,
+            "best_attempt": 1, "problems_left": []}
+
+
+def _two_profiles():
+    ok = {"calories": 2000, "protein": 100, "carbs": 200, "fat": 50,
+          "diet": "Non-Vegetarian", "allergies": [], "preferences": []}
+    bad = dict(ok, diet="Impossible")
+    return [{"name": "ok", "profile": ok}, {"name": "bad", "profile": bad}]
+
+
+def test_run_evaluation_scores_each_profile():
+    rows = run_evaluation(_two_profiles()[:1], generate=_fake_generate,
+                          pause_seconds=0)
+    assert rows[0]["ok"] is True
+    assert rows[0]["compliance"]["compliant"] is True
+    assert rows[0]["structure_problems"] == []
+    assert rows[0]["score"]["mean_percentage_error"] == 0.0
+
+
+def test_run_evaluation_records_failures():
+    rows = run_evaluation(_two_profiles()[1:], generate=_fake_generate,
+                          pause_seconds=0)
+    assert rows[0]["ok"] is False
+    assert "no safe plan" in rows[0]["error"]
+
+
+def test_summarize_run_counts_successes_and_failures():
+    rows = run_evaluation(_two_profiles(), generate=_fake_generate,
+                          pause_seconds=0)
+    summary = summarize_run(rows)
+    assert summary["profiles"] == 2
+    assert summary["generated"] == 1
+    assert [f["name"] for f in summary["failed"]] == ["bad"]
+    assert summary["planner_passed"] == 1
+    assert summary["structure_valid"] == 1
+    assert summary["compliance_rate"] == 1.0
+    assert summary["accuracy"]["within_tolerance_rate"] == 1.0
+
+
+def test_load_profiles_reads_json(tmp_path):
+    path = tmp_path / "p.json"
+    path.write_text(json.dumps(_two_profiles()), encoding="utf-8")
+    assert load_profiles(str(path)) == _two_profiles()
+
+
+def test_save_results_writes_json(tmp_path):
+    rows = run_evaluation(_two_profiles()[:1], generate=_fake_generate,
+                          pause_seconds=0)
+    summary = summarize_run(rows)
+    path = tmp_path / "out" / "r.json"
+    save_results(rows, summary, path=str(path))
+    saved = json.loads(path.read_text(encoding="utf-8"))
+    assert saved["summary"]["generated"] == 1
+    assert saved["rows"][0]["name"] == "ok"
+
+
+def test_test_profiles_file_is_well_formed():
+    profiles = load_profiles()
+    names = [p["name"] for p in profiles]
+    assert 10 <= len(profiles) <= 15
+    assert len(set(names)) == len(names)
+    for p in profiles:
+        profile = p["profile"]
+        for key in ["calories", "protein", "carbs", "fat", "diet"]:
+            assert key in profile
+        assert profile["diet"] in {"Vegetarian", "Non-Vegetarian", "Vegan"}
