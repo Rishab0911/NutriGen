@@ -37,19 +37,21 @@
 
     <!-- Header -->
     <header class="site-header">
-      <a href="#" class="brand" id="home-brand" aria-label="NutriGen home">
-        <span class="brand-mark">N</span>
-        <span class="brand-name">NutriGen</span>
-      </a>
+      <div class="site-header-inner">
+        <a href="#" class="brand" id="home-brand" aria-label="NutriGen home">
+          <span class="brand-mark">N</span>
+          <span class="brand-name">NutriGen</span>
+        </a>
 
-      <nav class="main-nav" aria-label="Main navigation">
-        <a href="#features">Features</a>
-        <a href="#how-it-works">How It Works</a>
-        <a href="#features" class="nav-link-plan">Your Plan</a>
-        <button type="button" class="nav-cta" id="start-plan-button">
-          Build My Plan
-        </button>
-      </nav>
+        <nav class="main-nav" aria-label="Main navigation">
+          <a href="#features">Features</a>
+          <a href="#how-it-works">How It Works</a>
+          <a href="#" class="nav-link-plan" id="nav-your-plan">Your Plan</a>
+          <button type="button" class="nav-cta" id="start-plan-button">
+            Build My Plan
+          </button>
+        </nav>
+      </div>
     </header>
 
     <!-- Hero -->
@@ -421,6 +423,19 @@
             <p id="api-error-message">Please check that the backend is running and try again.</p>
           </div>
           <button type="button" class="error-banner-close" id="api-error-close" aria-label="Dismiss error">×</button>
+        </div>
+
+        <!-- Saved details banner -->
+        <div class="saved-profile-banner hidden" id="saved-profile-banner">
+          <div>
+            <strong>Welcome back<span id="saved-profile-name"></span>!</strong>
+            <p>We found your saved details on this device. Use them, or start with a blank form.</p>
+          </div>
+          <div class="saved-profile-actions">
+            <button type="button" class="primary-button" id="use-saved-button">Use saved details</button>
+            <button type="button" class="secondary-button" id="start-blank-button">Start fresh</button>
+            <button type="button" class="saved-clear-link" id="clear-saved-button">Delete saved details</button>
+          </div>
         </div>
 
         <form id="nutrigen-form" class="form-card" novalidate>
@@ -975,6 +990,14 @@
               <span>Always verify ingredient packaging labels yourself, especially when managing severe allergies.</span>
             </div>
 
+            <label class="save-info-toggle">
+              <input type="checkbox" id="save-info-checkbox" checked />
+              <span>
+                <strong>Remember my details on this device</strong>
+                <small>So you don't have to fill this in again next time. Stored only in your browser.</small>
+              </span>
+            </label>
+
             <div class="form-actions">
               <button type="button" class="secondary-button back-button">
                 <span aria-hidden="true">←</span>
@@ -1500,4 +1523,3 @@
   <script src="script.js"></script>
 </body>
 </html>
-

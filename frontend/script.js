@@ -414,8 +414,14 @@ document.addEventListener("wheel", (event) => {
      10. BACK TO TOP, QUICK-JUMP DOCK & SCROLL-SPY
      ======================================================= */
 
+  /* =======================================================
+     10. BACK TO TOP, FLOATING QUICK-JUMP DOCK & SCROLL-SPY
+     ======================================================= */
+
   const backToTopBtn = $("back-to-top");
   const dockPills = qsa(".dock-pill");
+  const dockNav = $("quick-jump-dock");
+
   const dockTargets = dockPills
     .map(pill => ({ pill, el: $(pill.dataset.target) }))
     .filter(t => t.el);
@@ -436,24 +442,37 @@ document.addEventListener("wheel", (event) => {
 
   function updateScrollSpy() {
     spyTicking = false;
-    const y = window.scrollY;
 
-    // Top button: appears after scrolling a bit
+    const y = window.scrollY;
+    const planVisible = output && !output.classList.contains("hidden");
+
+    // Back-to-top button
     backToTopBtn?.classList.toggle("hidden", y < 500);
 
-    // Dock highlight: only on the results page, and not mid-click-scroll
-    if (spyLocked || !dockTargets.length || output.classList.contains("hidden")) return;
+    // Floating navigation follows the screen
+    dockNav?.classList.toggle(
+      "is-visible",
+      planVisible && y > window.innerHeight * 0.5
+    );
+
+    // Update active section
+    if (spyLocked || !dockTargets.length || !planVisible) return;
 
     const sorted = dockTargets
-      .map(t => ({ ...t, top: t.el.getBoundingClientRect().top + y }))
+      .map(t => ({
+        ...t,
+        top: t.el.getBoundingClientRect().top + y
+      }))
       .sort((a, b) => a.top - b.top);
 
     let current = sorted[0];
+
     sorted.forEach(t => {
       if (t.top - SPY_OFFSET <= y) current = t;
     });
 
     if (y < 80) current = sorted[0];
+
     if (window.innerHeight + y >= document.documentElement.scrollHeight - 4) {
       current = sorted[sorted.length - 1];
     }
@@ -463,10 +482,13 @@ document.addEventListener("wheel", (event) => {
 
   window.addEventListener("scroll", () => {
     if (spyLocked) {
-      // a pill click started a smooth scroll; unlock once scrolling stops
       clearTimeout(spyTimer);
-      spyTimer = setTimeout(() => { spyLocked = false; updateScrollSpy(); }, 150);
+      spyTimer = setTimeout(() => {
+        spyLocked = false;
+        updateScrollSpy();
+      }, 150);
     }
+
     if (!spyTicking) {
       spyTicking = true;
       requestAnimationFrame(updateScrollSpy);
@@ -475,17 +497,22 @@ document.addEventListener("wheel", (event) => {
 
   window.addEventListener("resize", updateScrollSpy);
 
-  // Re-sync whenever the results page is shown/hidden (fixes a stale "Method" pill)
+  // Re-sync when the generated plan is shown or hidden
   if (output) {
-    new MutationObserver(() => setTimeout(updateScrollSpy, 60))
-      .observe(output, { attributes: true, attributeFilter: ["class"] });
+    new MutationObserver(() => {
+      setTimeout(updateScrollSpy, 60);
+    }).observe(output, {
+      attributes: true,
+      attributeFilter: ["class"]
+    });
   }
 
+  // Back-to-top
   backToTopBtn?.addEventListener("click", () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
-    // the spy follows the scroll and lands on "Profile" by itself
   });
 
+  // Jump to selected meal-plan section
   dockPills.forEach(pill => {
     pill.addEventListener("click", () => {
       const target = $(pill.dataset.target);
@@ -493,14 +520,23 @@ document.addEventListener("wheel", (event) => {
 
       spyLocked = true;
       clearTimeout(spyTimer);
-      spyTimer = setTimeout(() => { spyLocked = false; updateScrollSpy(); }, 1200);
+
+      spyTimer = setTimeout(() => {
+        spyLocked = false;
+        updateScrollSpy();
+      }, 1200);
 
       setActivePill(pill);
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
+
+      target.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
     });
   });
 
-  /* =======================================================
+
+     /* =======================================================
      11. FORM VALIDATION
      ======================================================= */
 
@@ -646,7 +682,7 @@ document.addEventListener("wheel", (event) => {
     profile = profileData;
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000);
+    const timeoutId = setTimeout(() => controller.abort(), 180000);
     let response;
 
     try {
@@ -739,7 +775,13 @@ document.addEventListener("wheel", (event) => {
     set("output-target-weight", `${profile.target} kg`);
     set("output-calories", `${fmt(nutrition.kcal)} kcal${profile.calories === null ? " · target" : ""}`);
     set("output-diet", profile.diet);
-    set("output-preferences", list(profile.preferences));
+   set(
+  "output-preferences",
+  list([
+    ...profile.preferences,
+    ...(profile.otherPreference ? [profile.otherPreference.trim()] : [])
+  ])
+);
     set("output-allergies", list([...profile.allergies, ...words(profile.otherAllergy)]));
     set("profile-greeting", `Calibrated for ${profile.name} (${profile.goal} · ${profile.diet}).`);
 
@@ -1014,34 +1056,106 @@ document.addEventListener("wheel", (event) => {
 
   $("copy-plan-button")?.addEventListener("click", async () => {
     if (!profile || !nutrition || !mealPlan?.[0]) return;
+
     const day = mealPlan[0];
 
-    const mealLines = day.meals.map(m =>
-      `• ${m.label}: ${m.name} (${fmt(m.kcal)} kcal | P:${fmt(m.protein)}g C:${fmt(m.carbs)}g F:${fmt(m.fat)}g)`
-    ).join("\n");
+    const divider = "────────────────────────────";
+
+    const mealSections = day.meals.map(meal => {
+      const ingredients = meal.items?.length
+        ? meal.items.map(item => `   • ${item.food} — ${fmt(item.grams)} g`).join("\n")
+        : "   Ingredients included in the generated recipe.";
+
+      return [
+        `${meal.label.toUpperCase()}`,
+        divider,
+        `Dish: ${meal.name}`,
+        "",
+        "Ingredients:",
+        ingredients,
+        "",
+        `Calories: ${fmt(meal.kcal)} kcal`,
+        `Protein: ${fmt(meal.protein)} g`,
+        `Carbohydrates: ${fmt(meal.carbs)} g`,
+        `Fat: ${fmt(meal.fat)} g`
+      ].join("\n");
+    }).join("\n\n");
 
     const textToCopy = [
-      ` NutriGen Daily Nutrition Blueprint for ${profile.name}`,
-      `Goal: ${profile.goal} (${profile.diet})`,
-      `Daily Intake: ${fmt(day.totals.kcal)} kcal (Target: ${fmt(nutrition.kcal)} kcal)`,
-      `Macros: Protein ${fmt(day.totals.protein)}g · Carbs ${fmt(day.totals.carbs)}g · Fat ${fmt(day.totals.fat)}g`,
-      `\nDAILY SCHEDULE:\n${mealLines}`,
-      `\nGenerated by NutriGen.`
+      "NUTRIGEN — YOUR DAILY MEAL PLAN",
+      "Personalised Nutrition Report",
+      divider,
+      "",
+      "YOUR PROFILE",
+      `Name: ${profile.name}`,
+      `Age: ${profile.age} years`,
+      `Height: ${profile.height} cm`,
+      `Current Weight: ${fmt(profile.weight)} kg`,
+      `Target Weight: ${fmt(profile.target)} kg`,
+      `Goal: ${profile.goal}`,
+      `Diet: ${profile.diet}`,
+      "",
+      "YOUR DAILY NUTRITION TARGETS",
+      `Calories: ${fmt(nutrition.kcal)} kcal`,
+      `Protein: ${fmt(nutrition.protein)} g`,
+      `Carbohydrates: ${fmt(nutrition.carbs)} g`,
+      `Fat: ${fmt(nutrition.fat)} g`,
+      "",
+      divider,
+      "",
+      "YOUR MEAL SCHEDULE",
+      "",
+      mealSections,
+      "",
+      divider,
+      "",
+      "YOUR ACTUAL DAILY NUTRITION",
+      `Total Calories: ${fmt(day.totals.kcal)} kcal`,
+      `Total Protein: ${fmt(day.totals.protein)} g`,
+      `Total Carbohydrates: ${fmt(day.totals.carbs)} g`,
+      `Total Fat: ${fmt(day.totals.fat)} g`,
+      "",
+      `Estimated Maintenance (TDEE): ${fmt(nutrition.tdee)} kcal`,
+      "",
+      divider,
+      "Generated with NutriGen",
+      "Your nutrition, personalised."
     ].join("\n");
 
+    const btn = $("copy-plan-button");
+    const originalText = btn?.textContent;
+
     try {
-      await navigator.clipboard.writeText(textToCopy);
-      const btn = $("copy-plan-button");
-      if (btn) {
-        const orig = btn.textContent;
-        btn.textContent = "✓ Copied!";
-        setTimeout(() => { btn.textContent = orig; }, 2000);
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(textToCopy);
+      } else {
+        const temp = document.createElement("textarea");
+        temp.value = textToCopy;
+        temp.style.position = "fixed";
+        temp.style.opacity = "0";
+        document.body.appendChild(temp);
+        temp.select();
+
+        const copied = document.execCommand("copy");
+        temp.remove();
+
+        if (!copied) throw new Error("Clipboard copy failed.");
       }
-    } catch {
-      alert("Plan copied to clipboard.");
+
+      if (btn) {
+        btn.textContent = "✓ Copied!";
+        setTimeout(() => {
+          btn.textContent = originalText || "Copy Plan";
+        }, 2000);
+      }
+    } catch (error) {
+      console.error("Copy plan error:", error);
+      alert("Unable to copy automatically. Please try again using a secure browser connection.");
     }
   });
 
+
+  
   /* =======================================================
      19. SUBMIT FORM & API CALL
      ======================================================= */
@@ -1076,6 +1190,10 @@ document.addEventListener("wheel", (event) => {
     try {
       await prepareProfile(collected);
 
+      // Remember (or forget) the user's details based on the checkbox
+      if ($("save-info-checkbox")?.checked) writeSavedProfile(collected);
+
+      else clearSavedProfile();
       try {
         localStorage.setItem("nutrigenLastPlan", JSON.stringify({ profile, response: backendResponse }));
       } catch (err) {
@@ -1306,6 +1424,107 @@ document.addEventListener("wheel", (event) => {
       handleChatSubmit(chip.dataset.question);
     });
   });
+    /* =======================================================
+     21b. SAVED DETAILS + "YOUR PLAN" NAV LINK
+     ======================================================= */
+
+  const SAVED_PROFILE_KEY = "nutrigenSavedProfile";
+
+  function readSavedProfile() {
+    try {
+      const data = JSON.parse(localStorage.getItem(SAVED_PROFILE_KEY) || "null");
+      return data && data.name ? data : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function writeSavedProfile(p) {
+    try { localStorage.setItem(SAVED_PROFILE_KEY, JSON.stringify(p)); } catch {}
+  }
+
+  function clearSavedProfile() {
+    try { localStorage.removeItem(SAVED_PROFILE_KEY); } catch {}
+  }
+
+  const setVal = (id, value) => {
+    const el = $(id);
+    if (el) el.value = value ?? "";
+  };
+
+  function fillForm(p) {
+    formEl?.reset();
+
+    setVal("name", p.name);
+    setVal("age", p.age);
+    setVal("height", p.height);
+    setVal("current-weight", p.weight);
+    setVal("target-weight", p.target);
+    setVal("daily-calories", p.calories);
+    setVal("other-preference", p.otherPreference);
+    setVal("foods-to-include", p.include);
+    setVal("foods-to-avoid", p.avoid);
+    setVal("other-allergy", p.otherAllergy);
+    setVal("other-restriction", p.otherRestriction);
+
+    const pick = (name, value) => {
+      const radio = qs(`input[name="${name}"][value="${value}"]`);
+      if (radio) radio.checked = true;
+    };
+    if (p.gender) pick("gender", p.gender);
+    if (p.activity) pick("activity", String(p.activity));
+    if (p.goal) pick("goal", p.goal);
+    if (p.diet) pick("diet", p.diet);
+
+    ["preferences", "allergies", "restrictions"].forEach(name => {
+      qsa(`input[name="${name}"]`).forEach(input => {
+        input.checked = (p[name] || []).includes(input.value);
+      });
+    });
+
+    handleGoalChange();
+    applyDietFilterToAllergies();
+  }
+
+  function refreshSavedBanner() {
+    const banner = $("saved-profile-banner");
+    if (!banner) return;
+    const saved = readSavedProfile();
+    const shouldShow = !!saved && currentSlide === 0 && !val("name");
+    banner.classList.toggle("hidden", !shouldShow);
+    if (shouldShow) set("saved-profile-name", saved.name ? `, ${saved.name}` : "");
+  }
+
+  $("use-saved-button")?.addEventListener("click", () => {
+    const saved = readSavedProfile();
+    if (!saved) return;
+    clearErrors();
+    fillForm(saved);
+    hide($("saved-profile-banner"));
+  });
+
+  $("start-blank-button")?.addEventListener("click", () => {
+    formEl?.reset();
+    clearErrors();
+    handleGoalChange();
+    applyDietFilterToAllergies();
+    hide($("saved-profile-banner"));
+  });
+
+  $("clear-saved-button")?.addEventListener("click", () => {
+    clearSavedProfile();
+    hide($("saved-profile-banner"));
+  });
+
+  // "Your Plan" in the header: open the last plan, or the form if there isn't one yet
+  $("nav-your-plan")?.addEventListener("click", e => {
+    e.preventDefault();
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem("nutrigenLastPlan") || "null"); } catch {}
+    if (saved?.profile && saved?.response) restoreSavedPlan(saved);
+    else openForm();
+  });
+
 
   /* =======================================================
      22. INITIAL STATE
