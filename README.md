@@ -1,62 +1,97 @@
 # NutriGen
 
-NutriGen is a personalized meal planning system that uses nutrition
-reference data and a Large Language Model (LLM) to generate
-personalized meal plans.
+NutriGen is a personalized and proactive meal planner. Google Gemini chooses
+the foods, an optimizer sets the portions, and every calorie and macro is
+calculated from a USDA database of 8,002 foods, never taken from the AI.
+No model was trained: NutriGen uses a pretrained model through its API.
 
-## My Responsibility
+Why: when we asked Gemini for a 2,000 kcal day and added up the foods with
+USDA values, the plan was about 2,735 kcal (37% over). NutriGen closes that gap.
 
-- Nutrition reference data
-- Nutrition data retrieval
-- LLM integration
-- Prompt engineering
-- Few-shot prompting
-- Structured JSON generation
-- Dietary restriction handling
-- Model evaluation
+## How it works
 
-## Project Pipeline
+```mermaid
+flowchart LR
+    A["Website form"] --> B["FastAPI backend"]
+    B --> C["generate_meal_plan (planner.py)"]
+    C --> D["USDA food list (nutrition.py)"]
+    D --> E["Prompt (prompts.py)"]
+    E --> F["Gemini picks foods (llm.py)"]
+    F --> G["Optimizer sets grams"]
+    G --> H["Real totals + allergy and diet check"]
+    H -->|too far from targets, up to 3 attempts| E
+    H --> B
+    B --> A
+```
 
-User Profile
-↓
-Nutrition Database
-↓
-Nutrition Retrieval
-↓
-Prompt Engineering
-↓
-LLM
-↓
-Structured Meal Plan
-↓
-Evaluation
+1. The user profile (targets, diet, allergies, preferences) comes in.
+2. Foods matching the profile are looked up in the USDA database. Foods that
+   break an allergy, diet or restriction are removed before Gemini sees them.
+3. Gemini picks foods for breakfast, lunch, snack and dinner (JSON, foods only).
+4. A SciPy optimizer (`lsq_linear`) sets the grams so calories, protein, carbs
+   and fat are all close to the targets, with realistic portion limits.
+5. Totals are calculated from the database and compared with the targets.
+   A plan that breaks an allergy or diet rule is never returned.
+6. If a nutrient is more than 10% off, Gemini gets feedback and tries again
+   (up to 3 attempts).
 
+## Folder overview
 
+| Path | What it does |
+|---|---|
+| `planner.py` | `generate_meal_plan(profile)`: the pipeline above |
+| `nutrition.py` | Food lookup, calories and macros, allergy, diet and restriction rules |
+| `prompts.py` | System prompt, grounded prompt, food keywords, proactive prompts |
+| `llm.py` | Gemini connection (`send_prompt`, `send_prompt_json`) |
+| `proactive.py` | User state, triggers, decision rules, scheduler, written messages, cooldown |
+| `evaluation.py` | Error metrics, structure check, compliance check, 14-profile runner |
+| `backend/` | FastAPI app (`main.py`, `models.py`, `nutrition.py` for BMR and targets) |
+| `frontend/` | Website (HTML, CSS, JavaScript, light and dark theme) |
+| `data/clean/nutrition_clean.csv` | The cleaned USDA database |
+| `data/test_profiles.json` | 14 test profiles used by the evaluation |
+| `result/evaluation_results.json` | Saved results of the last evaluation run |
+| `test/` | Automated tests (pytest) |
+| `build_fulldata.py`, `build_paper_data.py`, `clean_data.py`, `fetch_data.py` | Scripts that built the database |
+| `docs/docs/api_contract.md` | The API contract between backend and frontend |
 
+## Data
 
-## Project Modules
+USDA FoodData Central: Foundation foods (395), SR Legacy (7,793) and a sample
+of 200 Branded foods, 8,388 rows in total. Cleaning drops missing values,
+impossible values (protein, fat or carbs above 100 g per 100 g, calories
+outside 0 to 900) and duplicate names, leaving 8,002 foods. All values are
+per 100 g, and many foods are raw or dry weights (for example oats, dry).
 
-### nutrition.py
-Handles nutrition data and food-related operations.
+## Setup
 
-### prompts.py
-Contains prompts and instructions used to guide the LLM.
+Python 3.10 or newer (we used 3.13).
 
-### llm.py
-Handles communication with the selected LLM.
+```
+pip install -r requirements.txt
+```
 
-### evaluation.py
-Evaluates generated meal plans using quantitative and rule-based metrics.
+Create a file named `.env` in the project folder (it is ignored by git):
 
+```
+GEMINI_API_KEY=your_key_here
+```
 
- ## Data
-Nutrition data comes from USDA FoodData Central: Foundation Foods, SR Legacy, and a random sample of Branded Foods. Run `build_fulldata.py` and `build_paper_data.py` to fetch raw data, then `clean_data.py` to produce the final cleaned dataset at `data/clean/nutrition_clean.csv` (8,002 foods: food, quantity, unit, calories, protein, carbs, fat — all values per 100g).
+`USDA_API_KEY` is only needed to run `fetch_data.py`.
 
-## Nutrition Module (`nutrition.py`)
-- `load_nutrition_data()` — loads the cleaned dataset as a pandas DataFrame
-- `get_food_names()` — returns a list of all food names
-- `get_food(name)` — exact-match lookup for a single food
-- `search_food(keyword)` — case-insensitive partial-match search across all foods
+## Run the app
 
-## Tests
-Run `pytest test/test_get_food.py -v` to verify retrieval functions.
+Run these from the project folder, in two terminals.
+
+Backend:
+
+```
+uvicorn backend.main:app --reload
+```
+
+Frontend:
+
+```
+python -m http.server 5500 --directory frontend
+```
+
+Open http://127.0.0.1:5500/
