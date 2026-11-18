@@ -641,6 +641,23 @@ document.addEventListener("wheel", (event) => {
   /* =======================================================
      13. FASTAPI INTEGRATION & ADAPTER
      ======================================================= */
+      // Turn a backend error detail (text, list or object) into readable text
+  function errorText(detail) {
+    if (!detail) return "";
+    if (typeof detail === "string") return detail;
+    if (Array.isArray(detail)) {
+      return detail
+        .map(item => {
+          if (typeof item === "string") return item;
+          const loc = Array.isArray(item.loc) ? item.loc : [];
+          const field = loc.length ? loc[loc.length - 1] : "";
+          const msg = item.msg || "Invalid input";
+          return field ? `${field}: ${msg}` : msg;
+        })
+        .join("; ");
+    }
+    return detail.message || JSON.stringify(detail);
+  }
 
   async function prepareProfile(profileData) {
     profile = profileData;
@@ -668,9 +685,13 @@ document.addEventListener("wheel", (event) => {
     }
 
     if (!response.ok) {
-      throw new Error(data?.detail || data?.message || `Request failed (HTTP ${response.status}).`);
+      const text = errorText(data?.detail) || errorText(data?.message);
+      if (response.status === 503 && !/allergy|diet/i.test(text)) {
+        throw new Error("The AI service is busy right now. Please try again in a minute.");
+      }
+      throw new Error(text || `Request failed (HTTP ${response.status}).`);
     }
-
+    
     if (data.status !== "success" || !Array.isArray(data.meals) || !data.day_totals || !data.macros) {
       throw new Error("Backend response is missing meals or nutrition data.");
     }
