@@ -6,3 +6,7 @@ numpy
 scipy
 google-genai
 python-dotenv
+schedule
+jsonschema
+requests
+pytest

@@ -4,8 +4,9 @@ pydantic
 pandas
 numpy
 scipy
-schedule
-python-dotenv
 google-genai
+python-dotenv
+schedule
+jsonschema
 requests
 pytest
