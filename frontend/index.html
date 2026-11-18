@@ -23,8 +23,53 @@
   />
 
   <script src="theme.js"></script>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=6" />
   <link rel="stylesheet" href="theme.css" />
+  <!-- Saved-profile banner styles live here too, so they always apply (even if style.css is cached/outdated) -->
+  <style id="saved-banner-inline">
+/* ---- layout (same in both themes) ---- */
+.saved-profile-banner{position:relative;overflow:hidden;padding-left:28px !important}
+.saved-profile-banner::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(180deg,#68b589,#e8b84b)}
+.saved-profile-main{flex:1 1 320px;min-width:0}
+.saved-profile-list{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.saved-profile-row{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:14px}
+.saved-profile-avatar{width:42px;height:42px;flex:0 0 42px;display:grid;place-items:center;border-radius:13px;color:#fff;font:600 18px "Playfair Display",serif}
+.saved-profile-info{flex:1;min-width:0}
+.saved-profile-info small{display:block;margin-top:1px;font-size:12px}
+.saved-pick-btn{min-height:40px !important;padding:0 18px !important;font-size:13px !important}
+.saved-delete-btn{background:none;border-radius:999px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;transition:background 200ms ease}
+@media (max-width:680px){.saved-profile-row{flex-wrap:wrap}.saved-profile-info{flex:1 1 calc(100% - 60px)}}
+
+/* ---- DARK look (default; also used whenever the site is in dark mode) ---- */
+.saved-profile-banner:not(.banner-light){background:radial-gradient(ellipse 55% 130% at 100% 0%,rgba(104,181,137,.22),transparent 60%),linear-gradient(135deg,#10261a,#0b1812) !important;border:1px solid rgba(130,196,159,.28) !important;box-shadow:0 14px 40px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.06) !important}
+.saved-profile-banner:not(.banner-light) strong{color:#fff !important}
+.saved-profile-banner:not(.banner-light) p{color:rgba(255,255,255,.78) !important}
+.saved-profile-banner:not(.banner-light) .saved-profile-info small{color:rgba(255,255,255,.6) !important}
+.saved-profile-banner:not(.banner-light) .saved-profile-row{background:rgba(255,255,255,.05) !important;border:1px solid rgba(255,255,255,.12) !important}
+.saved-profile-banner:not(.banner-light) .saved-profile-avatar{background:linear-gradient(145deg,#3d9162,#286845) !important}
+.saved-profile-banner:not(.banner-light) .primary-button{background:linear-gradient(135deg,#3d9162,#286845) !important;color:#fff !important;box-shadow:0 8px 22px rgba(61,145,98,.35),inset 0 1px 0 rgba(255,255,255,.18) !important}
+.saved-profile-banner:not(.banner-light) .secondary-button{background:rgba(255,255,255,.08) !important;border:1.5px solid rgba(255,255,255,.28) !important;color:#fff !important;box-shadow:none !important}
+.saved-profile-banner:not(.banner-light) .secondary-button:hover{background:rgba(255,255,255,.16) !important}
+.saved-profile-banner:not(.banner-light) .saved-clear-link{color:rgba(255,255,255,.65) !important}
+.saved-profile-banner:not(.banner-light) .saved-clear-link:hover{color:#ffb4ab !important}
+.saved-profile-banner:not(.banner-light) .saved-delete-btn{color:#ffb4ab !important;border:1px solid rgba(255,180,171,.45) !important}
+.saved-profile-banner:not(.banner-light) .saved-delete-btn:hover{background:rgba(255,180,171,.14)}
+
+/* ---- LIGHT look (the original premium style) ---- */
+.saved-profile-banner.banner-light{background:radial-gradient(ellipse 55% 130% at 100% 0%,rgba(104,181,137,.18),transparent 60%),linear-gradient(135deg,#ffffff,#eef7f2) !important;border:1.5px solid #ceeada !important;box-shadow:0 10px 30px rgba(6,28,16,.08) !important}
+.saved-profile-banner.banner-light strong{color:#061c10 !important}
+.saved-profile-banner.banner-light p{color:#5a7066 !important}
+.saved-profile-banner.banner-light .saved-profile-info small{color:#8fa398 !important}
+.saved-profile-banner.banner-light .saved-profile-row{background:rgba(255,255,255,.85) !important;border:1px solid #dde8e1 !important}
+.saved-profile-banner.banner-light .saved-profile-avatar{background:linear-gradient(145deg,#0d2e1a,#1f5c3a) !important}
+.saved-profile-banner.banner-light .primary-button{background:linear-gradient(135deg,#0d2e1a,#1f5c3a 55%,#1a4d31) !important;color:#fff !important;box-shadow:0 10px 26px rgba(40,104,69,.25),inset 0 1px 0 rgba(255,255,255,.1) !important}
+.saved-profile-banner.banner-light .secondary-button{background:#fff !important;border:1.5px solid #cddbd3 !important;color:#123824 !important;box-shadow:none !important}
+.saved-profile-banner.banner-light .secondary-button:hover{border-color:#51a374 !important}
+.saved-profile-banner.banner-light .saved-clear-link{color:#8fa398 !important}
+.saved-profile-banner.banner-light .saved-clear-link:hover{color:#c0392b !important}
+.saved-profile-banner.banner-light .saved-delete-btn{color:#c0392b !important;border:1px solid #f5c6c2 !important}
+.saved-profile-banner.banner-light .saved-delete-btn:hover{background:#fff5f4}
+  </style>
 </head>
 
 <body>
@@ -427,9 +472,11 @@
 
         <!-- Saved details banner -->
         <div class="saved-profile-banner hidden" id="saved-profile-banner">
-          <div>
+          <div class="saved-profile-main">
             <strong>Welcome back<span id="saved-profile-name"></span>!</strong>
-            <p>We found your saved details on this device. Use them, or start with a blank form.</p>
+            <p id="saved-profile-text">Is this you? We found your saved details on this device. Use them to auto-fill the form, or start with a blank one.</p>
+            <!-- JS lists every saved profile here when there is more than one -->
+            <div class="saved-profile-list hidden" id="saved-profile-list"></div>
           </div>
           <div class="saved-profile-actions">
             <button type="button" class="primary-button" id="use-saved-button">Use saved details</button>
@@ -1049,12 +1096,13 @@
         </div>
       </div>
 
-      <!-- Quick-Jump Section Navigator Dock (Stationary, Non-Blocking, No Grocery in dock) -->
+      <!-- Quick-Jump Section Navigator Dock (Stationary, Non-Blocking) -->
       <nav class="quick-jump-dock no-print" id="quick-jump-dock" aria-label="Quick jump navigation">
         <button type="button" class="dock-pill active" data-target="profile-summary-section">Profile</button>
         <button type="button" class="dock-pill" data-target="nutrition-dashboard">Macros</button>
         <button type="button" class="dock-pill" data-target="personal-encouragement-card">Note</button>
         <button type="button" class="dock-pill" data-target="meal-plan-section">Meals</button>
+        <button type="button" class="dock-pill" data-target="grocery-actions" data-open="grocery-checklist-card">Grocery</button>
         <button type="button" class="dock-pill" data-target="plan-explanation">Method</button>
       </nav>
 
@@ -1307,21 +1355,36 @@
           </div>
         </div>
         <!-- Grocery Checklist Button -->
-<div class="grocery-actions">
+<div class="grocery-actions" id="grocery-actions">
   <button type="button" class="secondary-button" id="toggle-grocery-button">
-    🛒 View Grocery Checklist (<span id="grocery-count">0</span>)
+     View Grocery Checklist (<span id="grocery-count">0</span>)
   </button>
 </div>
 
 <!-- Collapsible Grocery Shopping Checklist -->
 <div class="grocery-checklist-card hidden" id="grocery-checklist-card">
+
   <div class="grocery-header">
-    <div>
-      <h3>🛒 Ingredient Shopping Checklist</h3>
-      <p>Aggregated ingredient weights for today's plan. Tick off items as you shop.</p>
+    <div class="grocery-heading-title">
+      <div class="output-meal-icon grocery-heading-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="1.7"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9h18l-1.5 11h-15L3 9z"/>
+          <path d="M7 9l5-6 5 6"/>
+          <path d="M9 13v3M15 13v3"/>
+        </svg>
+      </div>
+
+      <div>
+        <h3>Ingredient Shopping Checklist</h3>
+        <p>Aggregated ingredient weights for today's plan. Tick off items as you shop.</p>
+      </div>
     </div>
+
     <button type="button" class="grocery-close" id="grocery-close">×</button>
   </div>
+
 
   <div class="grocery-items-grid" id="grocery-items-grid">
     <!-- JS inserts aggregated checklist items here -->
@@ -1505,21 +1568,23 @@
         <span class="loading-brand-subtitle">YOUR PERSONALIZED PLAN</span>
       </div>
 
-      <p id="loading-main-text" style="font-size:15px; font-weight:700; color:var(--g950); margin:0 0 12px;">Calculating Metabolic Targets…</p>
+      <p id="loading-main-text" style="font-size:20px; font-weight:700; color:var(--g950); margin:0 0 16px;">Understanding your body…</p>
       
       <div class="laser-progress-track">
         <div class="laser-progress-bar" id="laser-progress-bar"></div>
       </div>
 
       <div class="loading-checklist" id="loading-checklist">
-        <div class="checklist-step active" id="l-step-1">⏳ Understanding your body's energy needs...</div>
-        <div class="checklist-step" id="l-step-2">⏳ Filtering allergies & dietary restrictions...</div>
-        <div class="checklist-step" id="l-step-3">⏳ Balancing protein, carb & fat ratios...</div>
-        <div class="checklist-step" id="l-step-4">⏳ Creating your personalized daily meals...</div>
+        <div class="checklist-step active" id="l-step-1"><span class="ck-icon" aria-hidden="true"></span><span class="ck-text">Working out how much energy your body needs</span></div>
+        <div class="checklist-step" id="l-step-2"><span class="ck-icon" aria-hidden="true"></span><span class="ck-text">Checking your allergies and food choices</span></div>
+        <div class="checklist-step" id="l-step-3"><span class="ck-icon" aria-hidden="true"></span><span class="ck-text">Balancing protein, carbs and fats for your goal</span></div>
+        <div class="checklist-step" id="l-step-4"><span class="ck-icon" aria-hidden="true"></span><span class="ck-text">Building meals that match your numbers</span></div>
       </div>
+
+      <p class="loading-note">Hang tight, your plan is being built just for you.</p>
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <script src="script.js?v=6"></script>
 </body>
 </html>
