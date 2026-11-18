@@ -1282,7 +1282,10 @@ document.addEventListener("wheel", (event) => {
             ${note}` : `<div class="swap-controls swap-controls-idle"><span class="swap-status">Original dish</span></div>`;
 
       return `
-        <article class="output-meal-card ${isSwapped ? "meal-swapped" : ""} ${busy ? "meal-swapping" : ""}" data-card-label="${esc(meal.label)}">
+        <article class="output-meal-card ${isSwapped ? "meal-swapped" : ""} ${busy ? "meal-swapping" : ""}"
+          data-card-label="${esc(meal.label)}"
+          data-meal-calories="${Number(meal.kcal) || 0}"
+          data-meal-protein="${Number(meal.protein) || 0}">
           <div class="output-meal-icon meal-icon-styled" aria-hidden="true">
             ${iconSvg}
           </div>
@@ -1313,6 +1316,11 @@ document.addEventListener("wheel", (event) => {
         </article>
       `;
     }).join("");
+
+    // Let the optional proactive-reminder module attach meal logging controls.
+    window.dispatchEvent(new CustomEvent("nutrigen:plan-rendered", {
+      detail: { profile, response: backendResponse }
+    }));
 
     // Swap Dish → swaps right inside the meal card (next saved option, or fetches a new one)
     qsa(".swap-meal-btn", grid).forEach(btn => {
