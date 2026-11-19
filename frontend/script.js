@@ -173,44 +173,75 @@ document.addEventListener("wheel", (event) => {
 
   let loadingInterval = null;
 
+  const LOADING_STEPS = [
+    {
+      id: "l-step-1",
+      heading: "Understanding your body…",
+      active: "Working out how much energy your body needs",
+      done: "Calculated your daily calorie target"
+    },
+    {
+      id: "l-step-2",
+      heading: "Making it safe for you…",
+      active: "Checking your allergies and food choices",
+      done: "Removed foods you can't or won't eat"
+    },
+    {
+      id: "l-step-3",
+      heading: "Balancing your nutrition…",
+      active: "Balancing protein, carbs and fats for your goal",
+      done: "Balanced protein, carbs and fats"
+    },
+    {
+      id: "l-step-4",
+      heading: "Picking your meals…",
+      active: "Building meals that match your numbers",
+      done: "Meals matched to your numbers"
+    }
+  ];
+
+  function setLoadingStep(index, state) {
+    const step = LOADING_STEPS[index];
+    const el = step && $(step.id);
+    if (!el) return;
+    el.classList.remove("active", "done");
+    if (state) el.classList.add(state);
+    const label = qs(".ck-text", el);
+    if (label) label.textContent = state === "done" ? step.done : step.active;
+  }
+
   function showLoading() {
-    const overlay = $("loading-overlay");
-    show(overlay);
+    show($("loading-overlay"));
+    if (loadingInterval) clearInterval(loadingInterval);
 
-    const steps = [
-      { id: "l-step-1", text: "✓ Evaluated Mifflin-St Jeor BMR & TDEE" },
-      { id: "l-step-2", text: "✓ Applied allergies & dietary exclusions" },
-      { id: "l-step-3", text: "✓ Balanced protein, carb & fat ratios" },
-      { id: "l-step-4", text: "✓ Portioned recipes into daily schedule" }
-    ];
-
-    let currentStepIdx = 0;
-    qsa(".checklist-step").forEach(el => el.classList.remove("active", "done"));
-    $("l-step-1")?.classList.add("active");
+    let idx = 0;
+    let pct = 8;
+    LOADING_STEPS.forEach((_, i) => setLoadingStep(i, null));
+    setLoadingStep(0, "active");
+    set("loading-main-text", LOADING_STEPS[0].heading);
 
     const bar = $("laser-progress-bar");
-    if (bar) bar.style.width = "15%";
+    if (bar) bar.style.width = `${pct}%`;
 
     loadingInterval = setInterval(() => {
-      if (currentStepIdx < steps.length) {
-        const stepEl = $(steps[currentStepIdx].id);
-        if (stepEl) {
-          stepEl.textContent = steps[currentStepIdx].text;
-          stepEl.classList.remove("active");
-          stepEl.classList.add("done");
-        }
-        currentStepIdx++;
-        if (bar) bar.style.width = `${Math.min(95, (currentStepIdx / steps.length) * 100)}%`;
-        if (currentStepIdx < steps.length) {
-          const nextEl = $(steps[currentStepIdx].id);
-          nextEl?.classList.add("active");
-        }
+      if (idx < LOADING_STEPS.length - 1) {
+        // finish this step (green tick) and start the next one (spinner)
+        setLoadingStep(idx, "done");
+        idx++;
+        setLoadingStep(idx, "active");
+        set("loading-main-text", LOADING_STEPS[idx].heading);
+        pct = 8 + Math.round((idx / LOADING_STEPS.length) * 78);
+      } else {
+        // last step keeps spinning until the plan really arrives; the bar creeps so it never looks frozen
+        pct = Math.min(95, pct + 1.5);
       }
-    }, 700);
+      if (bar) bar.style.width = `${pct}%`;
+    }, 1800);
   }
 
   function hideLoading() {
     if (loadingInterval) clearInterval(loadingInterval);
+    loadingInterval = null;
     const bar = $("laser-progress-bar");
     if (bar) bar.style.width = "100%";
     hide($("loading-overlay"));
@@ -231,6 +262,12 @@ document.addEventListener("wheel", (event) => {
   let nutrition = null;
   let mealPlan = null;
   let backendResponse = null;
+
+  // Per-meal swap history: { Breakfast: { options: [rawMeal, ...], idx: 0 }, ... }
+  let swapState = {};
+  // Grocery items the user has already ticked (kept across swaps)
+  let groceryTicked = new Set();
+  const swapBusy = new Set();
 
   /* =======================================================
      7. MAINTAIN WEIGHT LOGIC (Auto-lock Target Weight)
@@ -351,9 +388,17 @@ document.addEventListener("wheel", (event) => {
     hide(landing);
     hide(output);
     show(formPage);
+
+    // Returning users: don't show the last person's answers — start blank so the
+    // "Which one are you?" prompt can ask who is filling the form
+    if (readSavedProfiles().length) {
+      formEl?.reset();
+      clearErrors();
+    }
     applyDietFilterToAllergies();
     handleGoalChange();
     goToSlide(0);
+    refreshSavedBanner(); // "Welcome back — is this you?" prompt for returning users
   }
 
   function openResults() {
@@ -407,6 +452,7 @@ document.addEventListener("wheel", (event) => {
       applyDietFilterToAllergies();
       handleGoalChange();
       goToSlide(0);
+      refreshSavedBanner();
     });
   });
 
@@ -414,8 +460,14 @@ document.addEventListener("wheel", (event) => {
      10. BACK TO TOP, QUICK-JUMP DOCK & SCROLL-SPY
      ======================================================= */
 
+  /* =======================================================
+     10. BACK TO TOP, FLOATING QUICK-JUMP DOCK & SCROLL-SPY
+     ======================================================= */
+
   const backToTopBtn = $("back-to-top");
   const dockPills = qsa(".dock-pill");
+  const dockNav = $("quick-jump-dock");
+
   const dockTargets = dockPills
     .map(pill => ({ pill, el: $(pill.dataset.target) }))
     .filter(t => t.el);
@@ -434,26 +486,47 @@ document.addEventListener("wheel", (event) => {
     });
   }
 
+  // A section counts as "reached" once it sits at (or above) the spot that
+  // clicking its pill scrolls it to: scroll-margin-top + scroll-padding-top.
+  function spyOffsetFor(el) {
+    const margin = parseFloat(getComputedStyle(el).scrollMarginTop) || 0;
+    const padding = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
+    return Math.max(SPY_OFFSET, margin + padding + 12);
+  }
+
   function updateScrollSpy() {
     spyTicking = false;
-    const y = window.scrollY;
 
-    // Top button: appears after scrolling a bit
+    const y = window.scrollY;
+    const planVisible = output && !output.classList.contains("hidden");
+
+    // Back-to-top button
     backToTopBtn?.classList.toggle("hidden", y < 500);
 
-    // Dock highlight: only on the results page, and not mid-click-scroll
-    if (spyLocked || !dockTargets.length || output.classList.contains("hidden")) return;
+    // Floating navigation follows the screen
+    dockNav?.classList.toggle(
+      "is-visible",
+      planVisible && y > window.innerHeight * 0.5
+    );
+
+    // Update active section
+    if (spyLocked || !dockTargets.length || !planVisible) return;
 
     const sorted = dockTargets
-      .map(t => ({ ...t, top: t.el.getBoundingClientRect().top + y }))
+      .map(t => ({
+        ...t,
+        top: t.el.getBoundingClientRect().top + y
+      }))
       .sort((a, b) => a.top - b.top);
 
     let current = sorted[0];
+
     sorted.forEach(t => {
-      if (t.top - SPY_OFFSET <= y) current = t;
+      if (t.top - spyOffsetFor(t.el) <= y) current = t;
     });
 
     if (y < 80) current = sorted[0];
+
     if (window.innerHeight + y >= document.documentElement.scrollHeight - 4) {
       current = sorted[sorted.length - 1];
     }
@@ -463,10 +536,13 @@ document.addEventListener("wheel", (event) => {
 
   window.addEventListener("scroll", () => {
     if (spyLocked) {
-      // a pill click started a smooth scroll; unlock once scrolling stops
       clearTimeout(spyTimer);
-      spyTimer = setTimeout(() => { spyLocked = false; updateScrollSpy(); }, 150);
+      spyTimer = setTimeout(() => {
+        spyLocked = false;
+        updateScrollSpy();
+      }, 150);
     }
+
     if (!spyTicking) {
       spyTicking = true;
       requestAnimationFrame(updateScrollSpy);
@@ -475,32 +551,49 @@ document.addEventListener("wheel", (event) => {
 
   window.addEventListener("resize", updateScrollSpy);
 
-  // Re-sync whenever the results page is shown/hidden (fixes a stale "Method" pill)
+  // Re-sync when the generated plan is shown or hidden
   if (output) {
-    new MutationObserver(() => setTimeout(updateScrollSpy, 60))
-      .observe(output, { attributes: true, attributeFilter: ["class"] });
+    new MutationObserver(() => {
+      setTimeout(updateScrollSpy, 60);
+    }).observe(output, {
+      attributes: true,
+      attributeFilter: ["class"]
+    });
   }
 
+  // Back-to-top
   backToTopBtn?.addEventListener("click", () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
-    // the spy follows the scroll and lands on "Profile" by itself
   });
 
+  // Jump to selected meal-plan section
   dockPills.forEach(pill => {
     pill.addEventListener("click", () => {
       const target = $(pill.dataset.target);
       if (!target) return;
 
+      // e.g. the Grocery pill opens the hidden checklist first
+      if (pill.dataset.open) show($(pill.dataset.open));
+
       spyLocked = true;
       clearTimeout(spyTimer);
-      spyTimer = setTimeout(() => { spyLocked = false; updateScrollSpy(); }, 1200);
+
+      spyTimer = setTimeout(() => {
+        spyLocked = false;
+        updateScrollSpy();
+      }, 1200);
 
       setActivePill(pill);
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
+
+      target.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
     });
   });
 
-  /* =======================================================
+
+     /* =======================================================
      11. FORM VALIDATION
      ======================================================= */
 
@@ -646,7 +739,7 @@ document.addEventListener("wheel", (event) => {
     profile = profileData;
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000);
+    const timeoutId = setTimeout(() => controller.abort(), 180000);
     let response;
 
     try {
@@ -676,6 +769,8 @@ document.addEventListener("wheel", (event) => {
     }
 
     backendResponse = data;
+    swapState = {};          // new plan → fresh swap history
+    groceryTicked = new Set();
 
     nutrition = {
       bmr: data.bmr,
@@ -707,7 +802,7 @@ document.addEventListener("wheel", (event) => {
         fat: meal.totals?.fat || 0,
         items: (meal.items || []).map(item => ({
           ...item,
-          food: cleanFoodText(item.food)
+          food: cleanFoodText(item.food), foodRaw: item.food
         })),
         notFound: meal.not_found || []
       }))
@@ -739,7 +834,13 @@ document.addEventListener("wheel", (event) => {
     set("output-target-weight", `${profile.target} kg`);
     set("output-calories", `${fmt(nutrition.kcal)} kcal${profile.calories === null ? " · target" : ""}`);
     set("output-diet", profile.diet);
-    set("output-preferences", list(profile.preferences));
+   set(
+  "output-preferences",
+  list([
+    ...profile.preferences,
+    ...(profile.otherPreference ? [profile.otherPreference.trim()] : [])
+  ])
+);
     set("output-allergies", list([...profile.allergies, ...words(profile.otherAllergy)]));
     set("profile-greeting", `Calibrated for ${profile.name} (${profile.goal} · ${profile.diet}).`);
 
@@ -885,7 +986,188 @@ document.addEventListener("wheel", (event) => {
      16. RENDER MEAL CARDS (Distinct SVGs, % per meal & Swap)
      ======================================================= */
 
-  function renderDay() {
+  /* ---- Meal card helpers: household measures, raw/cooked tag, method ---- */
+  const HOUSEHOLD = [
+    [/\begg(?!plant)/i, 50, "egg", "eggs"],
+    [/banana/i, 118, "banana", "bananas"],
+    [/apple/i, 180, "apple", "apples"],
+    [/bread/i, 30, "slice", "slices"],
+    [/^(milk|yogurt|yoghurt|curd)\b/i, 245, "cup", "cups"],
+    [/\b(oil|ghee)\b|^butter\b/i, 14, "tbsp", "tbsp"],
+    [/\boats?\b/i, 80, "cup (dry)", "cups (dry)"]
+  ];
+
+  // Display-only: turns USDA-style names into short, readable ones
+  function friendlyFood(name) {
+    const raw = String(name || "").trim();
+    if (!raw.includes(",")) return raw;
+    const parts = raw.split(",").map(p => p.trim()).filter(Boolean);
+    const cap = t => t.charAt(0).toUpperCase() + t.slice(1);
+    const head = (parts[0] || "").toLowerCase();
+    const second = (parts[1] || "").toLowerCase();
+    const SUFFIX = ["oil", "cheese", "milk", "yogurt", "yoghurt", "rice", "bread", "flour", "beans", "pasta", "juice"];
+    const DROP = ["fish", "nuts", "nut", "seeds", "seed", "shellfish", "crustaceans", "mollusks"];
+    if (SUFFIX.includes(head) && second) return cap(`${second} ${head}`);
+    if (DROP.includes(head) && second) return cap(second) + (parts[2] ? ` (${parts[2].toLowerCase()})` : "");
+    return cap(parts[0] || raw);
+  }
+
+  function householdMeasure(food, grams) {
+    const g = Number(grams) || 0;
+    const hit = HOUSEHOLD.find(([re]) => re.test(food));
+    if (!hit || g <= 0) return "";
+    const [, unitG, one, many] = hit;
+    const n = g / unitG;
+    if (n < 0.25 || n > 12) return "";
+    const rounded = Math.round(n * 2) / 2;
+    if (!rounded) return "";
+    const whole = Math.floor(rounded);
+    const text = `${whole || ""}${rounded % 1 ? "½" : ""}`;
+    return `≈ ${text} ${rounded <= 1 ? one : many}`;
+  }
+
+  function foodState(raw) {
+    const t = String(raw || "").toLowerCase();
+    if (/\braw\b/.test(t)) return "raw";
+    if (/\b(cooked|boiled|parboiled|steamed|roasted|grilled)\b/.test(t)) return "cooked";
+    if (/\bcanned\b/.test(t)) return "canned";
+    return "";
+  }
+
+  const ROLE_RULES = [
+    ["dairy", /^(milk|yogurt|yoghurt|curd)\b|kefir/i],
+    ["fat", /\b(oil|ghee)\b|^butter\b|avocado|almond|walnut|cashew|seed|nut/i],
+    ["fruit", /apple|banana|berry|berries|orange|mango|grape|melon|papaya|pear|peach|pineapple|fruit|kiwi/i],
+    ["grain", /rice|oat|bread|roti|chapati|pasta|noodle|quinoa|millet|couscous|cereal|tortilla|wheat|barley/i],
+    ["protein", /\begg(?!plant)|chicken|turkey|fish|salmon|tuna|shrimp|prawn|paneer|cheese|tofu|tempeh|lentil|dal|bean|chickpea|beef|pork|lamb|whey|soy/i],
+    ["veg", /spinach|broccoli|carrot|tomato|onion|pepper|cucumber|lettuce|cabbage|cauliflower|kale|mushroom|zucchini|squash|beet|okra|pumpkin|potato|celery|garlic|capsicum/i]
+  ];
+
+  function roleOf(food) {
+    const hit = ROLE_RULES.find(([, re]) => re.test(food));
+    return hit ? hit[0] : "other";
+  }
+
+  const stepOpen = new Set();   // which "How to make it" guides are expanded
+  const stepDone = new Set();   // remembers which steps were ticked (survives swaps / re-renders)
+
+  const normStep = s => typeof s === "string"
+    ? { title: "", text: s, min: 0 }
+    : { title: s?.title || "", text: s?.text || s?.step || s?.description || "", min: Number(s?.minutes ?? s?.min) || 0 };
+
+  function buildMethod(meal) {
+    const items = meal.items || [];
+    if (!items.length) return [];
+    const by = {};
+    items.forEach(it => {
+      const r = roleOf(it.food);
+      (by[r] = by[r] || []).push({
+        name: friendlyFood(it.food),
+        g: it.grams,
+        state: foodState(it.foodRaw)
+      });
+    });
+
+    const listJoin = arr => arr.length < 2 ? (arr[0] || "") : `${arr.slice(0, -1).join(", ")} and ${arr[arr.length - 1]}`;
+    const phrase = o => o.state === "cooked"
+      ? o.name.toLowerCase()
+      : `${fmt(o.g)} g ${o.state ? o.state + " " : ""}${o.name.toLowerCase()}`;
+    const names = r => listJoin(by[r].slice(0, 3).map(phrase));
+    const cookedNote = r => {
+      const c = (by[r] || []).filter(o => o.state === "cooked");
+      return c.length
+        ? ` Portion ${listJoin(c.map(o => `${fmt(o.g)} g ${o.name.toLowerCase()}`))} after cooking.`
+        : "";
+    };
+    const anyOf = (r, re) => (by[r] || []).some(o => re.test(o.name));
+
+    const steps = [{
+      title: "Get ready",
+      text: "Weigh or measure everything in the ingredient list and wash any fresh produce.",
+      min: 2
+    }];
+
+    if (by.grain) {
+      const quick = by.grain.every(o => /oat|bread|tortilla|roti|chapati/i.test(o.name));
+      steps.push({
+        title: "Cook the base",
+        text: quick
+          ? `Prepare ${names("grain")}: simmer oats for 3–5 minutes, or toast or warm bread and roti.${cookedNote("grain")}`
+          : `Cook ${names("grain")} until soft (boil, steam or simmer).${cookedNote("grain")}`,
+        min: quick ? 4 : 12
+      });
+    }
+
+    if (by.protein) {
+      steps.push({
+        title: "Cook the protein",
+        text: `Cook or heat ${names("protein")} until fully done: grill, pan-sear, boil or scramble. Chicken, fish and eggs must be cooked all the way through.${cookedNote("protein")}`,
+        min: anyOf("protein", /egg/i) ? 6 : anyOf("protein", /paneer|tofu|cheese|whey|tempeh/i) ? 5 : 10
+      });
+    }
+
+    if (by.veg) {
+      steps.push({
+        title: "Prep the vegetables",
+        text: `Wash and chop ${names("veg")}, then sauté or steam for 3–5 minutes, or keep it fresh as a salad.`,
+        min: 6
+      });
+    }
+
+    if (by.fruit || by.dairy) {
+      steps.push({
+        title: "Add the fresh items",
+        text: by.fruit && by.dairy
+          ? `Slice ${names("fruit")} and add ${names("dairy")} cold, or warm it gently.`
+          : by.fruit
+            ? `Wash and slice ${names("fruit")}.`
+            : `Add ${names("dairy")} cold, or warm it gently.`,
+        min: 2
+      });
+    }
+
+    if (by.fat) {
+      steps.push({
+        title: "Measure the fat",
+        text: `Measure ${names("fat")} with a spoon, not by eye. It is calorie-dense.`,
+        min: 1
+      });
+    }
+
+    steps.push({
+      title: "Plate and serve",
+      text: "Combine everything in a bowl or plate, season lightly with salt, pepper, herbs or spices, and enjoy.",
+      min: 2
+    });
+    return steps;
+  }
+
+  function buildTips(meal) {
+    const items = meal.items || [];
+    const roles = items.map(i => roleOf(i.food));
+    const type = String(meal.label || "").toLowerCase();
+    const tips = [];
+
+    if (items.some(i => foodState(i.foodRaw))) {
+      tips.push("Weigh each item in the state shown (raw or cooked) so your calories stay accurate.");
+    }
+    if (!roles.includes("veg") && (type === "lunch" || type === "dinner")) {
+      tips.push("No vegetables in this dish. A side of cucumber or tomato slices adds fibre for very few calories (a small extra, not counted in your totals).");
+    }
+    const flavour = {
+      breakfast: "Cinnamon or cardamom adds a sweet, warm flavour with almost no calories.",
+      lunch: "Finish with lemon juice, black pepper, cumin or fresh coriander for flavour without meaningful calories.",
+      dinner: "Finish with lemon juice, black pepper, cumin or fresh coriander for flavour without meaningful calories.",
+      snack: "Drink water or unsweetened tea with this snack. It keeps you full for longer."
+    };
+    tips.push(flavour[type] || "Fresh herbs, lemon and spices add flavour without meaningful calories.");
+    if (roles.includes("grain") || roles.includes("protein")) {
+      tips.push("Short on time? Cook the base and protein in bulk and refrigerate. Cooked food keeps 1–2 days (rice: eat within 1 day).");
+    }
+    return tips.slice(0, 3);
+  }
+
+  function renderDay(keepCardAnimation = false) {
     if (!mealPlan?.[0]) return;
     const day = mealPlan[0];
     const totalDayKcal =
@@ -899,11 +1181,28 @@ document.addEventListener("wheel", (event) => {
     const grid = qs(".meal-plan-grid");
     if (!grid) return;
 
+    // After a swap we re-render without replaying the card entrance animation
+    grid.classList.toggle("no-anim", !!keepCardAnimation);
+
     grid.innerHTML = day.meals.map(meal => {
       const typeKey = (meal.label || "").toLowerCase();
       const iconSvg = MEAL_ICONS[typeKey] || MEAL_ICONS.lunch;
       const timing = MEAL_TIMES[typeKey] || "";
-      const prepTime = MEAL_PREP[typeKey] || "⏱ 15 mins prep";
+      const rawMeal = backendResponse?.meals?.find(m => m.meal === meal.label);
+      const steps = (Array.isArray(rawMeal?.steps) && rawMeal.steps.length
+        ? rawMeal.steps.map(normStep)
+        : buildMethod(meal)).filter(s => s.text);
+      const tips = (Array.isArray(rawMeal?.tips) && rawMeal.tips.length
+        ? rawMeal.tips.map(String)
+        : buildTips(meal)).slice(0, 4);
+      const stepKey = i => `${meal.label}|${meal.name}|${i}`;
+      const openKey = `${meal.label}|${meal.name}`;
+      const isOpen = stepOpen.has(openKey);
+      const doneCount = steps.filter((_, i) => stepDone.has(stepKey(i))).length;
+      const stepMinutes = steps.reduce((sum, s) => sum + (s.min || 0), 0);
+      const prepMin = Number(rawMeal?.prep_minutes)
+        || (stepMinutes ? Math.min(45, Math.max(5, stepMinutes)) : Math.min(40, 5 + (meal.items?.length || 0) * 4));
+      const prepTime = `⏱ ~${prepMin} min`;
 
       // Caloric percentage contribution of this meal
       const mealPct = Math.round((meal.kcal / totalDayKcal) * 100);
@@ -912,8 +1211,81 @@ document.addEventListener("wheel", (event) => {
         ? meal.items.map(item => `${esc(item.food)} (${fmt(item.grams)} g)`).join(" · ")
         : "Ingredients calibrated by NutriGen.";
 
+      const ingredientsHtml = meal.items?.length
+        ? `<div class="ingredients-block">
+              <div class="ingredients-title">Ingredients <small>· ${meal.items.length} items</small></div>
+              <ul class="ingredient-list">
+                ${meal.items.map(item => {
+                  const state = foodState(item.foodRaw);
+                  const home = householdMeasure(item.food, item.grams);
+                  return `<li>
+                    <div class="ing-name">${esc(friendlyFood(item.food))}${state ? `<em class="ing-state">${state}</em>` : ""}${home ? `<small class="ing-home">${esc(home)}</small>` : ""}</div>
+                    <div class="ing-qty">${fmt(item.grams)} g</div>
+                  </li>`;
+                }).join("")}
+              </ul>
+            </div>
+            ${steps.length ? `<div class="how-to ${isOpen ? "open" : ""}">
+              <button type="button" class="how-to-toggle" aria-expanded="${isOpen}" data-open-key="${esc(openKey)}">
+                <div class="how-to-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h12v16H6z" /><path d="M9 9h6M9 13h6M9 17h3" /></svg></div>
+                <div class="how-to-heading">
+                  <div class="how-to-title">How to make it</div>
+                  <div class="how-to-sub">${steps.length} steps · tap to show / hide</div>
+                </div>
+                <div class="how-to-meta">${doneCount}/${steps.length} done · ~${prepMin} min</div>
+                <div class="how-to-chevron" aria-hidden="true">▾</div>
+              </button>
+              <div class="how-to-body">
+                <div class="step-hint">Tap a step to tick it off as you cook.</div>
+                <div class="how-to-progress"><div class="how-to-progress-fill" style="width:${Math.round((doneCount / steps.length) * 100)}%"></div></div>
+                <ol class="step-list">
+                  ${steps.map((s, i) => {
+                    const done = stepDone.has(stepKey(i));
+                    return `<li class="step-item ${done ? "done" : ""}" role="checkbox" tabindex="0" aria-checked="${done}" data-step-key="${esc(stepKey(i))}">
+                      <div class="step-num">${i + 1}</div>
+                      <div class="step-main">
+                        <div class="step-label">STEP ${i + 1}</div>
+                        <div class="step-title-row">
+                          <div class="step-title">${esc(s.title || `Step ${i + 1}`)}</div>
+                          ${s.min ? `<div class="step-time">~${s.min} min</div>` : ""}
+                        </div>
+                        <div class="step-text">${esc(s.text)}</div>
+                      </div>
+                    </li>`;
+                  }).join("")}
+                </ol>
+                ${tips.length ? `<div class="meal-tips">
+                  <div class="tips-title"> Tips &amp; suggestions</div>
+                  <ul>${tips.map(t => `<li>${esc(t)}</li>`).join("")}</ul>
+                </div>` : ""}
+              </div>
+            </div>` : ""}`
+        : `<p class="meal-ingredients">${ingredientsStr}</p>`;
+
+      // Swap history for this meal (original dish is option 0)
+      const st = swapState[meal.label];
+      const optCount = st ? st.options.length : 1;
+      const optIdx = st ? st.idx : 0;
+      const isSwapped = optIdx > 0;
+      const busy = swapBusy.has(meal.label);
+      const statusText = isSwapped
+        ? `✓ Swapped · option ${optIdx + 1} of ${optCount}`
+        : (optCount > 1 ? `Original dish · option 1 of ${optCount}` : "");
+      const note = st?.note ? `<p class="swap-note">${esc(st.note)}</p>` : "";
+
+      const swapControls = optCount > 1 || st?.note ? `
+            <div class="swap-controls">
+              <button type="button" class="swap-nav-btn" data-swap-dir="prev" data-meal-type="${esc(meal.label)}" aria-label="Previous dish for ${esc(meal.label)}" ${optIdx === 0 || busy ? "disabled" : ""}>‹</button>
+              <span class="swap-status ${isSwapped ? "is-swapped" : ""}">${esc(statusText)}</span>
+              <button type="button" class="swap-nav-btn" data-swap-dir="next" data-meal-type="${esc(meal.label)}" aria-label="Next dish for ${esc(meal.label)}" ${optIdx >= optCount - 1 || busy ? "disabled" : ""}>›</button>
+            </div>
+            ${note}` : `<div class="swap-controls swap-controls-idle"><span class="swap-status">Original dish</span></div>`;
+
       return `
-        <article class="output-meal-card">
+        <article class="output-meal-card ${isSwapped ? "meal-swapped" : ""} ${busy ? "meal-swapping" : ""}"
+          data-card-label="${esc(meal.label)}"
+          data-meal-calories="${Number(meal.kcal) || 0}"
+          data-meal-protein="${Number(meal.protein) || 0}">
           <div class="output-meal-icon meal-icon-styled" aria-hidden="true">
             ${iconSvg}
           </div>
@@ -921,17 +1293,18 @@ document.addEventListener("wheel", (event) => {
           <div class="meal-card-content">
             <div class="meal-label-row">
               <span class="meal-label">${esc(meal.label.toUpperCase())} ${timing ? `· ${timing}` : ""}</span>
-              <button type="button" class="swap-meal-btn" data-meal-name="${esc(meal.name)}" data-meal-type="${esc(meal.label)}">
-                 Swap Dish
+              <button type="button" class="swap-meal-btn" data-meal-name="${esc(meal.name)}" data-meal-type="${esc(meal.label)}" ${busy ? "disabled" : ""}>
+                 ${busy ? "Finding a dish…" : "Swap Dish"}
               </button>
             </div>
 
             <h3>${esc(meal.name)}</h3>
+            ${swapControls}
             <div class="meal-meta-row">
               <span class="meal-prep-badge">${prepTime}</span>
               <span class="meal-pct-badge">${mealPct}% of daily intake</span>
             </div>
-            <p class="meal-ingredients">${ingredientsStr}</p>
+            ${ingredientsHtml}
 
             <div class="macro-line">
               <b>${fmt(meal.kcal)} kcal</b>
@@ -944,21 +1317,261 @@ document.addEventListener("wheel", (event) => {
       `;
     }).join("");
 
-    // Wire up Swap Buttons directly to the Chat Assistant
+    // Let the optional proactive-reminder module attach meal logging controls.
+    window.dispatchEvent(new CustomEvent("nutrigen:plan-rendered", {
+      detail: { profile, response: backendResponse }
+    }));
+
+    // Swap Dish → swaps right inside the meal card (next saved option, or fetches a new one)
     qsa(".swap-meal-btn", grid).forEach(btn => {
+      btn.addEventListener("click", () => swapMeal(btn.dataset.mealType, "swap"));
+    });
+
+    // ‹ › arrows → step through dishes already seen for that meal
+    qsa(".swap-nav-btn", grid).forEach(btn => {
+      btn.addEventListener("click", () => swapMeal(btn.dataset.mealType, btn.dataset.swapDir));
+    });
+
+    // Open / close the step-by-step guide
+    qsa(".how-to-toggle", grid).forEach(btn => {
       btn.addEventListener("click", () => {
-        const dishName = btn.dataset.mealName;
-        const mealType = btn.dataset.mealType;
-        openChat();
-        const chatInput = $("chat-input");
-        if (chatInput) {
-          chatInput.value = `Can you suggest an alternative for ${mealType}: ${dishName}?`;
-          $("chat-form")?.dispatchEvent(new Event("submit", { cancelable: true }));
+        const how = btn.closest(".how-to");
+        const open = !how.classList.contains("open");
+        how.classList.toggle("open", open);
+        btn.setAttribute("aria-expanded", String(open));
+        if (open) stepOpen.add(btn.dataset.openKey);
+        else stepOpen.delete(btn.dataset.openKey);
+      });
+    });
+
+    // Tick steps off as you cook
+    qsa(".step-item", grid).forEach(li => {
+      const toggle = () => {
+        const nowDone = !li.classList.contains("done");
+        li.classList.toggle("done", nowDone);
+        li.setAttribute("aria-checked", String(nowDone));
+        if (nowDone) stepDone.add(li.dataset.stepKey);
+        else stepDone.delete(li.dataset.stepKey);
+
+        const how = li.closest(".how-to");
+        const meta = how && qs(".how-to-meta", how);
+        if (how) {
+          const total = qsa(".step-item", how).length;
+          const done = qsa(".step-item.done", how).length;
+          if (meta) meta.textContent = meta.textContent.replace(/^\d+\/\d+ done/, `${done}/${total} done`);
+          const fill = qs(".how-to-progress-fill", how);
+          if (fill) fill.style.width = `${total ? Math.round((done / total) * 100) : 0}%`;
+        }
+      };
+      li.addEventListener("click", toggle);
+      li.addEventListener("keydown", e => {
+        if (e.key === " " || e.key === "Enter") {
+          e.preventDefault();
+          toggle();
         }
       });
     });
 
     renderGroceryChecklist(day.meals);
+  }
+
+  /* =======================================================
+     16b. IN-CARD DISH SWAP (history, totals, checklist sync)
+     ======================================================= */
+
+  function mapBackendMeal(meal) {
+    return {
+      label: meal.meal,
+      name: cleanFoodText(meal.dish),
+      rawDish: meal.dish,
+      kcal: meal.totals?.calories || 0,
+      protein: meal.totals?.protein || 0,
+      carbs: meal.totals?.carbs || 0,
+      fat: meal.totals?.fat || 0,
+      items: (meal.items || []).map(item => ({
+        ...item,
+        food: cleanFoodText(item.food), foodRaw: item.food
+      })),
+      notFound: meal.not_found || []
+    };
+  }
+
+  function ensureSwapState(label) {
+    if (!swapState[label]) {
+      const original = backendResponse?.meals?.find(m => m.meal === label);
+      if (!original) return null;
+      swapState[label] = { options: [original], idx: 0, note: "" };
+    }
+    return swapState[label];
+  }
+
+  // Applies option `idx` for a meal and re-syncs everything that depends on it
+  function applyMealOption(label, idx) {
+    const st = ensureSwapState(label);
+    if (!st || !st.options[idx] || !backendResponse || !mealPlan?.[0]) return;
+
+    st.idx = idx;
+    st.note = "";
+    const raw = st.options[idx];
+
+    const pos = backendResponse.meals.findIndex(m => m.meal === label);
+    if (pos < 0) return;
+
+    // 1. Replace the dish
+    backendResponse.meals[pos] = raw;
+    mealPlan[0].meals[pos] = mapBackendMeal(raw);
+
+    // 2. Recalculate day totals from the dishes now selected
+    const sum = key =>
+      Math.round(backendResponse.meals.reduce((s, m) => s + (Number(m.totals?.[key]) || 0), 0) * 10) / 10;
+
+    const totals = {
+      calories: sum("calories"),
+      protein: sum("protein"),
+      carbs: sum("carbs"),
+      fat: sum("fat")
+    };
+
+    backendResponse.day_totals = { ...backendResponse.day_totals, ...totals };
+    mealPlan[0].totals = {
+      kcal: totals.calories,
+      protein: totals.protein,
+      carbs: totals.carbs,
+      fat: totals.fat
+    };
+
+    if (nutrition) {
+      nutrition.actualCalories = totals.calories;
+      nutrition.actualProtein = totals.protein;
+      nutrition.actualCarbs = totals.carbs;
+      nutrition.actualFat = totals.fat;
+    }
+
+    // 3. Refresh dashboard, macro bar, meal cards and the grocery checklist
+    fillDashboard();
+    renderDay(true);
+
+    // 4. Remember the swap so "View my last plan" matches what's on screen
+    try {
+      localStorage.setItem(
+        "nutrigenLastPlan",
+        JSON.stringify({ profile, response: backendResponse, swaps: swapState })
+      );
+    } catch (err) {
+      console.warn("Storage warning:", err);
+    }
+
+    const announcer = $("plan-announcer");
+    if (announcer) {
+      announcer.textContent = `${label} changed to ${mealPlan[0].meals[pos].name}. Daily total is now ${fmt(totals.calories)} kcal.`;
+    }
+  }
+
+  // Normalised dish name used to spot duplicates ("Oats Bowl" vs "oats  bowl")
+  const dishKey = text =>
+    cleanFoodText(String(text || "")).trim().toLowerCase().replace(/\s+/g, " ");
+
+  async function fetchAlternativeMeal(label) {
+    const st = ensureSwapState(label);
+    if (!st || !profile) return null;
+
+    // Calories of the original dish: replacements should stay close to it
+    const baseKcal = Number(st.options[0]?.totals?.calories) || 0;
+    const kcalOf = meal => Number(meal?.totals?.calories) || 0;
+
+    // Never offer a dish already seen for this meal, or one already used by another meal today
+    const avoid = new Set(st.options.map(o => dishKey(o.dish)));
+    (backendResponse?.meals || []).forEach(m => {
+      if (m.meal !== label) avoid.add(dishKey(m.dish));
+    });
+
+    const found = [];
+    let lastError = null;
+
+    for (let attempt = 0; attempt < 6; attempt++) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 60000);
+      try {
+        const response = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(profile),
+          signal: controller.signal
+        });
+        const data = await response.json();
+        if (!response.ok || data.status !== "success" || !Array.isArray(data.meals)) continue;
+
+        const candidate = data.meals.find(m => m.meal === label);
+        const key = dishKey(candidate?.dish);
+        if (!candidate || !key || avoid.has(key)) continue;
+
+        avoid.add(key);
+        found.push(candidate);
+
+        // Good match (within 20% of the original calories) → use it straight away
+        if (!baseKcal || Math.abs(kcalOf(candidate) - baseKcal) / baseKcal <= 0.2) return candidate;
+      } catch (err) {
+        lastError = err;
+        break;
+      } finally {
+        clearTimeout(timeoutId);
+      }
+    }
+
+    // No perfect match: take the closest one, as long as it is within 40% of the original
+    if (found.length) {
+      found.sort((a, b) => Math.abs(kcalOf(a) - baseKcal) - Math.abs(kcalOf(b) - baseKcal));
+      const best = found[0];
+      if (!baseKcal || Math.abs(kcalOf(best) - baseKcal) / baseKcal <= 0.4) return best;
+      return null;
+    }
+
+    if (lastError) throw lastError;
+    return null;
+  }
+
+  async function swapMeal(label, action) {
+    if (!label || swapBusy.has(label) || !mealPlan?.[0]) return;
+    const st = ensureSwapState(label);
+    if (!st) return;
+
+    if (action === "prev") {
+      if (st.idx > 0) applyMealOption(label, st.idx - 1);
+      return;
+    }
+
+    if (action === "next") {
+      if (st.idx < st.options.length - 1) applyMealOption(label, st.idx + 1);
+      return;
+    }
+
+    // "swap": use the next saved option if there is one, otherwise ask the backend for a new dish
+    if (st.idx < st.options.length - 1) {
+      applyMealOption(label, st.idx + 1);
+      return;
+    }
+
+    swapBusy.add(label);
+    st.note = "";
+    renderDay(true);
+
+    try {
+      const fresh = await fetchAlternativeMeal(label);
+      swapBusy.delete(label);
+
+      if (fresh) {
+        st.options.push(fresh);
+        applyMealOption(label, st.options.length - 1);
+      } else {
+        st.note = "No new dish with similar calories found right now — try again in a moment.";
+        renderDay(true);
+      }
+    } catch (error) {
+      console.error("Swap error:", error);
+      swapBusy.delete(label);
+      st.note = "Couldn't reach the backend to find another dish.";
+      renderDay(true);
+    }
   }
 
   /* =======================================================
@@ -988,11 +1601,19 @@ document.addEventListener("wheel", (event) => {
 
     listGrid.innerHTML = [...itemMap.entries()].map(([food, grams], idx) => `
       <label class="grocery-item">
-        <input type="checkbox" id="g-item-${idx}" />
-        <span class="grocery-name">${esc(food)}</span>
+        <input type="checkbox" id="g-item-${idx}" data-food="${esc(food)}" ${groceryTicked.has(food) ? "checked" : ""} />
+        <span class="grocery-name">${esc(friendlyFood(food))}</span>
         <strong class="grocery-qty">${fmt(grams)} g</strong>
       </label>
     `).join("");
+
+    // Remember ticks so swapping a dish doesn't wipe items already marked as bought
+    qsa('input[data-food]', listGrid).forEach(box => {
+      box.addEventListener("change", () => {
+        if (box.checked) groceryTicked.add(box.dataset.food);
+        else groceryTicked.delete(box.dataset.food);
+      });
+    });
   }
 
   $("toggle-grocery-button")?.addEventListener("click", () => {
@@ -1014,34 +1635,106 @@ document.addEventListener("wheel", (event) => {
 
   $("copy-plan-button")?.addEventListener("click", async () => {
     if (!profile || !nutrition || !mealPlan?.[0]) return;
+
     const day = mealPlan[0];
 
-    const mealLines = day.meals.map(m =>
-      `• ${m.label}: ${m.name} (${fmt(m.kcal)} kcal | P:${fmt(m.protein)}g C:${fmt(m.carbs)}g F:${fmt(m.fat)}g)`
-    ).join("\n");
+    const divider = "────────────────────────────";
+
+    const mealSections = day.meals.map(meal => {
+      const ingredients = meal.items?.length
+        ? meal.items.map(item => `   • ${friendlyFood(item.food)} — ${fmt(item.grams)} g`).join("\n")
+        : "   Ingredients included in the generated recipe.";
+
+      return [
+        `${meal.label.toUpperCase()}`,
+        divider,
+        `Dish: ${meal.name}`,
+        "",
+        "Ingredients:",
+        ingredients,
+        "",
+        `Calories: ${fmt(meal.kcal)} kcal`,
+        `Protein: ${fmt(meal.protein)} g`,
+        `Carbohydrates: ${fmt(meal.carbs)} g`,
+        `Fat: ${fmt(meal.fat)} g`
+      ].join("\n");
+    }).join("\n\n");
 
     const textToCopy = [
-      `🥗 NutriGen Daily Nutrition Blueprint for ${profile.name}`,
-      `Goal: ${profile.goal} (${profile.diet})`,
-      `Daily Intake: ${fmt(day.totals.kcal)} kcal (Target: ${fmt(nutrition.kcal)} kcal)`,
-      `Macros: Protein ${fmt(day.totals.protein)}g · Carbs ${fmt(day.totals.carbs)}g · Fat ${fmt(day.totals.fat)}g`,
-      `\nDAILY SCHEDULE:\n${mealLines}`,
-      `\nGenerated by NutriGen.`
+      "NUTRIGEN — YOUR DAILY MEAL PLAN",
+      "Personalised Nutrition Report",
+      divider,
+      "",
+      "YOUR PROFILE",
+      `Name: ${profile.name}`,
+      `Age: ${profile.age} years`,
+      `Height: ${profile.height} cm`,
+      `Current Weight: ${fmt(profile.weight)} kg`,
+      `Target Weight: ${fmt(profile.target)} kg`,
+      `Goal: ${profile.goal}`,
+      `Diet: ${profile.diet}`,
+      "",
+      "YOUR DAILY NUTRITION TARGETS",
+      `Calories: ${fmt(nutrition.kcal)} kcal`,
+      `Protein: ${fmt(nutrition.protein)} g`,
+      `Carbohydrates: ${fmt(nutrition.carbs)} g`,
+      `Fat: ${fmt(nutrition.fat)} g`,
+      "",
+      divider,
+      "",
+      "YOUR MEAL SCHEDULE",
+      "",
+      mealSections,
+      "",
+      divider,
+      "",
+      "YOUR ACTUAL DAILY NUTRITION",
+      `Total Calories: ${fmt(day.totals.kcal)} kcal`,
+      `Total Protein: ${fmt(day.totals.protein)} g`,
+      `Total Carbohydrates: ${fmt(day.totals.carbs)} g`,
+      `Total Fat: ${fmt(day.totals.fat)} g`,
+      "",
+      `Estimated Maintenance (TDEE): ${fmt(nutrition.tdee)} kcal`,
+      "",
+      divider,
+      "Generated with NutriGen",
+      "Your nutrition, personalised."
     ].join("\n");
 
+    const btn = $("copy-plan-button");
+    const originalText = btn?.textContent;
+
     try {
-      await navigator.clipboard.writeText(textToCopy);
-      const btn = $("copy-plan-button");
-      if (btn) {
-        const orig = btn.textContent;
-        btn.textContent = "✓ Copied!";
-        setTimeout(() => { btn.textContent = orig; }, 2000);
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(textToCopy);
+      } else {
+        const temp = document.createElement("textarea");
+        temp.value = textToCopy;
+        temp.style.position = "fixed";
+        temp.style.opacity = "0";
+        document.body.appendChild(temp);
+        temp.select();
+
+        const copied = document.execCommand("copy");
+        temp.remove();
+
+        if (!copied) throw new Error("Clipboard copy failed.");
       }
-    } catch {
-      alert("Plan copied to clipboard.");
+
+      if (btn) {
+        btn.textContent = "✓ Copied!";
+        setTimeout(() => {
+          btn.textContent = originalText || "Copy Plan";
+        }, 2000);
+      }
+    } catch (error) {
+      console.error("Copy plan error:", error);
+      alert("Unable to copy automatically. Please try again using a secure browser connection.");
     }
   });
 
+
+  
   /* =======================================================
      19. SUBMIT FORM & API CALL
      ======================================================= */
@@ -1076,8 +1769,12 @@ document.addEventListener("wheel", (event) => {
     try {
       await prepareProfile(collected);
 
+      // Remember (or forget) the user's details based on the checkbox
+      if ($("save-info-checkbox")?.checked) writeSavedProfile(collected);
+
+      else removeSavedProfile(collected.name);
       try {
-        localStorage.setItem("nutrigenLastPlan", JSON.stringify({ profile, response: backendResponse }));
+        localStorage.setItem("nutrigenLastPlan", JSON.stringify({ profile, response: backendResponse, swaps: swapState }));
       } catch (err) {
         console.warn("Storage warning:", err);
       }
@@ -1118,6 +1815,8 @@ document.addEventListener("wheel", (event) => {
     if (!saved?.profile || !saved?.response) return;
     profile = saved.profile;
     backendResponse = saved.response;
+    swapState = saved.swaps && typeof saved.swaps === "object" ? saved.swaps : {};
+    groceryTicked = new Set();
     const data = backendResponse;
 
     nutrition = {
@@ -1148,7 +1847,7 @@ document.addEventListener("wheel", (event) => {
         protein: m.totals?.protein || 0,
         carbs: m.totals?.carbs || 0,
         fat: m.totals?.fat || 0,
-        items: (m.items || []).map(i => ({ ...i, food: cleanFoodText(i.food) })),
+        items: (m.items || []).map(i => ({ ...i, food: cleanFoodText(i.food), foodRaw: i.food })),
         notFound: m.not_found || []
       }))
     }];
@@ -1180,7 +1879,10 @@ document.addEventListener("wheel", (event) => {
 
     $("last-plan-button")?.addEventListener("click", e => {
       e.preventDefault();
-      restoreSavedPlan(saved);
+      // Re-read so any swaps made after this button was created are included
+      let latest = saved;
+      try { latest = JSON.parse(localStorage.getItem("nutrigenLastPlan") || "null") || saved; } catch {}
+      restoreSavedPlan(latest);
     });
   }
 
@@ -1199,6 +1901,7 @@ document.addEventListener("wheel", (event) => {
     handleGoalChange();
     applyDietFilterToAllergies();
     goToSlide(0);
+    refreshSavedBanner();
   }
 
   $("new-plan-button")?.addEventListener("click", startFresh);
@@ -1306,6 +2009,235 @@ document.addEventListener("wheel", (event) => {
       handleChatSubmit(chip.dataset.question);
     });
   });
+    /* =======================================================
+     21b. SAVED DETAILS + "YOUR PLAN" NAV LINK
+     ======================================================= */
+
+  const SAVED_PROFILE_KEY = "nutrigenSavedProfile";     // old single-profile key (auto-migrated)
+  const SAVED_PROFILES_KEY = "nutrigenSavedProfiles";   // list of saved profiles
+  const MAX_SAVED_PROFILES = 8;
+
+  const sameName = (a, b) =>
+    String(a || "").trim().toLowerCase() === String(b || "").trim().toLowerCase();
+
+  function readSavedProfiles() {
+    let profilesList = [];
+    try {
+      const parsed = JSON.parse(localStorage.getItem(SAVED_PROFILES_KEY) || "null");
+      if (Array.isArray(parsed)) profilesList = parsed.filter(p => p && p.name);
+    } catch {}
+
+    // Move a profile saved by the earlier single-profile version into the list
+    try {
+      const old = JSON.parse(localStorage.getItem(SAVED_PROFILE_KEY) || "null");
+      if (old && old.name && !profilesList.some(p => sameName(p.name, old.name))) {
+        profilesList.push(old);
+        localStorage.setItem(SAVED_PROFILES_KEY, JSON.stringify(profilesList));
+      }
+      localStorage.removeItem(SAVED_PROFILE_KEY);
+    } catch {}
+
+    return profilesList;
+  }
+
+  function storeSavedProfiles(profilesList) {
+    try {
+      localStorage.setItem(SAVED_PROFILES_KEY, JSON.stringify(profilesList.slice(-MAX_SAVED_PROFILES)));
+    } catch {}
+  }
+
+  // Most recently saved profile (used when there is only one)
+  function readSavedProfile() {
+    const all = readSavedProfiles();
+    return all.length ? all[all.length - 1] : null;
+  }
+
+  // Saves or updates the profile that has this name
+  function writeSavedProfile(p) {
+    const rest = readSavedProfiles().filter(x => !sameName(x.name, p.name));
+    rest.push(p);
+    storeSavedProfiles(rest);
+  }
+
+  function removeSavedProfile(name) {
+    storeSavedProfiles(readSavedProfiles().filter(x => !sameName(x.name, name)));
+  }
+
+  // Deletes every saved profile
+  function clearSavedProfile() {
+    try {
+      localStorage.removeItem(SAVED_PROFILES_KEY);
+      localStorage.removeItem(SAVED_PROFILE_KEY);
+    } catch {}
+  }
+
+  const setVal = (id, value) => {
+    const el = $(id);
+    if (el) el.value = value ?? "";
+  };
+
+  function fillForm(p) {
+    formEl?.reset();
+
+    setVal("name", p.name);
+    setVal("age", p.age);
+    setVal("height", p.height);
+    setVal("current-weight", p.weight);
+    setVal("target-weight", p.target);
+    setVal("daily-calories", p.calories);
+    setVal("other-preference", p.otherPreference);
+    setVal("foods-to-include", p.include);
+    setVal("foods-to-avoid", p.avoid);
+    setVal("other-allergy", p.otherAllergy);
+    setVal("other-restriction", p.otherRestriction);
+
+    const pick = (name, value) => {
+      const radio = qs(`input[name="${name}"][value="${value}"]`);
+      if (radio) radio.checked = true;
+    };
+    if (p.gender) pick("gender", p.gender);
+    if (p.activity) pick("activity", String(p.activity));
+    if (p.goal) pick("goal", p.goal);
+    if (p.diet) pick("diet", p.diet);
+
+    ["preferences", "allergies", "restrictions"].forEach(name => {
+      qsa(`input[name="${name}"]`).forEach(input => {
+        input.checked = (p[name] || []).includes(input.value);
+      });
+    });
+
+    handleGoalChange();
+    applyDietFilterToAllergies();
+  }
+
+  function renderSavedProfileList(profilesList) {
+    const listEl = $("saved-profile-list");
+    if (!listEl) return;
+
+    listEl.innerHTML = [...profilesList].reverse().map(p => {
+      const details = [p.goal, p.diet, p.weight ? `${p.weight} kg` : ""].filter(Boolean).join(" · ");
+      return `
+        <div class="saved-profile-row">
+          <span class="saved-profile-avatar" aria-hidden="true">${esc((p.name || "?").trim().charAt(0).toUpperCase())}</span>
+          <div class="saved-profile-info">
+            <strong>${esc(p.name)}</strong>
+            <small>${esc(details)}</small>
+          </div>
+          <button type="button" class="primary-button saved-pick-btn" data-saved-name="${esc(p.name)}">That's me</button>
+          <button type="button" class="saved-delete-btn" data-saved-delete="${esc(p.name)}" aria-label="Delete saved details for ${esc(p.name)}">Delete</button>
+        </div>`;
+    }).join("");
+  }
+
+  // Is the site currently dark? Reads the real page colours, so it follows your theme toggle
+  function isDarkTheme() {
+    const channels = color => {
+      const m = /rgba?\(([^)]+)\)/.exec(color || "");
+      if (!m) return null;
+      const p = m[1].split(",").map(s => parseFloat(s));
+      return p.length > 3 && p[3] === 0 ? null : p;
+    };
+    for (const el of [qs(".form-card"), document.body, document.documentElement]) {
+      if (!el) continue;
+      const p = channels(getComputedStyle(el).backgroundColor);
+      if (p) return (0.2126 * p[0] + 0.7152 * p[1] + 0.0722 * p[2]) < 128;
+    }
+    return !!window.matchMedia?.("(prefers-color-scheme: dark)").matches;
+  }
+
+  function applyBannerTheme() {
+    $("saved-profile-banner")?.classList.toggle("banner-light", !isDarkTheme());
+  }
+
+  // Re-check when the theme is toggled
+  [document.documentElement, document.body].forEach(el => {
+    new MutationObserver(() => setTimeout(applyBannerTheme, 60))
+      .observe(el, { attributes: true, attributeFilter: ["class", "data-theme", "style"] });
+  });
+
+  function refreshSavedBanner() {
+    const banner = $("saved-profile-banner");
+    if (!banner) return;
+    applyBannerTheme();
+
+    const profilesList = readSavedProfiles();
+    const shouldShow = profilesList.length > 0 && currentSlide === 0 && !val("name");
+    banner.classList.toggle("hidden", !shouldShow);
+    if (!shouldShow) return;
+
+    const multi = profilesList.length > 1;
+    const latest = profilesList[profilesList.length - 1];
+
+    set("saved-profile-name", multi ? "" : (latest.name ? `, ${latest.name}` : ""));
+    set(
+      "saved-profile-text",
+      multi
+        ? "Which one are you? Pick your profile to auto-fill the form, or start fresh as someone new."
+        : "Is this you? We found your saved details on this device. Use them to auto-fill the form, or start with a blank one."
+    );
+    set("start-blank-button", multi ? "I'm someone new" : "Start fresh");
+    set("clear-saved-button", multi ? "Delete all saved details" : "Delete saved details");
+
+    renderSavedProfileList(profilesList);
+    $("saved-profile-list")?.classList.toggle("hidden", !multi);
+    $("use-saved-button")?.classList.toggle("hidden", multi);
+  }
+
+  $("use-saved-button")?.addEventListener("click", () => {
+    const saved = readSavedProfile();
+    if (!saved) return;
+    clearErrors();
+    fillForm(saved);
+    hide($("saved-profile-banner"));
+  });
+
+  // Several profiles: "That's me" fills the form, "Delete" removes just that person
+  $("saved-profile-list")?.addEventListener("click", e => {
+    const pick = e.target.closest("[data-saved-name]");
+    const del = e.target.closest("[data-saved-delete]");
+
+    if (pick) {
+      const chosen = readSavedProfiles().find(p => p.name === pick.dataset.savedName);
+      if (!chosen) return;
+      clearErrors();
+      fillForm(chosen);
+      hide($("saved-profile-banner"));
+      return;
+    }
+
+    if (del) {
+      const name = del.dataset.savedDelete;
+      if (!window.confirm(`Delete the saved details for ${name}?`)) return;
+      removeSavedProfile(name);
+      refreshSavedBanner();
+    }
+  });
+
+  $("start-blank-button")?.addEventListener("click", () => {
+    formEl?.reset();
+    clearErrors();
+    handleGoalChange();
+    applyDietFilterToAllergies();
+    hide($("saved-profile-banner"));
+  });
+
+  $("clear-saved-button")?.addEventListener("click", () => {
+    const count = readSavedProfiles().length;
+    const msg = count > 1 ? "Delete ALL saved profiles on this device?" : "Delete your saved details from this device?";
+    if (!window.confirm(msg)) return;
+    clearSavedProfile();
+    hide($("saved-profile-banner"));
+  });
+
+  // "Your Plan" in the header: open the last plan, or the form if there isn't one yet
+  $("nav-your-plan")?.addEventListener("click", e => {
+    e.preventDefault();
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem("nutrigenLastPlan") || "null"); } catch {}
+    if (saved?.profile && saved?.response) restoreSavedPlan(saved);
+    else openForm();
+  });
+
 
   /* =======================================================
      22. INITIAL STATE

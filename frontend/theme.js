@@ -86,4 +86,11 @@
     if (before) root.setAttribute("data-theme", before);
     before = null;
   });
+    // 5) Header bar appears only after scrolling
+  function onScroll() {
+    root.classList.toggle("is-scrolled", window.scrollY > 12);
+  }
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+
 })();

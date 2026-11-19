@@ -6,3 +6,6 @@ numpy
 scipy
 google-genai
 python-dotenv
+schedule
+pytest
+groq
