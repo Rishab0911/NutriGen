@@ -301,6 +301,117 @@ document.addEventListener("wheel", (event) => {
 
   qsa('input[name="goal"]').forEach(r => r.addEventListener("change", handleGoalChange));
 
+  /* =======================================================
+     7b. HEIGHT: centimetres OR feet + inches
+     #height always holds the value in cm (validation, saving
+     and the backend all keep working); the ft/in boxes just
+     convert into it.
+     ======================================================= */
+
+  let heightUnit = "cm";
+
+  function cmToFtIn(cm) {
+    const totalIn = Math.round((cm / 2.54) * 10) / 10;
+    let ft = Math.floor(totalIn / 12);
+    let inch = Math.round((totalIn - ft * 12) * 10) / 10;
+    if (inch >= 12) { ft += 1; inch = 0; }
+    return { ft, inch };
+  }
+
+  function updateHeightHint() {
+    const hint = $("height-hint");
+    if (!hint) return;
+    const cm = num("height");
+    const ok = Number.isFinite(cm) && cm > 0;
+
+    if (heightUnit === "ft") {
+      hint.textContent = ok
+        ? `Feet and inches (about ${Math.round(cm)} cm).`
+        : "Enter feet and inches, e.g. 5 ft 7 in.";
+    } else {
+      const { ft, inch } = ok ? cmToFtIn(cm) : { ft: 0, inch: 0 };
+      hint.textContent = ok
+        ? `Height in centimetres (about ${ft} ft ${fmt(inch)} in).`
+        : "Height in centimetres.";
+    }
+  }
+
+  function syncHeightFromFt() {
+    const ft = num("height-ft");
+    const inch = num("height-in");
+    const target = $("height");
+    if (!target) return;
+    if (Number.isNaN(ft) && Number.isNaN(inch)) {
+      target.value = "";
+    } else {
+      const totalIn = (Number.isNaN(ft) ? 0 : ft) * 12 + (Number.isNaN(inch) ? 0 : inch);
+      target.value = String(Math.round(totalIn * 2.54 * 10) / 10);
+    }
+    updateHeightHint();
+  }
+
+  function syncFtFromHeight() {
+    const cm = num("height");
+    const ftBox = $("height-ft");
+    const inBox = $("height-in");
+    if (!ftBox || !inBox) return;
+    if (!Number.isFinite(cm) || cm <= 0) {
+      ftBox.value = "";
+      inBox.value = "";
+      return;
+    }
+    const { ft, inch } = cmToFtIn(cm);
+    ftBox.value = String(ft);
+    inBox.value = String(inch);
+  }
+
+  function setHeightUnit(unit) {
+    heightUnit = unit === "ft" ? "ft" : "cm";
+    qsa(".unit-btn").forEach(btn => {
+      const on = btn.dataset.unit === heightUnit;
+      btn.classList.toggle("active", on);
+      btn.setAttribute("aria-pressed", String(on));
+    });
+    $("height")?.classList.toggle("hidden", heightUnit === "ft");
+    $("height-ft-row")?.classList.toggle("hidden", heightUnit !== "ft");
+    $("height-label")?.setAttribute("for", heightUnit === "ft" ? "height-ft" : "height");
+    if (heightUnit === "ft") syncFtFromHeight();
+    updateHeightHint();
+    try { localStorage.setItem("nutrigenHeightUnit", heightUnit); } catch {}
+  }
+
+  qsa(".unit-btn").forEach(btn => {
+    btn.addEventListener("click", () => setHeightUnit(btn.dataset.unit));
+  });
+
+  $("height")?.addEventListener("input", updateHeightHint);
+  $("height-ft")?.addEventListener("input", syncHeightFromFt);
+  $("height-in")?.addEventListener("input", syncHeightFromFt);
+
+  $("height-help-toggle")?.addEventListener("click", () => {
+    const panel = $("height-help");
+    if (!panel) return;
+    const open = panel.classList.contains("hidden");
+    panel.classList.toggle("hidden", !open);
+    $("height-help-toggle").setAttribute("aria-expanded", String(open));
+  });
+
+  // Tap a common height: fills both unit boxes
+  $("height-chips")?.addEventListener("click", e => {
+    const chip = e.target.closest(".height-chip");
+    if (!chip) return;
+    const totalIn = Number(chip.dataset.ft) * 12 + Number(chip.dataset.in);
+    const heightInput = $("height");
+    if (heightInput) heightInput.value = String(Math.round(totalIn * 2.54 * 10) / 10);
+    syncFtFromHeight();
+    updateHeightHint();
+    clearErrors();
+  });
+
+  try {
+    if (localStorage.getItem("nutrigenHeightUnit") === "ft") setHeightUnit("ft");
+  } catch {}
+
   $("current-weight")?.addEventListener("input", () => {
     if (one("goal") === "Maintain Weight") {
       const targetInput = $("target-weight");
@@ -312,9 +423,36 @@ document.addEventListener("wheel", (event) => {
      8. DYNAMIC DIET FILTER FOR ALLERGIES (Slide 3 -> 4)
      ======================================================= */
 
+  // Example text (light grey) that matches the chosen diet
+  const DIET_HINTS = {
+    "Vegetarian": {
+      include: "e.g. paneer, tofu, oats",
+      avoid: "e.g. mushrooms, peanuts",
+      restriction: "e.g. Jain, No Onion/Garlic"
+    },
+    "Vegan": {
+      include: "e.g. tofu, chickpeas, oats",
+      avoid: "e.g. mushrooms, peanuts",
+      restriction: "e.g. Jain, No Onion/Garlic"
+    },
+    "Non-Vegetarian": {
+      include: "e.g. chicken, eggs, fish",
+      avoid: "e.g. pork, shellfish, mushrooms",
+      restriction: "e.g. Halal, Kosher, No Onion/Garlic"
+    }
+  };
+
+  function updateDietHints() {
+    const hints = DIET_HINTS[one("diet")] || DIET_HINTS["Vegetarian"];
+    $("foods-to-include")?.setAttribute("placeholder", hints.include);
+    $("foods-to-avoid")?.setAttribute("placeholder", hints.avoid);
+    $("other-restriction")?.setAttribute("placeholder", hints.restriction);
+  }
+
   function applyDietFilterToAllergies() {
     const diet = one("diet");
     const isVeg = diet === "Vegetarian" || diet === "Vegan";
+    updateDietHints();
 
     qsa('[data-diet-filter="non-veg"]').forEach(card => {
       const input = card.querySelector('input[type="checkbox"]');
@@ -455,10 +593,6 @@ document.addEventListener("wheel", (event) => {
       refreshSavedBanner();
     });
   });
-
-  /* =======================================================
-     10. BACK TO TOP, QUICK-JUMP DOCK & SCROLL-SPY
-     ======================================================= */
 
   /* =======================================================
      10. BACK TO TOP, FLOATING QUICK-JUMP DOCK & SCROLL-SPY
@@ -630,7 +764,11 @@ document.addEventListener("wheel", (event) => {
       const height = num("height");
       if (!val("name")) return showError("name", "Please enter your name.");
       if (!(age >= 1 && age <= 120)) return showError("age", "Enter an age between 1 and 120.");
-      if (!(height >= 50 && height <= 250)) return showError("height", "Enter a height between 50 and 250 cm.");
+      if (!(height >= 50 && height <= 250)) {
+        return heightUnit === "ft"
+          ? showError("height-ft", "Enter a height between about 1 ft 8 in and 8 ft 2 in.")
+          : showError("height", "Enter a height between 50 and 250 cm.");
+      }
       if (!one("gender")) return showError(qs(".gender-grid"), "Please choose an option.");
       if (!one("activity")) return showError(qs(".activity-grid"), "Please select your activity level.");
       return true;
@@ -668,6 +806,24 @@ document.addEventListener("wheel", (event) => {
     // Step 3
     () => {
       if (!one("diet")) return showError(qs(".diet-grid"), "Please choose your diet preference.");
+
+      // "Foods to include" must not contradict the diet
+      const diet = one("diet");
+      if (diet === "Vegetarian" || diet === "Vegan") {
+        const MEAT = /\b(chicken|mutton|lamb|goat|beef|pork|bacon|ham|turkey|duck|sausages?|meat|fish|salmon|tuna|sardines?|prawns?|shrimps?|crab|lobster|squid|seafood|shellfish|anchovy|anchovies)\b/i;
+        const ANIMAL = /\b(eggs?|milk|paneer|cheese|curd|dahi|yogh?urt|ghee|butter|cream|whey|honey|dairy)\b/i;
+        // plant-based versions are fine (peanut butter, soy milk, ...)
+        const PLANT = /\b(peanut|almond|nut|cashew|shea|cocoa|coconut|soy|soya|oat|rice) (butter|milk|cream|yogh?urt|curd)\b/gi;
+        for (const item of words(val("foods-to-include"))) {
+          const clean = item.replace(PLANT, "");
+          if (MEAT.test(clean) || (diet === "Vegan" && ANIMAL.test(clean))) {
+            return showError(
+              "foods-to-include",
+              `"${item}" isn't ${diet.toLowerCase()}. Remove it, or go back and change your diet.`
+            );
+          }
+        }
+      }
       return true;
     },
     // Step 4
@@ -1640,6 +1796,14 @@ document.addEventListener("wheel", (event) => {
 
     const divider = "────────────────────────────";
 
+    // Marks dishes the user swapped, so the copied plan shows what was actually chosen
+    const swapInfo = label => {
+      const st = swapState[label];
+      if (!st || !st.idx) return "";
+      const original = cleanFoodText(st.options?.[0]?.dish || "");
+      return original ? ` (swapped, original: ${original})` : " (swapped)";
+    };
+
     const mealSections = day.meals.map(meal => {
       const ingredients = meal.items?.length
         ? meal.items.map(item => `   • ${friendlyFood(item.food)} — ${fmt(item.grams)} g`).join("\n")
@@ -1648,7 +1812,7 @@ document.addEventListener("wheel", (event) => {
       return [
         `${meal.label.toUpperCase()}`,
         divider,
-        `Dish: ${meal.name}`,
+        `Dish: ${meal.name}${swapInfo(meal.label)}`,
         "",
         "Ingredients:",
         ingredients,
@@ -1734,7 +1898,7 @@ document.addEventListener("wheel", (event) => {
   });
 
 
-  
+
   /* =======================================================
      19. SUBMIT FORM & API CALL
      ======================================================= */
@@ -1957,7 +2121,27 @@ document.addEventListener("wheel", (event) => {
     if (/swap|alternative|replace|instead of/.test(text)) {
       const meal = day.meals.find(m => text.includes(m.label.toLowerCase()) || text.includes(m.name.toLowerCase()));
       if (meal) {
-        return `For ${meal.label} (${meal.name}), balanced alternatives matching around ${fmt(meal.kcal)} kcal include: grilled cottage cheese (paneer) with mixed sautéed veggies, lentil stew with brown rice, or a Greek yogurt chia bowl.`;
+        const ALTS = {
+          "Vegetarian": ["paneer with sautéed vegetables", "lentil stew with brown rice", "a Greek yogurt chia bowl"],
+          "Vegan": ["tofu stir-fry with vegetables", "lentil stew with brown rice", "a chickpea and quinoa bowl"],
+          "Non-Vegetarian": ["grilled chicken with sautéed vegetables", "fish with steamed rice", "an egg and vegetable scramble"]
+        };
+        const ALLERGY_WORDS = {
+          milk: ["paneer", "yogurt", "cheese", "milk"], eggs: ["egg"], fish: ["fish"],
+          shellfish: ["prawn", "shrimp"], soy: ["tofu", "soy"], peanuts: ["peanut"], gluten: ["gluten"]
+        };
+        const blocked = [
+          ...words(profile.avoid),
+          ...words(profile.otherAllergy),
+          ...profile.allergies.flatMap(a => ALLERGY_WORDS[a.toLowerCase()] || [a.toLowerCase()]),
+          ...(profile.preferences.includes("Dairy Free") ? ["paneer", "yogurt", "cheese", "milk"] : [])
+        ];
+        const options = (ALTS[profile.diet] || ALTS["Vegetarian"])
+          .filter(opt => !blocked.some(b => b && opt.toLowerCase().includes(b)));
+        if (!options.length) {
+          return `For ${meal.label} (${meal.name}), try asking for another dish with the Swap Dish button on the meal card.`;
+        }
+        return `For ${meal.label} (${meal.name}), ${profile.diet} alternatives around ${fmt(meal.kcal)} kcal include: ${options.join(", ")}.`;
       }
       return "To swap a meal, let me know which one (Breakfast, Lunch, Snack or Dinner)!";
     }
@@ -2082,6 +2266,8 @@ document.addEventListener("wheel", (event) => {
     setVal("name", p.name);
     setVal("age", p.age);
     setVal("height", p.height);
+    syncFtFromHeight();
+    updateHeightHint();
     setVal("current-weight", p.weight);
     setVal("target-weight", p.target);
     setVal("daily-calories", p.calories);
@@ -2155,7 +2341,17 @@ document.addEventListener("wheel", (event) => {
       .observe(el, { attributes: true, attributeFilter: ["class", "data-theme", "style"] });
   });
 
-  function refreshSavedBanner() {
+  // Opens / closes the "Select your profile" list
+  function setPickerOpen(open) {
+    $("saved-profile-list")?.classList.toggle("hidden", !open);
+    const btn = $("select-profile-button");
+    if (btn) {
+      btn.setAttribute("aria-expanded", String(open));
+      btn.textContent = open ? "Hide profiles ▴" : "Select your profile ▾";
+    }
+  }
+
+  function refreshSavedBanner(keepOpen = false) {
     const banner = $("saved-profile-banner");
     if (!banner) return;
     applyBannerTheme();
@@ -2172,16 +2368,22 @@ document.addEventListener("wheel", (event) => {
     set(
       "saved-profile-text",
       multi
-        ? "Which one are you? Pick your profile to auto-fill the form, or start fresh as someone new."
+        ? `We found ${profilesList.length} saved profiles on this device. Select yours to auto-fill the form, or start fresh as someone new.`
         : "Is this you? We found your saved details on this device. Use them to auto-fill the form, or start with a blank one."
     );
     set("start-blank-button", multi ? "I'm someone new" : "Start fresh");
     set("clear-saved-button", multi ? "Delete all saved details" : "Delete saved details");
 
     renderSavedProfileList(profilesList);
-    $("saved-profile-list")?.classList.toggle("hidden", !multi);
+    $("select-profile-button")?.classList.toggle("hidden", !multi);
     $("use-saved-button")?.classList.toggle("hidden", multi);
+    setPickerOpen(multi && keepOpen);
   }
+
+  $("select-profile-button")?.addEventListener("click", () => {
+    const listEl = $("saved-profile-list");
+    setPickerOpen(!!listEl && listEl.classList.contains("hidden"));
+  });
 
   $("use-saved-button")?.addEventListener("click", () => {
     const saved = readSavedProfile();
@@ -2201,6 +2403,7 @@ document.addEventListener("wheel", (event) => {
       if (!chosen) return;
       clearErrors();
       fillForm(chosen);
+      setPickerOpen(false);
       hide($("saved-profile-banner"));
       return;
     }
@@ -2209,7 +2412,7 @@ document.addEventListener("wheel", (event) => {
       const name = del.dataset.savedDelete;
       if (!window.confirm(`Delete the saved details for ${name}?`)) return;
       removeSavedProfile(name);
-      refreshSavedBanner();
+      refreshSavedBanner(true);   // keep the list open after deleting
     }
   });
 
@@ -2218,6 +2421,7 @@ document.addEventListener("wheel", (event) => {
     clearErrors();
     handleGoalChange();
     applyDietFilterToAllergies();
+    setPickerOpen(false);
     hide($("saved-profile-banner"));
   });
 
@@ -2226,6 +2430,7 @@ document.addEventListener("wheel", (event) => {
     const msg = count > 1 ? "Delete ALL saved profiles on this device?" : "Delete your saved details from this device?";
     if (!window.confirm(msg)) return;
     clearSavedProfile();
+    setPickerOpen(false);
     hide($("saved-profile-banner"));
   });
 

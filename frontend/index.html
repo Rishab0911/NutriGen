@@ -23,7 +23,7 @@
   />
 
   <script src="theme.js"></script>
-  <link rel="stylesheet" href="style.css?v=6" />
+  <link rel="stylesheet" href="style.css?v=7" />
   <link rel="stylesheet" href="theme.css" />
   <link rel="stylesheet" href="proactive.css?v=1" />
   <!-- Saved-profile banner styles live here too, so they always apply (even if style.css is cached/outdated) -->
@@ -32,7 +32,8 @@
 .saved-profile-banner{position:relative;overflow:hidden;padding-left:28px !important}
 .saved-profile-banner::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(180deg,#68b589,#e8b84b)}
 .saved-profile-main{flex:1 1 320px;min-width:0}
-.saved-profile-list{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.saved-profile-list{flex:0 0 100%;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(320px,100%),1fr));gap:10px;max-height:300px;overflow-y:auto;padding-right:4px}
+.saved-profile-info small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .saved-profile-row{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:14px}
 .saved-profile-avatar{width:42px;height:42px;flex:0 0 42px;display:grid;place-items:center;border-radius:13px;color:#fff;font:600 18px "Playfair Display",serif}
 .saved-profile-info{flex:1;min-width:0}
@@ -476,14 +477,15 @@
           <div class="saved-profile-main">
             <strong>Welcome back<span id="saved-profile-name"></span>!</strong>
             <p id="saved-profile-text">Is this you? We found your saved details on this device. Use them to auto-fill the form, or start with a blank one.</p>
-            <!-- JS lists every saved profile here when there is more than one -->
-            <div class="saved-profile-list hidden" id="saved-profile-list"></div>
           </div>
           <div class="saved-profile-actions">
+            <button type="button" class="primary-button hidden" id="select-profile-button" aria-expanded="false">Select your profile ▾</button>
             <button type="button" class="primary-button" id="use-saved-button">Use saved details</button>
             <button type="button" class="secondary-button" id="start-blank-button">Start fresh</button>
             <button type="button" class="saved-clear-link" id="clear-saved-button">Delete saved details</button>
           </div>
+          <!-- JS lists every saved profile here (opens when "Select your profile" is pressed) -->
+          <div class="saved-profile-list hidden" id="saved-profile-list"></div>
         </div>
 
         <form id="nutrigen-form" class="form-card" novalidate>
@@ -510,7 +512,7 @@
               />
             </div>
 
-            <div class="field-row">
+            <div class="field-row field-row-height">
               <div class="field">
                 <label for="age">Age</label>
                 <input
@@ -526,8 +528,15 @@
                 <small>Enter your age in years.</small>
               </div>
 
-              <div class="field">
-                <label for="height">Height</label>
+              <div class="field height-field">
+                <div class="height-label-row">
+                  <label for="height" id="height-label">Height</label>
+                  <div class="unit-toggle" role="group" aria-label="Height unit">
+                    <button type="button" class="unit-btn active" data-unit="cm" aria-pressed="true">cm</button>
+                    <button type="button" class="unit-btn" data-unit="ft" aria-pressed="false">ft / in</button>
+                  </div>
+                </div>
+
                 <input
                   type="number"
                   id="height"
@@ -538,7 +547,45 @@
                   placeholder="e.g. 170"
                   required
                 />
-                <small>Height in centimetres.</small>
+
+                <div class="height-ft-row hidden" id="height-ft-row">
+                  <div class="ft-input">
+                    <input type="number" id="height-ft" min="1" max="8" step="1" placeholder="e.g. 5" aria-label="Height in feet" />
+                    <span aria-hidden="true">ft</span>
+                  </div>
+                  <div class="ft-input">
+                    <input type="number" id="height-in" min="0" max="11.9" step="0.1" placeholder="e.g. 7" aria-label="Height in inches" />
+                    <span aria-hidden="true">in</span>
+                  </div>
+                </div>
+
+                <small id="height-hint">Height in centimetres.</small>
+
+                <button type="button" class="height-help-link" id="height-help-toggle" aria-expanded="false" aria-controls="height-help">
+                  Don't know your height?
+                </button>
+
+                <div class="height-help hidden" id="height-help">
+                  <strong>Easy ways to find your height</strong>
+                  <ol>
+                    <li>Stand barefoot with your back and heels against a wall, looking straight ahead.</li>
+                    <li>Lay a book or ruler flat on your head, level against the wall, and mark the spot.</li>
+                    <li>Measure from the floor to the mark with a tape, then enter it above.</li>
+                    <li>No tape? Check an ID, health card or a recent doctor visit. A rough guess is fine: a small error barely changes your calorie target.</li>
+                  </ol>
+                  <span class="height-quick-label">Or tap the closest height:</span>
+                  <div class="height-chips" id="height-chips">
+                    <button type="button" class="height-chip" data-ft="4" data-in="10">4'10"</button>
+                    <button type="button" class="height-chip" data-ft="5" data-in="0">5'0"</button>
+                    <button type="button" class="height-chip" data-ft="5" data-in="2">5'2"</button>
+                    <button type="button" class="height-chip" data-ft="5" data-in="4">5'4"</button>
+                    <button type="button" class="height-chip" data-ft="5" data-in="6">5'6"</button>
+                    <button type="button" class="height-chip" data-ft="5" data-in="8">5'8"</button>
+                    <button type="button" class="height-chip" data-ft="5" data-in="10">5'10"</button>
+                    <button type="button" class="height-chip" data-ft="6" data-in="0">6'0"</button>
+                    <button type="button" class="height-chip" data-ft="6" data-in="2">6'2"</button>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -1102,7 +1149,7 @@
         <button type="button" class="dock-pill active" data-target="profile-summary-section">Profile</button>
         <button type="button" class="dock-pill" data-target="nutrition-dashboard">Macros</button>
         <button type="button" class="dock-pill" data-target="personal-encouragement-card">Note</button>
-        <button type="button" class="dock-pill" data-target="meal-plan-section">Meals</button>
+        <button type="button" class="dock-pill" data-target="meal-plan-day-heading">Meals</button>
         <button type="button" class="dock-pill" data-target="grocery-actions" data-open="grocery-checklist-card">Grocery</button>
         <button type="button" class="dock-pill" data-target="plan-explanation">Method</button>
       </nav>
@@ -1340,7 +1387,7 @@
         
 
         <div class="meal-plan-wrapper">
-          <div class="meal-plan-day-heading">
+          <div class="meal-plan-day-heading" id="meal-plan-day-heading">
             <div>
               <span class="day-label">DAILY FRAMEWORK</span>
               <h3 id="selected-day-title">Today's Fresh Meals</h3>
@@ -1586,7 +1633,7 @@
     </div>
   </div>
 
-  <script src="script.js?v=6"></script>
+  <script src="script.js?v=7"></script>
   <script src="proactive.js?v=1"></script>
 </body>
 </html>
