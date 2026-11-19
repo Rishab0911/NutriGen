@@ -1,8 +1,6 @@
 import json
 import os
 import time
-
-import time
 from datetime import datetime
 
 from jsonschema import Draft202012Validator
@@ -13,6 +11,8 @@ from proactive import UserState, detect_triggers
 TOLERANCE = 10  # percent, the same limit the planner uses
 NUTRIENTS = ["calories", "protein", "carbs", "fat"]
 MEAL_NAMES = ["Breakfast", "Lunch", "Snack", "Dinner"]
+PROFILES_PATH = "data/test_profiles.json"
+RESULTS_PATH = "result/evaluation_results.json"
 
 
 def absolute_error(actual, target):
@@ -58,7 +58,7 @@ def evaluate_plan(result, tolerance=TOLERANCE):
 
 
 def summarize(evaluations):
-    """Combine the scores of many plans (for the 12 Nov test dataset)."""
+    """Combine the scores of many plans (for the test dataset)."""
     count = len(evaluations)
     per_nutrient_mae = {
         n: mae([e["per_nutrient"][n]["absolute_error"] for e in evaluations])
@@ -154,6 +154,7 @@ def time_call(func, *args, **kwargs):
     value = func(*args, **kwargs)
     return value, round(time.perf_counter() - start, 2)
 
+
 def check_compliance(result, profile):
     """Does the plan respect the user's allergies, diet and restrictions?"""
     banned = restricted_words(profile)
@@ -222,8 +223,6 @@ def evaluate_triggers(cases=None):
         "accuracy": round(correct / total, 2) if total else None,
         "wrong": wrong,
     }
-PROFILES_PATH = "data/test_profiles.json"
-RESULTS_PATH = "result/evaluation_results.json"
 
 
 def load_profiles(path=PROFILES_PATH):
@@ -232,31 +231,45 @@ def load_profiles(path=PROFILES_PATH):
 
 
 def run_evaluation(profiles, generate=None, pause_seconds=8):
-    """Run the planner on every profile and score each plan.
-    `generate` defaults to generate_meal_plan (tests pass a fake one)."""
+    """Run the planner on every profile and safely evaluate each plan.
+
+    `generate` defaults to generate_meal_plan (tests pass a fake one).
+    A profile that fails, or returns a plan with the wrong structure,
+    is recorded as a failed row and the run continues.
+    """
     if generate is None:
         from planner import generate_meal_plan as generate
+
     rows = []
-    for item in profiles:
+    for index, item in enumerate(profiles):
         profile = item["profile"]
         row = {"name": item["name"]}
         try:
             output, seconds = time_call(generate, profile)
-        except Exception as error:
-            row.update({"ok": False, "error": str(error)})
-        else:
             result = output["result"]
+
+            # Check the structure before doing any maths on the plan.
+            structure_problems = check_structure(result)
+            if structure_problems:
+                raise ValueError(
+                    "Invalid plan structure: " + "; ".join(structure_problems))
+
             row.update({
                 "ok": True,
                 "seconds": seconds,
                 "passed": output["passed"],
                 "attempt": output["best_attempt"],
                 "score": evaluate_plan(result),
-                "structure_problems": check_structure(result),
+                "structure_problems": structure_problems,
                 "compliance": check_compliance(result, profile),
             })
+        except Exception as error:
+            row.update({"ok": False, "error": str(error)})
         rows.append(row)
-        time.sleep(pause_seconds)
+
+        # Pause only between profiles, not after the last one.
+        if index < len(profiles) - 1 and pause_seconds > 0:
+            time.sleep(pause_seconds)
     return rows
 
 
