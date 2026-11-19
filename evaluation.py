@@ -231,7 +231,7 @@ def load_profiles(path=PROFILES_PATH):
         return json.load(f)
 
 
-def run_evaluation(profiles, generate=None, pause_seconds=1):
+def run_evaluation(profiles, generate=None, pause_seconds=8):
     """Run the planner on every profile and score each plan.
     `generate` defaults to generate_meal_plan (tests pass a fake one)."""
     if generate is None:
