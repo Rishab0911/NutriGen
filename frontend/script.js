@@ -76,7 +76,8 @@ document.addEventListener("wheel", (event) => {
      2. BACKEND CONFIGURATION
      ======================================================= */
 
-  const API_URL = "http://127.0.0.1:8000/generate-meal";
+    const API_ORIGIN = window.location.port === "5500" ? "http://127.0.0.1:8000" : "";
+        const API_URL = `${API_ORIGIN}/generate-meal`;
 
   /* =======================================================
      3. CLEAN FOOD & INGREDIENT NAMES (Removes DB Jargon)

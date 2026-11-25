@@ -3,7 +3,7 @@
 (() => {
   "use strict";
 
-  const API_BASE = "http://127.0.0.1:8000";
+  const API_BASE = window.location.port === "5500" ? "http://127.0.0.1:8000" : "";
   const USER_MAP_KEY = "nutrigenProactiveUserIds";
   const LAST_NOTIFICATION_KEY = "nutrigenLastNotificationId";
   let userId = null;

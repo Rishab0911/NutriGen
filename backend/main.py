@@ -5,12 +5,16 @@ import threading
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
 from pydantic import BaseModel, Field
 
 from backend.models import UserProfile, MealPlanResponse
 from backend.nutrition import calculate_nutrition
 from backend import proactive_store
 from planner import generate_meal_plan
+from pathlib import Path
 
 from proactive import (
     UserState,
@@ -149,11 +153,9 @@ class ProactiveSettingsRequest(BaseModel):
 
 # ---------------- HOME ROUTE ----------------
 
-@app.get("/")
+@app.get("/", include_in_schema=False)
 def home():
-    return {
-        "message": "NutriGen Backend is Running!"
-    }
+    return RedirectResponse(url="/app/")
 
 
 # ---------------- HEALTH CHECK ----------------
@@ -433,3 +435,8 @@ def test_error():
         status_code=404,
         detail="User not found",
     )
+
+# ---------------- SERVE THE WEBSITE ----------------
+
+FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
+app.mount("/app", StaticFiles(directory=FRONTEND_DIR, html=True), name="website")
