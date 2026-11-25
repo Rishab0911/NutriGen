@@ -1,4 +1,4 @@
-# NutriGen
+Live demo: https://nutrigen-2xkl.onrender.com (free tier, may take about a minute to wake up)
 
 NutriGen is a personalized and proactive meal planner. Google Gemini chooses
 the foods, an optimizer sets the portions, and every calorie and macro is
@@ -182,8 +182,7 @@ include waits after Gemini "high demand" (503) errors, so they vary.
 - The compliance check uses the same word lists as the planner, so it confirms
   the pipeline keeps its promise but is not an independent audit.
 - The 14 test profiles were made by hand: this is a test set, not a benchmark.
-- The proactive module is tested on its own but is not yet connected to the website.
-
+- The proactive layer is connected to the website through the `/proactive/...` routes in the backend and `proactive.js` in the frontend.
 ## Team
 
 Neil Gogte Institute of Technology.
