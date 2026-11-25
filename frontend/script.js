@@ -286,7 +286,7 @@ document.addEventListener("wheel", (event) => {
       targetWeightInput.setAttribute("readonly", "true");
       targetWeightInput.classList.add("input-locked");
       if (targetHint) {
-        targetHint.textContent = "🔒 Target locked to current weight (Maintain balance).";
+        targetHint.textContent = "Target locked to current weight (Maintain balance).";
         targetHint.style.color = "var(--g700)";
       }
     } else {
